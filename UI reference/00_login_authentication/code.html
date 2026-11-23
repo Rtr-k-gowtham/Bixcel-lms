@@ -1,0 +1,274 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login &amp; Authentication — Bixcel IMS + LMS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'sidebar': '#0F172A',
+        'on-sidebar': '#FFFFFF',
+        'sidebar-muted': '#94A3B8',
+        'sidebar-surface': '#1E293B',
+        'sidebar-active': '#1D4ED8',
+        'success': '#059669',
+        'on-success': '#1C1C1C',
+        'success-container': '#D1FAE5',
+        'on-success-container': '#065F46',
+        'pending': '#B45309',
+        'on-pending': '#FFFFFF',
+        'pending-container': '#FEF3C7',
+        'on-pending-container': '#92400E',
+        'overdue': '#BE123C',
+        'on-overdue': '#FFFFFF',
+        'overdue-container': '#FFE4E6',
+        'on-overdue-container': '#9F1239',
+        'light-primary': '#0037B0',
+        'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#1D4ED8',
+        'light-on-primary-container': '#FFFFFF',
+        'light-primary-tint': '#EFEFFF',
+        'light-on-primary-tint': '#002682',
+        'light-secondary': '#4D5B94',
+        'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#DCE1FF',
+        'light-on-secondary-container': '#1D2C63',
+        'light-tertiary': '#7F2500',
+        'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#FFDBCF',
+        'light-on-tertiary-container': '#5C1900',
+        'light-error': '#BA1A1A',
+        'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6',
+        'light-on-error-container': '#93000A',
+        'light-background': '#F8FAFC',
+        'light-on-background': '#1A1B23',
+        'light-surface': '#F8FAFC',
+        'light-surface-dim': '#E2E8F0',
+        'light-surface-bright': '#FFFFFF',
+        'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F9',
+        'light-surface-container': '#E2E8F0',
+        'light-surface-container-high': '#CBD5E1',
+        'light-surface-container-highest': '#94A3B8',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#E2E8F0',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#64748B',
+        'light-outline-variant': '#E2E8F0',
+        'light-inverse-surface': '#1E293B',
+        'light-inverse-on-surface': '#F8FAFC',
+        'light-inverse-primary': '#B7C4FF',
+        'light-shadow': '#0F172A',
+        'light-scrim': '#0F172A',
+        'dark-primary': '#B7C4FF',
+        'dark-on-primary': '#002682',
+        'dark-primary-container': '#1D4ED8',
+        'dark-on-primary-container': '#FFFFFF',
+        'dark-primary-tint': '#1D2C63',
+        'dark-on-primary-tint': '#DCE1FF',
+        'dark-secondary': '#B7C4FF',
+        'dark-on-secondary': '#1D2C63',
+        'dark-secondary-container': '#35437B',
+        'dark-on-secondary-container': '#DCE1FF',
+        'dark-tertiary': '#FFB59C',
+        'dark-on-tertiary': '#5C1900',
+        'dark-tertiary-container': '#832700',
+        'dark-on-tertiary-container': '#FFDBCF',
+        'dark-error': '#FFB4AB',
+        'dark-on-error': '#690005',
+        'dark-error-container': '#93000A',
+        'dark-on-error-container': '#FFDAD6',
+        'dark-background': '#0B0F19',
+        'dark-on-background': '#F1F5F9',
+        'dark-surface': '#0B0F19',
+        'dark-surface-dim': '#0B0F19',
+        'dark-surface-bright': '#1E293B',
+        'dark-surface-container-lowest': '#0F172A',
+        'dark-surface-container-low': '#1E293B',
+        'dark-surface-container': '#334155',
+        'dark-surface-container-high': '#475569',
+        'dark-surface-container-highest': '#64748B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#94A3B8',
+        'dark-outline-variant': '#334155',
+        'dark-inverse-surface': '#F1F5F9',
+        'dark-inverse-on-surface': '#0F172A',
+        'dark-inverse-primary': '#1D4ED8',
+        'dark-shadow': '#000000',
+        'dark-scrim': '#000000',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '32px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.25px', fontWeight: '600' }],
+        'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.15px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.1px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '600' }],
+        'mono-sm': ['12px', { lineHeight: '16px', letterSpacing: '0px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '200ms',
+        'surface-exit': '150ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+        'surface-exit': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+        'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>.material-symbols-outlined { display: inline-block; width: 1em; height: 1em; line-height: 1 !important; box-sizing: content-box; overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle; }</style>
+</head>
+<body class="bg-light-surface text-light-on-surface font-body antialiased">
+  <main class="min-h-[1024px] grid grid-cols-1 lg:grid-cols-12" data-stitch-vh="min-h-[1024px]===min-h-screen">
+    <!-- Left Section: Bixcel Brand Identity -->
+    <section class="lg:col-span-6 bg-sidebar text-on-sidebar p-8 sm:p-12 lg:p-16 flex flex-col justify-between gap-10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded bg-sidebar-active flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-on-sidebar text-[22px]">school</span>
+        </div>
+        <div>
+          <span data-design-text-token="title-lg" class="font-title text-title-lg text-on-sidebar block">Bixcel</span>
+        </div>
+      </div>
+
+      <div class="max-w-md w-full my-auto mx-auto">
+        <div class="rounded-md overflow-hidden border border-sidebar-surface bg-sidebar-surface">
+          <img src="https://lh3.googleusercontent.com/aida/ALJJyrCfJWcI_scPMRyNqo2ZwHuoS9ywzoNPksO_uLPji4cE8a49P5YtR8wA21EdIkgs8VnKOl1o460zIGiR0bgc9KBsa6Kr0c8D4lO3XOWDd-9l1Tcsch_vhJyysmfpEQPeXofXqcE_KGzfBcA770tISLE-5UJaOANtfk_6qMKO3JSY7sWYQScNH_1Y_hwpDQCk40H2MR1abRNq5_5YF-58Yw91lToGFsZXPlsT4Wqv8ZImV9-oBsMxuzFfnJGcGHoyCiPS" alt="Bixcel academic network illustration" class="w-full h-64 object-cover">
+        </div>
+      </div>
+
+      <div aria-hidden="true"></div>
+    </section>
+
+    <!-- Right Section: Login Form Card -->
+    <section class="lg:col-span-6 relative overflow-hidden bg-light-surface p-6 sm:p-12 flex items-center justify-center" style="background-image: radial-gradient(#CBD5E1 1px, transparent 1px); background-size: 24px 24px;">
+      <!-- Subtle architectural corner accents -->
+      <div aria-hidden="true" class="pointer-events-none absolute -top-24 -right-24 w-80 h-80 rounded-full border border-light-outline-variant bg-light-primary-tint/50"></div>
+      <div aria-hidden="true" class="pointer-events-none absolute -bottom-28 -left-24 w-72 h-72 rounded-full border border-light-outline-variant bg-light-surface-container-low/70"></div>
+
+      <div class="relative z-10 w-full max-w-md bg-light-surface-container-lowest border border-light-outline-variant rounded-lg shadow-md overflow-hidden">
+        <div class="p-8 sm:p-10 flex flex-col gap-6">
+          <header class="flex items-center justify-between gap-4">
+            <h2 data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface">Welcome Back</h2>
+            <span class="w-9 h-9 rounded-full bg-light-primary-tint text-light-primary inline-flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">lock</span>
+            </span>
+          </header>
+
+        <form id="loginForm" class="flex flex-col gap-5" onsubmit="handleLogin(event)">
+          <!-- COMPONENT: input-field-icon -->
+          <label data-component-id="input-field-icon" data-component-type="input-field" data-component-variant="with-icon" class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Email or Username</span>
+            <div class="relative flex items-center">
+              <span aria-hidden="true" class="material-symbols-outlined text-light-outline text-[18px] absolute left-3.5 pointer-events-none">mail</span>
+              <input id="emailInput" type="text" required value="elena.rostova@bixcel.edu" placeholder="name@bixcel.edu" class="w-full pl-10 pr-3.5 py-2.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-md placeholder:text-light-outline focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none transition-colors duration-state-change">
+            </div>
+          </label>
+
+          <!-- Password input with show/hide icon -->
+          <label data-component-id="input-field-password" data-component-type="input-field" data-component-variant="password" class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Password</span>
+            <div class="relative flex items-center">
+              <span aria-hidden="true" class="material-symbols-outlined text-light-outline text-[18px] absolute left-3.5 pointer-events-none">lock</span>
+              <input id="passwordInput" type="password" required value="••••••••••••" autocomplete="current-password" placeholder="Enter your password" class="w-full pl-10 pr-10 py-2.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-md placeholder:text-light-outline focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none transition-colors duration-state-change">
+              <button type="button" onclick="togglePassword()" aria-label="Toggle password visibility" class="absolute right-2.5 p-1 rounded text-light-outline hover:text-light-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-light-primary">
+                <span id="passwordToggleIcon" class="material-symbols-outlined text-[18px]">visibility</span>
+              </button>
+            </div>
+          </label>
+
+          <div class="flex items-center justify-between gap-4">
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 rounded-sm border-light-outline-variant text-light-primary focus:ring-light-primary">
+              <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Remember me</span>
+            </label>
+            <a href="../forgot-password/ForgotPassword.html" data-design-text-token="label-md" class="font-label text-label-md text-light-primary hover:underline">Forgot password?</a>
+          </div>
+
+          <!-- COMPONENT: button-primary -->
+          <button data-component-id="button-primary" data-component-type="button" data-component-variant="primary" type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-light-primary text-light-on-primary shadow-sm hover:bg-light-primary-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-light-primary focus-visible:ring-offset-2 transition-colors duration-state-change ease-state-change">
+            <span data-design-text-token="label-lg" class="font-label text-label-lg">Sign In</span>
+          </button>
+        </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('passwordInput');
+      const icon = document.getElementById('passwordToggleIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('emailInput').value.toLowerCase();
+      if (email.includes('marcus')) {
+        window.location.href = '../tutor-dashboard/TutorDashboard.html';
+      } else if (email.includes('aarav')) {
+        window.location.href = '../student-dashboard/StudentDashboard.html';
+      } else {
+        window.location.href = '../executive-dashboard/ExecutiveDashboard.html';
+      }
+    }
+  </script>
+
+
+</body></html>

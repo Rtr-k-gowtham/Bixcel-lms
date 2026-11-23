@@ -1,0 +1,686 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Lessons for Course — BIXCEL Institute of Technology</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'sidebar': '#0F172A',
+        'on-sidebar': '#FFFFFF',
+        'sidebar-muted': '#94A3B8',
+        'sidebar-surface': '#1E293B',
+        'sidebar-active': '#1D4ED8',
+        'success': '#059669',
+        'on-success': '#1C1C1C',
+        'success-container': '#D1FAE5',
+        'on-success-container': '#065F46',
+        'pending': '#B45309',
+        'on-pending': '#FFFFFF',
+        'pending-container': '#FEF3C7',
+        'on-pending-container': '#92400E',
+        'overdue': '#BE123C',
+        'on-overdue': '#FFFFFF',
+        'overdue-container': '#FFE4E6',
+        'on-overdue-container': '#9F1239',
+        'light-primary': '#0037B0',
+        'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#1D4ED8',
+        'light-on-primary-container': '#FFFFFF',
+        'light-primary-tint': '#EFEFFF',
+        'light-on-primary-tint': '#002682',
+        'light-secondary': '#4D5B94',
+        'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#DCE1FF',
+        'light-on-secondary-container': '#1D2C63',
+        'light-tertiary': '#7F2500',
+        'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#FFDBCF',
+        'light-on-tertiary-container': '#5C1900',
+        'light-error': '#BA1A1A',
+        'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6',
+        'light-on-error-container': '#93000A',
+        'light-background': '#F8FAFC',
+        'light-on-background': '#1A1B23',
+        'light-surface': '#F8FAFC',
+        'light-surface-dim': '#E2E8F0',
+        'light-surface-bright': '#FFFFFF',
+        'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F9',
+        'light-surface-container': '#E2E8F0',
+        'light-surface-container-high': '#CBD5E1',
+        'light-surface-container-highest': '#94A3B8',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#E2E8F0',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#64748B',
+        'light-outline-variant': '#E2E8F0',
+        'light-inverse-surface': '#1E293B',
+        'light-inverse-on-surface': '#F8FAFC',
+        'light-inverse-primary': '#B7C4FF',
+        'light-shadow': '#0F172A',
+        'light-scrim': '#0F172A',
+        'dark-primary': '#B7C4FF',
+        'dark-on-primary': '#002682',
+        'dark-primary-container': '#1D4ED8',
+        'dark-on-primary-container': '#FFFFFF',
+        'dark-primary-tint': '#1D2C63',
+        'dark-on-primary-tint': '#DCE1FF',
+        'dark-secondary': '#B7C4FF',
+        'dark-on-secondary': '#1D2C63',
+        'dark-secondary-container': '#35437B',
+        'dark-on-secondary-container': '#DCE1FF',
+        'dark-tertiary': '#FFB59C',
+        'dark-on-tertiary': '#5C1900',
+        'dark-tertiary-container': '#832700',
+        'dark-on-tertiary-container': '#FFDBCF',
+        'dark-error': '#FFB4AB',
+        'dark-on-error': '#690005',
+        'dark-error-container': '#93000A',
+        'dark-on-error-container': '#FFDAD6',
+        'dark-background': '#0B0F19',
+        'dark-on-background': '#F1F5F9',
+        'dark-surface': '#0B0F19',
+        'dark-surface-dim': '#0B0F19',
+        'dark-surface-bright': '#1E293B',
+        'dark-surface-container-lowest': '#0F172A',
+        'dark-surface-container-low': '#1E293B',
+        'dark-surface-container': '#334155',
+        'dark-surface-container-high': '#475569',
+        'dark-surface-container-highest': '#64748B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#94A3B8',
+        'dark-outline-variant': '#334155',
+        'dark-inverse-surface': '#F1F5F9',
+        'dark-inverse-on-surface': '#0F172A',
+        'dark-inverse-primary': '#1D4ED8',
+        'dark-shadow': '#000000',
+        'dark-scrim': '#000000',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '32px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.25px', fontWeight: '600' }],
+        'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.15px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.1px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '600' }],
+        'mono-sm': ['12px', { lineHeight: '16px', letterSpacing: '0px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '200ms',
+        'surface-exit': '150ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+        'surface-exit': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+        'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>.material-symbols-outlined { display: inline-block; width: 1em; height: 1em; line-height: 1 !important; box-sizing: content-box; overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle; }</style>
+</head>
+<body class="bg-light-surface text-light-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex bg-light-surface" data-stitch-vh="min-h-[1024px]===min-h-screen">
+    <!-- Fixed Left Deep Navy Sidebar -->
+    <aside id="appSidebar" class="hidden lg:flex lg:w-[260px] lg:shrink-0 bg-sidebar text-on-sidebar flex-col border-r border-sidebar-surface min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="h-16 px-5 flex items-center gap-3 border-b border-sidebar-surface shrink-0">
+        <div class="w-8 h-8 rounded bg-sidebar-active flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-sidebar text-[18px]">school</span>
+        </div>
+        <div class="flex flex-col">
+          <span data-design-text-token="title-md" class="font-title text-title-md text-on-sidebar leading-tight">BIXCEL</span>
+          <span data-design-text-token="label-sm" class="font-label text-label-sm text-sidebar-muted">IMS + LMS</span>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto" aria-label="Main Navigation">
+        <a href="../executive-dashboard/ExecutiveDashboard.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">dashboard</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Dashboard</span>
+        </a>
+        <a href="../course-builder/CourseBuilder.html" class="flex items-center gap-3 px-3 py-2 rounded bg-sidebar-active text-on-sidebar">
+          <span class="material-symbols-outlined text-[18px]">menu_book</span>
+          <span data-design-text-token="label-lg" class="font-label text-label-lg">Course Management</span>
+        </a>
+        <a href="../module-library/ModuleLibrary.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">library_books</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Module Library</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">workspaces</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Batch Management</span>
+        </a>
+        <a href="../student-onboarding/StudentOnboarding.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">groups</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Student Management</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">co_present</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Tutor Management</span>
+        </a>
+        <a href="../payment-collection/PaymentCollection.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">payments</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Payment Collection</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">analytics</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Reports</span>
+        </a>
+        <a href="../user-master/UserMaster.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Workspace Column -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Top Navigation Bar -->
+      <header class="h-16 bg-light-surface-container-lowest border-b border-light-outline-variant px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
+        <div class="flex items-center gap-4 min-w-0">
+          <button type="button" onclick="toggleMobileSidebar()" aria-label="Toggle menu" class="lg:hidden p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low">
+            <span class="material-symbols-outlined text-[20px]">menu</span>
+          </button>
+          <nav aria-label="Breadcrumb" class="hidden sm:flex items-center gap-2 text-light-on-surface-variant whitespace-nowrap min-w-0">
+            <a href="../executive-dashboard/ExecutiveDashboard.html" data-design-text-token="body-sm" class="font-body text-body-sm hover:text-light-on-surface shrink-0">Dashboard</a>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <a href="../course-builder/CourseBuilder.html" data-design-text-token="body-sm" class="font-body text-body-sm hover:text-light-on-surface shrink-0">Courses</a>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <a href="../create-course/CreateCourse.html" data-design-text-token="body-sm" class="font-body text-body-sm hover:text-light-on-surface shrink-0">Create Course</a>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface truncate">Select Lessons</span>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button type="button" aria-label="4 unread notifications" class="relative p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors shrink-0">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" aria-hidden="true" class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-overdue text-on-overdue tabular-nums">
+              <span data-design-text-token="label-sm" class="font-label text-label-sm">4</span>
+            </span>
+          </button>
+
+          <div class="relative shrink-0">
+            <button type="button" onclick="toggleProfileMenu()" class="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded hover:bg-light-surface-container-low transition-colors whitespace-nowrap">
+              <img src="https://lh3.googleusercontent.com/aida/ALJJyrBd27Pcp-38xV9L7VVALoFkMPFl6P9jkluTbF9AAc-VR9946-u8sITfideqg0hpCVkohixawS6upYk7MErsueQRuq5jqp1kQASv578H2UOWfLASJF8ONheCm4OfreEei9ATFbWUWE9XqEi52cQsH_OmlFXp6A8C_7KT4I-ks8kvl8Yj22f8gpgkcr5pu3YJXIGB90_bu1pEx7kr551LYJvFR9JbrH0YXh7OINEX0VbaWD5Az3PUhQ" alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+              <span data-design-text-token="label-md" class="hidden sm:inline font-label text-label-md text-light-on-surface whitespace-nowrap">Elena Rostova (Super Admin)</span>
+              <span class="material-symbols-outlined text-light-outline text-[18px]">expand_more</span>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-lg py-1.5 z-30">
+              <a href="../executive-dashboard/ExecutiveDashboard.html" class="block px-4 py-2 font-body text-body-sm text-light-on-surface hover:bg-light-surface-container-low">Executive Dashboard</a>
+              <a href="../login-authentication/LoginAuthentication.html" class="block px-4 py-2 font-body text-body-sm text-overdue hover:bg-overdue-container">Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Workspace Content -->
+      <main class="flex-1 p-5 lg:p-6 flex flex-col gap-5 max-w-[1360px] w-full mx-auto">
+        <!-- Page Header & Step Progress -->
+        <section class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <h1 data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface">Select Lessons</h1>
+            <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant text-pretty">Choose multiple lessons from the library to build your course curriculum.</p>
+          </div>
+
+          <!-- 4-Step Progress Indicator -->
+          <div class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Course Creation Steps">
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded bg-success-container/60">
+              <span class="w-6 h-6 rounded-full bg-success text-light-on-primary flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[14px]">check</span>
+              </span>
+              <div class="flex flex-col">
+                <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-success-container">Step 1 · Completed</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md text-on-success-container">Course Details</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded bg-light-primary-tint border border-light-primary/30">
+              <span class="w-6 h-6 rounded-full bg-light-primary text-light-on-primary flex items-center justify-center shrink-0 font-label text-label-sm">2</span>
+              <div class="flex flex-col">
+                <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-primary">Step 2 · Active</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-primary-tint">Select Lessons</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded bg-light-surface-container-low">
+              <span class="w-6 h-6 rounded-full bg-light-surface-container text-light-on-surface-variant flex items-center justify-center shrink-0 font-label text-label-sm">3</span>
+              <div class="flex flex-col">
+                <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Step 3 · Upcoming</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Organize Curriculum</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 px-3 py-2 rounded bg-light-surface-container-low">
+              <span class="w-6 h-6 rounded-full bg-light-surface-container text-light-on-surface-variant flex items-center justify-center shrink-0 font-label text-label-sm">4</span>
+              <div class="flex flex-col">
+                <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Step 4 · Upcoming</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Review &amp; Publish</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Course Information Summary Card -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm px-5 py-3.5 grid grid-cols-2 lg:grid-cols-5 gap-4 items-center">
+          <div class="flex flex-col gap-0.5 col-span-2">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Course Name</span>
+            <span data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface">Graphic Design Master Course</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Course Category</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-primary">Design</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Course Duration</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface tabular-nums">52 Days</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Selected Lessons</span>
+            <span id="summarySelectedCount" data-design-text-token="title-md" class="font-title text-title-md text-light-primary tabular-nums">6</span>
+          </div>
+        </section>
+
+        <!-- Main Split Workspace: Lesson Library (Left 9 cols) + Selected Lessons Sticky Panel (Right 3 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <!-- Left: Lesson Library Section -->
+          <div class="lg:col-span-9 flex flex-col gap-4">
+            <!-- Top Toolbar -->
+            <div class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col gap-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="relative flex items-center flex-1">
+                  <span class="material-symbols-outlined text-light-outline text-[18px] absolute left-3 pointer-events-none">search</span>
+                  <input id="lessonSearchInput" type="search" oninput="filterLessons()" placeholder="Search lessons by title or ID..." class="w-full pl-9 pr-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-sm placeholder:text-light-outline focus:bg-light-surface-container-lowest focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  <button type="button" onclick="selectAllLessons()" class="px-3 py-2 rounded border border-light-primary/30 bg-light-primary-tint text-light-on-primary-tint hover:bg-light-primary-tint/80 font-label text-label-md transition-colors whitespace-nowrap">Select All</button>
+                  <button type="button" onclick="clearLessonSelection()" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface-variant hover:bg-light-surface-container-low font-label text-label-md transition-colors whitespace-nowrap">Clear Selection</button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <select id="catFilter" onchange="filterLessons()" aria-label="Category filter" class="pl-2.5 pr-7 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+                  <option value="all">Category: All</option>
+                  <option value="Design">Design</option>
+                </select>
+                <select id="modFilter" onchange="filterLessons()" aria-label="Module filter" class="pl-2.5 pr-7 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+                  <option value="all">Module: All</option>
+                  <option value="Design Fundamentals">Design Fundamentals</option>
+                  <option value="Photoshop Fundamentals">Photoshop Fundamentals</option>
+                </select>
+                <select id="diffFilter" onchange="filterLessons()" aria-label="Difficulty filter" class="pl-2.5 pr-7 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+                  <option value="all">Difficulty: All</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                </select>
+                <select id="durFilter" onchange="filterLessons()" aria-label="Duration filter" class="pl-2.5 pr-7 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+                  <option value="all">Duration: All</option>
+                  <option value="short">Up to 45m</option>
+                  <option value="long">60m+</option>
+                </select>
+                <select id="sortFilter" onchange="sortLessons()" aria-label="Sort lessons" class="pl-2.5 pr-7 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+                  <option value="latest">Sort: Latest</option>
+                  <option value="oldest">Sort: Oldest</option>
+                  <option value="az">Sort: A–Z</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Lesson Selection List -->
+            <div class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm overflow-hidden">
+              <div class="hidden md:grid md:grid-cols-[1fr_96px_104px_56px_80px] gap-3 px-4 py-2.5 bg-light-surface-container-low border-b border-light-outline-variant text-light-on-surface-variant font-label text-label-sm items-center">
+                <div>Lesson</div>
+                <div>Type</div>
+                <div>Level</div>
+                <div class="text-right">Time</div>
+                <div class="text-right">Action</div>
+              </div>
+              <div id="lessonCardsGrid" class="divide-y divide-light-outline-variant">
+                <!-- Rows rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Empty Search State -->
+            <div id="emptyLessonsState" class="hidden bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-8 text-center flex-col items-center gap-2">
+              <span class="material-symbols-outlined text-light-outline text-[32px]">search_off</span>
+              <p data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface">No lessons match your filters</p>
+              <p data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Clear your search query or reset filters to browse all lessons.</p>
+            </div>
+          </div>
+
+          <!-- Right: Sticky Selected Lessons Panel -->
+          <aside class="lg:col-span-3 lg:sticky lg:top-20 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm flex flex-col">
+            <header class="px-4 py-3 border-b border-light-outline-variant flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-light-primary text-[18px]">playlist_add_check</span>
+                <h2 data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface">Selected Lessons</h2>
+              </div>
+              <span id="panelCountBadge" class="px-2 py-0.5 rounded-full bg-light-primary-tint text-light-on-primary-tint font-label text-label-sm tabular-nums">6</span>
+            </header>
+
+            <div id="selectedPanelList" class="p-2.5 flex flex-col gap-2 max-h-[420px] overflow-y-auto">
+              <!-- Populated dynamically -->
+            </div>
+
+            <footer class="p-3.5 border-t border-light-outline-variant bg-light-surface-container-low/60 flex flex-col gap-1.5 rounded-b-md">
+              <div class="flex items-center justify-between">
+                <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Total Lessons</span>
+                <span id="panelTotalLessons" data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface tabular-nums">6</span>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Est. Duration</span>
+                <span id="panelTotalDuration" data-design-text-token="label-md" class="font-label text-label-md text-light-primary tabular-nums">5h 45m</span>
+              </div>
+            </footer>
+          </aside>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md px-6 py-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <a href="../create-course/CreateCourse.html" class="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface hover:bg-light-surface-container-low font-label text-label-lg transition-colors whitespace-nowrap">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span>Back to Course Details</span>
+          </a>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="button" onclick="window.location.href=&#39;../course-builder/CourseBuilder.html&#39;" class="px-4 py-2.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface hover:bg-light-surface-container-low font-label text-label-lg transition-colors whitespace-nowrap">
+              Save as Draft
+            </button>
+            <button id="addSelectedBtn" type="button" onclick="window.location.href=&#39;../course-builder/CourseBuilder.html&#39;" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center gap-2 px-5 py-2.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm font-label text-label-lg transition-colors whitespace-nowrap">
+              <span>Add Selected Lessons (6)</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Lesson Preview Modal -->
+  <div id="lessonPreviewModal" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle" class="hidden fixed inset-0 z-50 bg-light-scrim/50 flex items-center justify-center p-4">
+    <div class="bg-light-surface-container-lowest border border-light-outline-variant rounded-lg shadow-xl w-full max-w-[540px] flex flex-col">
+      <header class="px-6 py-4 border-b border-light-outline-variant flex items-center justify-between gap-4">
+        <div class="flex flex-col gap-0.5">
+          <span id="previewModalMeta" data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">LSN-101 · Design Fundamentals</span>
+          <h2 id="previewModalTitle" data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">Lesson Preview</h2>
+        </div>
+        <button type="button" onclick="closePreviewModal()" aria-label="Close preview" class="p-1.5 rounded text-light-on-surface-variant hover:bg-light-surface-container-low">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </header>
+      <div class="p-6 flex flex-col gap-4">
+        <div class="p-4 rounded bg-light-surface-container-low border border-light-outline-variant flex items-center justify-between">
+          <span id="previewModalType" class="font-label text-label-md text-light-primary">Video Lesson</span>
+          <span id="previewModalDuration" class="font-label text-label-md text-light-on-surface tabular-nums">45 Minutes</span>
+        </div>
+        <p id="previewModalDesc" data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant"></p>
+      </div>
+      <footer class="px-6 py-4 border-t border-light-outline-variant flex items-center justify-end gap-3">
+        <button type="button" onclick="closePreviewModal()" class="px-4 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-label text-label-lg hover:bg-light-surface-container-low">Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const lessonsData = [
+      { id: 'LSN-101', title: 'Introduction to Graphic Design', module: 'Design Fundamentals', category: 'Design', day: '01', mins: 45, durationLabel: '45m', type: 'Video', difficulty: 'Beginner', desc: 'Core principles of visual communication, design history, and studio workflows.' },
+      { id: 'LSN-102', title: 'Principles of Visual Design', module: 'Design Fundamentals', category: 'Design', day: '02', mins: 60, durationLabel: '60m', type: 'PDF', difficulty: 'Beginner', desc: 'Balance, contrast, alignment, hierarchy, and whitespace in editorial layouts.' },
+      { id: 'LSN-103', title: 'Color Theory Basics', module: 'Design Fundamentals', category: 'Design', day: '03', mins: 40, durationLabel: '40m', type: 'Video', difficulty: 'Beginner', desc: 'Color harmonies, RGB vs CMYK models, contrast ratios, and brand palettes.' },
+      { id: 'LSN-104', title: 'Typography Fundamentals', module: 'Design Fundamentals', category: 'Design', day: '04', mins: 50, durationLabel: '50m', type: 'Text', difficulty: 'Intermediate', desc: 'Typeface anatomy, pairing rules, modular scales, and grid legibility.' },
+      { id: 'LSN-201', title: 'Introduction to Adobe Photoshop', module: 'Photoshop Fundamentals', category: 'Design', day: '01', mins: 90, durationLabel: '90m', type: 'Video', difficulty: 'Beginner', desc: 'Raster editing basics, non-destructive layers, masks, and smart objects.' },
+      { id: 'LSN-202', title: 'Photoshop Tools and Workspace', module: 'Photoshop Fundamentals', category: 'Design', day: '02', mins: 60, durationLabel: '60m', type: 'PDF', difficulty: 'Intermediate', desc: 'Customizing studio panels, selection tools, pen paths, and export presets.' }
+    ];
+
+    let selectedOrder = lessonsData.map((l) => l.id);
+    let dragSrcId = null;
+
+    function typeIcon(type) {
+      if (type === 'Video') return 'play_circle';
+      if (type === 'PDF') return 'picture_as_pdf';
+      return 'article';
+    }
+
+    function renderLessons() {
+      const q = document.getElementById('lessonSearchInput').value.trim().toLowerCase();
+      const cat = document.getElementById('catFilter').value;
+      const mod = document.getElementById('modFilter').value;
+      const diff = document.getElementById('diffFilter').value;
+      const dur = document.getElementById('durFilter').value;
+      const sort = document.getElementById('sortFilter').value;
+
+      let filtered = lessonsData.filter((l) => {
+        const matchQ = !q || l.title.toLowerCase().includes(q) || l.id.toLowerCase().includes(q);
+        const matchCat = cat === 'all' || l.category === cat;
+        const matchMod = mod === 'all' || l.module === mod;
+        const matchDiff = diff === 'all' || l.difficulty === diff;
+        const matchDur = dur === 'all' || (dur === 'short' ? l.mins <= 45 : l.mins >= 60);
+        return matchQ && matchCat && matchMod && matchDiff && matchDur;
+      });
+
+      if (sort === 'az') {
+        filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+      } else if (sort === 'oldest') {
+        filtered = [...filtered].reverse();
+      }
+
+      const grid = document.getElementById('lessonCardsGrid');
+      const empty = document.getElementById('emptyLessonsState');
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        empty.classList.remove('hidden');
+        empty.classList.add('flex');
+      } else {
+        empty.classList.add('hidden');
+        empty.classList.remove('flex');
+      }
+
+      filtered.forEach((l) => {
+        const isSelected = selectedOrder.includes(l.id);
+        const row = document.createElement('div');
+        row.onclick = () => toggleLesson(l.id);
+        row.className = 'cursor-pointer px-4 py-3.5 grid grid-cols-1 md:grid-cols-[1fr_96px_104px_56px_80px] gap-3 items-center transition-colors border-l-[3px] ' + (isSelected ? 'bg-light-primary-tint/30 border-l-light-primary' : 'bg-light-surface-container-lowest border-l-transparent hover:bg-light-surface-container-low/60');
+
+        row.innerHTML = `
+          <div class="flex items-start gap-3 min-w-0">
+            <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleLesson('${l.id}')" aria-label="Select ${l.title}" class="mt-0.5 w-4 h-4 rounded border-light-outline text-light-primary focus:ring-light-primary-tint shrink-0">
+            <div class="flex flex-col gap-0.5 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant shrink-0">${l.id}</span>
+                <p data-design-text-token="body-md" class="font-body font-semibold text-body-md text-light-on-surface">${l.title}</p>
+              </div>
+              <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-primary">${l.module} · Day ${l.day}</span>
+              <p data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant line-clamp-1">${l.desc}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-light-surface-container-low border border-light-outline-variant text-light-primary font-label text-label-sm whitespace-nowrap">
+              <span class="material-symbols-outlined text-[14px]">${typeIcon(l.type)}</span>
+              <span>${l.type}</span>
+            </span>
+          </div>
+
+          <div class="flex items-center">
+            <span data-design-text-token="label-sm" class="px-2.5 py-1 rounded bg-light-surface-container-low text-light-on-surface-variant font-label text-label-sm whitespace-nowrap">${l.difficulty}</span>
+          </div>
+
+          <div class="md:text-right">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface tabular-nums whitespace-nowrap">${l.durationLabel}</span>
+          </div>
+
+          <div class="flex md:justify-end">
+            <button type="button" onclick="event.stopPropagation(); openPreviewModal('${l.id}')" class="px-2.5 py-1 rounded border border-light-outline-variant bg-light-surface-container-lowest hover:bg-light-surface-container-low font-label text-label-sm text-light-on-surface whitespace-nowrap">Preview</button>
+          </div>
+        `;
+        grid.appendChild(row);
+      });
+
+      renderSelectedPanel();
+    }
+
+    function renderSelectedPanel() {
+      const list = document.getElementById('selectedPanelList');
+      list.innerHTML = '';
+      let totalMins = 0;
+
+      if (selectedOrder.length === 0) {
+        list.innerHTML = '<p class="p-4 text-center font-body text-body-sm text-light-on-surface-variant">No lessons selected yet. Click any lesson card to add it.</p>';
+      } else {
+        selectedOrder.forEach((id) => {
+          const l = lessonsData.find((item) => item.id === id);
+          if (!l) return;
+          totalMins += l.mins;
+
+          const item = document.createElement('div');
+          item.draggable = true;
+          item.className = 'p-2 rounded bg-light-surface-container-low border border-light-outline-variant flex items-center justify-between gap-2 cursor-move';
+          item.ondragstart = () => { dragSrcId = id; };
+          item.ondragover = (e) => { e.preventDefault(); };
+          item.ondrop = (e) => {
+            e.preventDefault();
+            if (!dragSrcId || dragSrcId === id) return;
+            const fromIdx = selectedOrder.indexOf(dragSrcId);
+            const toIdx = selectedOrder.indexOf(id);
+            selectedOrder.splice(fromIdx, 1);
+            selectedOrder.splice(toIdx, 0, dragSrcId);
+            renderSelectedPanel();
+          };
+
+          item.innerHTML = `
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="material-symbols-outlined text-light-outline text-[16px] shrink-0">drag_indicator</span>
+              <div class="flex flex-col min-w-0">
+                <span class="font-label text-label-md text-light-on-surface truncate">${l.title}</span>
+                <span class="font-body text-body-sm text-light-on-surface-variant truncate">${l.module} · Day ${l.day}</span>
+              </div>
+            </div>
+            <button type="button" onclick="toggleLesson('${l.id}')" aria-label="Remove ${l.title}" class="p-1 rounded text-light-outline hover:text-overdue hover:bg-overdue-container shrink-0">
+              <span class="material-symbols-outlined text-[16px]">close</span>
+            </button>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      const hrs = Math.floor(totalMins / 60);
+      const rem = totalMins % 60;
+      const durText = hrs + 'h ' + rem + 'm';
+
+      document.getElementById('summarySelectedCount').textContent = selectedOrder.length;
+      document.getElementById('panelCountBadge').textContent = selectedOrder.length;
+      document.getElementById('panelTotalLessons').textContent = selectedOrder.length;
+      document.getElementById('panelTotalDuration').textContent = durText;
+      document.getElementById('addSelectedBtn').querySelector('span').textContent = 'Add Selected Lessons (' + selectedOrder.length + ')';
+    }
+
+    function toggleLesson(id) {
+      if (selectedOrder.includes(id)) {
+        selectedOrder = selectedOrder.filter((item) => item !== id);
+      } else {
+        selectedOrder.push(id);
+      }
+      renderLessons();
+    }
+
+    function selectAllLessons() {
+      selectedOrder = lessonsData.map((l) => l.id);
+      renderLessons();
+    }
+
+    function clearLessonSelection() {
+      selectedOrder = [];
+      renderLessons();
+    }
+
+    function filterLessons() {
+      renderLessons();
+    }
+
+    function sortLessons() {
+      renderLessons();
+    }
+
+    function openPreviewModal(id) {
+      const l = lessonsData.find((item) => item.id === id);
+      if (!l) return;
+      document.getElementById('previewModalMeta').textContent = l.id + ' · ' + l.module + ' · Day ' + l.day;
+      document.getElementById('previewModalTitle').textContent = l.title;
+      document.getElementById('previewModalType').textContent = l.type + ' Lesson · ' + l.difficulty;
+      document.getElementById('previewModalDuration').textContent = l.durationLabel;
+      document.getElementById('previewModalDesc').textContent = l.desc;
+      document.getElementById('lessonPreviewModal').classList.remove('hidden');
+    }
+
+    function closePreviewModal() {
+      document.getElementById('lessonPreviewModal').classList.add('hidden');
+    }
+
+    function toggleProfileMenu() {
+      document.getElementById('profileMenu').classList.toggle('hidden');
+    }
+
+    function toggleMobileSidebar() {
+      const aside = document.getElementById('appSidebar');
+      aside.classList.toggle('hidden');
+      aside.classList.toggle('fixed');
+      aside.classList.toggle('inset-y-0');
+      aside.classList.toggle('left-0');
+      aside.classList.toggle('z-40');
+      aside.classList.toggle('w-[260px]');
+      aside.classList.toggle('flex');
+    }
+
+    renderLessons();
+  </script>
+
+</body></html>

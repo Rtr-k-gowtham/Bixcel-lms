@@ -1,0 +1,654 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Master (users) — Bixcel IMS + LMS</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'sidebar': '#0F172A',
+        'on-sidebar': '#FFFFFF',
+        'sidebar-muted': '#94A3B8',
+        'sidebar-surface': '#1E293B',
+        'sidebar-active': '#1D4ED8',
+        'success': '#059669',
+        'on-success': '#1C1C1C',
+        'success-container': '#D1FAE5',
+        'on-success-container': '#065F46',
+        'pending': '#B45309',
+        'on-pending': '#FFFFFF',
+        'pending-container': '#FEF3C7',
+        'on-pending-container': '#92400E',
+        'overdue': '#BE123C',
+        'on-overdue': '#FFFFFF',
+        'overdue-container': '#FFE4E6',
+        'on-overdue-container': '#9F1239',
+        'light-primary': '#0037B0',
+        'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#1D4ED8',
+        'light-on-primary-container': '#FFFFFF',
+        'light-primary-tint': '#EFEFFF',
+        'light-on-primary-tint': '#002682',
+        'light-secondary': '#4D5B94',
+        'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#DCE1FF',
+        'light-on-secondary-container': '#1D2C63',
+        'light-tertiary': '#7F2500',
+        'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#FFDBCF',
+        'light-on-tertiary-container': '#5C1900',
+        'light-error': '#BA1A1A',
+        'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6',
+        'light-on-error-container': '#93000A',
+        'light-background': '#F8FAFC',
+        'light-on-background': '#1A1B23',
+        'light-surface': '#F8FAFC',
+        'light-surface-dim': '#E2E8F0',
+        'light-surface-bright': '#FFFFFF',
+        'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F9',
+        'light-surface-container': '#E2E8F0',
+        'light-surface-container-high': '#CBD5E1',
+        'light-surface-container-highest': '#94A3B8',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#E2E8F0',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#64748B',
+        'light-outline-variant': '#E2E8F0',
+        'light-inverse-surface': '#1E293B',
+        'light-inverse-on-surface': '#F8FAFC',
+        'light-inverse-primary': '#B7C4FF',
+        'light-shadow': '#0F172A',
+        'light-scrim': '#0F172A',
+        'dark-primary': '#B7C4FF',
+        'dark-on-primary': '#002682',
+        'dark-primary-container': '#1D4ED8',
+        'dark-on-primary-container': '#FFFFFF',
+        'dark-primary-tint': '#1D2C63',
+        'dark-on-primary-tint': '#DCE1FF',
+        'dark-secondary': '#B7C4FF',
+        'dark-on-secondary': '#1D2C63',
+        'dark-secondary-container': '#35437B',
+        'dark-on-secondary-container': '#DCE1FF',
+        'dark-tertiary': '#FFB59C',
+        'dark-on-tertiary': '#5C1900',
+        'dark-tertiary-container': '#832700',
+        'dark-on-tertiary-container': '#FFDBCF',
+        'dark-error': '#FFB4AB',
+        'dark-on-error': '#690005',
+        'dark-error-container': '#93000A',
+        'dark-on-error-container': '#FFDAD6',
+        'dark-background': '#0B0F19',
+        'dark-on-background': '#F1F5F9',
+        'dark-surface': '#0B0F19',
+        'dark-surface-dim': '#0B0F19',
+        'dark-surface-bright': '#1E293B',
+        'dark-surface-container-lowest': '#0F172A',
+        'dark-surface-container-low': '#1E293B',
+        'dark-surface-container': '#334155',
+        'dark-surface-container-high': '#475569',
+        'dark-surface-container-highest': '#64748B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#94A3B8',
+        'dark-outline-variant': '#334155',
+        'dark-inverse-surface': '#F1F5F9',
+        'dark-inverse-on-surface': '#0F172A',
+        'dark-inverse-primary': '#1D4ED8',
+        'dark-shadow': '#000000',
+        'dark-scrim': '#000000',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '32px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.25px', fontWeight: '600' }],
+        'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.15px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.1px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '600' }],
+        'mono-sm': ['12px', { lineHeight: '16px', letterSpacing: '0px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '200ms',
+        'surface-exit': '150ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+        'surface-exit': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+        'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>.material-symbols-outlined { display: inline-block; width: 1em; height: 1em; line-height: 1 !important; box-sizing: content-box; overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle; }</style>
+</head>
+<body class="bg-light-surface text-light-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex bg-light-surface" data-stitch-vh="min-h-[1024px]===min-h-screen">
+    <!-- Persistent Deep Navy Sidebar (identical shell to ExecutiveDashboard) -->
+    <aside id="appSidebar" class="hidden lg:flex lg:w-[260px] lg:shrink-0 bg-sidebar text-on-sidebar flex-col border-r border-sidebar-surface min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="h-16 px-5 flex items-center gap-3 border-b border-sidebar-surface shrink-0">
+        <div class="w-8 h-8 rounded bg-sidebar-active flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-sidebar text-[18px]">school</span>
+        </div>
+        <div class="flex flex-col">
+          <span data-design-text-token="title-md" class="font-title text-title-md text-on-sidebar leading-tight">Bixcel</span>
+          <span data-design-text-token="label-sm" class="font-label text-label-sm text-sidebar-muted">IMS + LMS</span>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-3 py-4 flex flex-col gap-5 overflow-y-auto" aria-label="Main Navigation">
+        <div>
+          <a href="../executive-dashboard/ExecutiveDashboard.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">dashboard</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg">Dashboard</span>
+          </a>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span data-design-text-token="label-sm" class="px-3 font-label text-label-sm text-sidebar-muted uppercase tracking-wider">Academics</span>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">menu_book</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Course Management</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">library_books</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Reusable Module Library</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">view_quilt</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Custom Course Builder</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">timeline</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Day-Wise Curriculum</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">article</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Lesson Management</span>
+          </a>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span data-design-text-token="label-sm" class="px-3 font-label text-label-sm text-sidebar-muted uppercase tracking-wider">People</span>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">groups</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Student Management</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">co_present</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Tutor Management</span>
+          </a>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span data-design-text-token="label-sm" class="px-3 font-label text-label-sm text-sidebar-muted uppercase tracking-wider">Operations</span>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">workspaces</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Batch Management</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">schedule</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Timetable &amp; Scheduling</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Attendance Management</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">assignment</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Assignment Management</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">quiz</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Examination Management</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">flag</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Competency Milestones</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Student Calendar</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">monitoring</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Academic Progress</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">star</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Tutor Rating &amp; Feedback</span>
+          </a>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span data-design-text-token="label-sm" class="px-3 font-label text-label-sm text-sidebar-muted uppercase tracking-wider">Finance &amp; Reports</span>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Fees &amp; Payments</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">analytics</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Institutional Analytics</span>
+          </a>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span data-design-text-token="label-sm" class="px-3 font-label text-label-sm text-sidebar-muted uppercase tracking-wider">Settings</span>
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded bg-sidebar-active text-on-sidebar">
+            <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg">User Master</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">notifications_active</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Notifications</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">history</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Audit Logs</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-1.5 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+            <span class="material-symbols-outlined text-[18px]">settings</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Institute Settings</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Workspace Column -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Top Navigation Header -->
+      <header class="h-16 bg-light-surface-container-lowest border-b border-light-outline-variant px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
+        <div class="flex items-center gap-4 min-w-0">
+          <button type="button" onclick="toggleMobileSidebar()" aria-label="Toggle menu" class="lg:hidden p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low">
+            <span class="material-symbols-outlined text-[20px]">menu</span>
+          </button>
+          <nav aria-label="Breadcrumb" class="hidden sm:flex items-center gap-2 text-light-on-surface-variant whitespace-nowrap">
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Bixcel</span>
+            <span class="material-symbols-outlined text-[16px] text-light-outline">chevron_right</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm">Settings</span>
+            <span class="material-symbols-outlined text-[16px] text-light-outline">chevron_right</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">User Master</span>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+          <div class="relative hidden md:flex items-center w-64">
+            <span class="material-symbols-outlined text-light-outline text-[18px] absolute left-3 pointer-events-none">search</span>
+            <input type="search" placeholder="Search students, courses, batches..." class="w-full pl-9 pr-3 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-sm placeholder:text-light-outline focus:bg-light-surface-container-lowest focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </div>
+
+          <button type="button" aria-label="4 unread notifications" class="relative p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors shrink-0">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" aria-hidden="true" class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-overdue text-on-overdue tabular-nums">
+              <span data-design-text-token="label-sm" class="font-label text-label-sm">4</span>
+            </span>
+          </button>
+
+          <div class="relative shrink-0">
+            <button type="button" onclick="toggleProfileMenu()" class="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded hover:bg-light-surface-container-low transition-colors whitespace-nowrap">
+              <img src="https://lh3.googleusercontent.com/aida/ALJJyrBd27Pcp-38xV9L7VVALoFkMPFl6P9jkluTbF9AAc-VR9946-u8sITfideqg0hpCVkohixawS6upYk7MErsueQRuq5jqp1kQASv578H2UOWfLASJF8ONheCm4OfreEei9ATFbWUWE9XqEi52cQsH_OmlFXp6A8C_7KT4I-ks8kvl8Yj22f8gpgkcr5pu3YJXIGB90_bu1pEx7kr551LYJvFR9JbrH0YXh7OINEX0VbaWD5Az3PUhQ" alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+              <span data-design-text-token="label-md" class="hidden sm:inline font-label text-label-md text-light-on-surface whitespace-nowrap">Elena Rostova (Super Admin)</span>
+              <span class="material-symbols-outlined text-light-outline text-[18px]">expand_more</span>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-lg py-1.5 z-30">
+              <a href="../executive-dashboard/ExecutiveDashboard.html" class="block px-4 py-2 font-body text-body-sm text-light-on-surface hover:bg-light-surface-container-low">Executive Dashboard</a>
+              <a href="../login-authentication/LoginAuthentication.html" class="block px-4 py-2 font-body text-body-sm text-overdue hover:bg-overdue-container">Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 p-6 lg:p-8 flex flex-col gap-6 max-w-[1440px] w-full mx-auto">
+        <!-- Page Header -->
+        <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-3">
+              <h1 data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface">User Master</h1>
+              <span data-design-text-token="mono-sm" class="font-mono text-mono-sm px-2 py-0.5 rounded bg-light-primary-tint text-light-on-primary-tint">users</span>
+            </div>
+            <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant">Manage multi-tenant user accounts, campus partitioning, role assignments, and account states.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 shrink-0">
+            <a href="../user-master-form/UserMasterForm.html" data-component-id="button-with-icon" data-component-type="button" data-component-variant="with-icon" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-light-primary text-light-on-primary shadow-sm hover:bg-light-primary-container transition-colors whitespace-nowrap">
+              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">person_add</span>
+              <span data-design-text-token="label-lg" class="font-label text-label-lg">Create User</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Account Status KPI Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-2">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Total User Records</span>
+            <div class="flex items-center justify-between">
+              <span data-design-text-token="headline-lg" class="font-headline text-headline-lg tabular-nums text-light-on-surface">2,912</span>
+              <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-primary-tint bg-light-primary-tint px-2 py-0.5 rounded-full whitespace-nowrap">3 Institutes</span>
+            </div>
+          </article>
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-2">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Active Accounts</span>
+            <div class="flex items-center justify-between">
+              <span data-design-text-token="headline-lg" class="font-headline text-headline-lg tabular-nums text-on-success-container">2,846</span>
+              <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-success-container bg-success-container px-2 py-0.5 rounded-full whitespace-nowrap">Active</span>
+            </div>
+          </article>
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-2">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Inactive Accounts</span>
+            <div class="flex items-center justify-between">
+              <span data-design-text-token="headline-lg" class="font-headline text-headline-lg tabular-nums text-on-pending-container">48</span>
+              <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-pending-container bg-pending-container px-2 py-0.5 rounded-full whitespace-nowrap">Inactive</span>
+            </div>
+          </article>
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-2">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Suspended / Soft-Deleted</span>
+            <div class="flex items-center justify-between">
+              <span data-design-text-token="headline-lg" class="font-headline text-headline-lg tabular-nums text-on-overdue-container">18</span>
+              <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-overdue-container bg-overdue-container px-2 py-0.5 rounded-full whitespace-nowrap">Restricted</span>
+            </div>
+          </article>
+        </section>
+
+        <!-- Search & Multi-Tenant Filter Toolbar -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md p-4 shadow-sm flex flex-wrap items-center gap-3">
+          <div class="relative flex-1 min-w-[220px]">
+            <span class="material-symbols-outlined text-light-outline text-[18px] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+            <input type="search" id="userSearch" placeholder="Filter by user_id, full_name, email, phone..." class="w-full pl-9 pr-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm placeholder:text-light-outline focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </div>
+
+          <select aria-label="Filter by institute_id" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest font-body text-body-sm text-light-on-surface focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+            <option value>All Institutes (institute_id)</option>
+            <option value="INST-01">INST-01 • Bixcel Main</option>
+            <option value="INST-02">INST-02 • Bixcel Tech</option>
+          </select>
+
+          <select aria-label="Filter by branch_id" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest font-body text-body-sm text-light-on-surface focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+            <option value>All Branches (branch_id)</option>
+            <option value="BR-NORTH">BR-NORTH • North Campus</option>
+            <option value="BR-SOUTH">BR-SOUTH • South Campus</option>
+            <option value="BR-ONLINE">BR-ONLINE • Virtual</option>
+          </select>
+
+          <select aria-label="Filter by role_id" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest font-body text-body-sm text-light-on-surface focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+            <option value>All Roles (role_id)</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="Tutor">Tutor</option>
+            <option value="Student">Student</option>
+          </select>
+
+          <select aria-label="Filter by account_status" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest font-body text-body-sm text-light-on-surface focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+            <option value>All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+        </section>
+
+        <!-- Full-Width User Directory Table -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm overflow-hidden flex flex-col">
+          <header class="px-5 py-4 border-b border-light-outline-variant flex items-center justify-between gap-4">
+            <h2 data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">User Directory</h2>
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant tabular-nums whitespace-nowrap">Showing 4 of 2,912</span>
+          </header>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-light-surface-container-low border-b border-light-outline-variant">
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">User (full_name / user_id)</span></th>
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">Contact (email / phone)</span></th>
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">Tenant / Branch</span></th>
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">Role</span></th>
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">Status</span></th>
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">Last Login</span></th>
+                  <th scope="col" class="px-5 py-3 text-light-on-surface-variant text-right"><span data-design-text-token="label-md" class="font-label text-label-md whitespace-nowrap">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-light-outline-variant">
+                <tr class="hover:bg-light-surface-container-low">
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <img src="https://lh3.googleusercontent.com/aida/ALJJyrBd27Pcp-38xV9L7VVALoFkMPFl6P9jkluTbF9AAc-VR9946-u8sITfideqg0hpCVkohixawS6upYk7MErsueQRuq5jqp1kQASv578H2UOWfLASJF8ONheCm4OfreEei9ATFbWUWE9XqEi52cQsH_OmlFXp6A8C_7KT4I-ks8kvl8Yj22f8gpgkcr5pu3YJXIGB90_bu1pEx7kr551LYJvFR9JbrH0YXh7OINEX0VbaWD5Az3PUhQ" alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+                      <div class="flex flex-col">
+                        <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Elena Rostova</span>
+                        <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">USR-0001</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface">elena.rostova@bixcel.edu</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">+1 (415) 890-2341</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface">INST-01</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">BR-NORTH</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span data-design-text-token="label-md" class="font-label text-label-md px-2.5 py-0.5 rounded bg-light-primary-tint text-light-on-primary-tint">Super Admin</span>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success-container text-on-success-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Active</span>
+                    </span>
+                  </td>
+                  <td class="px-5 py-3.5 tabular-nums whitespace-nowrap">
+                    <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Nov 20, 2026 • 08:42</span>
+                  </td>
+                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                    <a href="../user-master-form/UserMasterForm.html" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-light-outline-variant text-light-on-surface font-label text-label-md hover:bg-light-surface-container-low">
+                      <span class="material-symbols-outlined text-[16px]" aria-hidden="true">edit</span>
+                      <span data-design-text-token="label-md">Edit</span>
+                    </a>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-light-surface-container-low">
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <img src="https://lh3.googleusercontent.com/aida/ALJJyrA-VKsTxLd7i53dHimEz4vpLk7Hozna1Y8pL0AXAY05vVKvluNt4z_Saum5P43CDc9qeSxu0OPx18ZwB3bmjoBvsAos_AZjtp_1HHU26LUKveKT9h_P86bC3GavSrehnPPeORj3eDARzWwfzxVUG3jqYAlplrrDlSS9_BfQak3hiRsvfwKDc-m6tX8xtSuA2JeiqCZ1qXTotQUlU3hLzThKllZ1IkbZVIvouFd-jdPeMYaL9SnEIg" alt="Dr. Marcus Vance" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+                      <div class="flex flex-col">
+                        <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Dr. Marcus Vance</span>
+                        <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">USR-0142</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface">marcus.vance@bixcel.edu</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">+1 (415) 742-1190</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface">INST-01</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">BR-NORTH</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span data-design-text-token="label-md" class="font-label text-label-md px-2.5 py-0.5 rounded bg-light-surface-container-low text-light-on-surface">Tutor</span>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success-container text-on-success-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Active</span>
+                    </span>
+                  </td>
+                  <td class="px-5 py-3.5 tabular-nums whitespace-nowrap">
+                    <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Nov 20, 2026 • 09:05</span>
+                  </td>
+                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                    <a href="../user-master-form/UserMasterForm.html" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-light-outline-variant text-light-on-surface font-label text-label-md hover:bg-light-surface-container-low">
+                      <span class="material-symbols-outlined text-[16px]" aria-hidden="true">edit</span>
+                      <span data-design-text-token="label-md">Edit</span>
+                    </a>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-light-surface-container-low">
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <img src="https://lh3.googleusercontent.com/aida/ALJJyrCKCo67W6Sthncte-By_907lBoXcbjHkshsTTZ9oJMtvdPvdpvkaVNHI3khezMeasBpbkXU9bd-xM5VQ00ikiZftanEQ4QiWiPnhQ8Hwa_PPdOfginvdbOxpNfx32RQrWrpRqTF0pqVh4-sSWzG_6eVfbZVF2H82j7OQ-zO--TIVTFjmpDpTqmie0eQAso_Witf5xnXXELCwwejj-s_FNbYzW2Jw_9pQpmCFHguigbd-adzTpSjgndD" alt="Aarav Mehta" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+                      <div class="flex flex-col">
+                        <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Aarav Mehta</span>
+                        <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">USR-1088</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface">aarav.mehta@bixcel.edu</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">+1 (415) 603-8824</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface">INST-01</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">BR-SOUTH</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span data-design-text-token="label-md" class="font-label text-label-md px-2.5 py-0.5 rounded bg-light-surface-container-low text-light-on-surface">Student</span>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pending-container text-on-pending-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-pending"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Inactive</span>
+                    </span>
+                  </td>
+                  <td class="px-5 py-3.5 tabular-nums whitespace-nowrap">
+                    <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Nov 12, 2026 • 16:19</span>
+                  </td>
+                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                    <a href="../user-master-form/UserMasterForm.html" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-light-outline-variant text-light-on-surface font-label text-label-md hover:bg-light-surface-container-low">
+                      <span class="material-symbols-outlined text-[16px]" aria-hidden="true">edit</span>
+                      <span data-design-text-token="label-md">Edit</span>
+                    </a>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-light-surface-container-low">
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-overdue-container text-on-overdue-container flex items-center justify-center shrink-0">
+                        <span data-design-text-token="label-md" class="font-label text-label-md">NK</span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Nadia Kapoor</span>
+                        <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">USR-0914</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface">nadia.kapoor@bixcel.edu</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">+1 (415) 519-4402</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <div class="flex flex-col">
+                      <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface">INST-02</span>
+                      <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">BR-ONLINE</span>
+                    </div>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span data-design-text-token="label-md" class="font-label text-label-md px-2.5 py-0.5 rounded bg-light-surface-container-low text-light-on-surface">Student</span>
+                  </td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-overdue-container text-on-overdue-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-overdue"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Suspended</span>
+                    </span>
+                  </td>
+                  <td class="px-5 py-3.5 tabular-nums whitespace-nowrap">
+                    <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Oct 28, 2026 • 11:04</span>
+                  </td>
+                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                    <a href="../user-master-form/UserMasterForm.html" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-light-outline-variant text-light-on-surface font-label text-label-md hover:bg-light-surface-container-low">
+                      <span class="material-symbols-outlined text-[16px]" aria-hidden="true">edit</span>
+                      <span data-design-text-token="label-md">Edit</span>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <footer class="px-5 py-3 border-t border-light-outline-variant flex items-center justify-between bg-light-surface-container-low/50">
+            <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Page 1 of 728</span>
+            <div class="flex items-center gap-2">
+              <button type="button" class="px-3 py-1 rounded border border-light-outline-variant bg-light-surface-container-lowest font-label text-label-md text-light-on-surface-variant hover:bg-light-surface-container-low">Previous</button>
+              <button type="button" class="px-3 py-1 rounded border border-light-outline-variant bg-light-surface-container-lowest font-label text-label-md text-light-on-surface hover:bg-light-surface-container-low">Next</button>
+            </div>
+          </footer>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleProfileMenu() {
+      document.getElementById('profileMenu').classList.toggle('hidden');
+    }
+
+    function toggleMobileSidebar() {
+      const aside = document.getElementById('appSidebar');
+      aside.classList.toggle('hidden');
+      aside.classList.toggle('fixed');
+      aside.classList.toggle('inset-y-0');
+      aside.classList.toggle('left-0');
+      aside.classList.toggle('z-40');
+      aside.classList.toggle('w-[260px]');
+      aside.classList.toggle('flex');
+    }
+  </script>
+
+
+</body></html>

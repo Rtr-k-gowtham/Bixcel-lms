@@ -1,0 +1,427 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Enrollment — BIXCEL Institute of Technology</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'sidebar': '#0F172A',
+        'on-sidebar': '#FFFFFF',
+        'sidebar-muted': '#94A3B8',
+        'sidebar-surface': '#1E293B',
+        'sidebar-active': '#1D4ED8',
+        'success': '#059669',
+        'on-success': '#1C1C1C',
+        'success-container': '#D1FAE5',
+        'on-success-container': '#065F46',
+        'pending': '#B45309',
+        'on-pending': '#FFFFFF',
+        'pending-container': '#FEF3C7',
+        'on-pending-container': '#92400E',
+        'overdue': '#BE123C',
+        'on-overdue': '#FFFFFF',
+        'overdue-container': '#FFE4E6',
+        'on-overdue-container': '#9F1239',
+        'light-primary': '#0037B0',
+        'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#1D4ED8',
+        'light-on-primary-container': '#FFFFFF',
+        'light-primary-tint': '#EFEFFF',
+        'light-on-primary-tint': '#002682',
+        'light-secondary': '#4D5B94',
+        'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#DCE1FF',
+        'light-on-secondary-container': '#1D2C63',
+        'light-tertiary': '#7F2500',
+        'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#FFDBCF',
+        'light-on-tertiary-container': '#5C1900',
+        'light-error': '#BA1A1A',
+        'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6',
+        'light-on-error-container': '#93000A',
+        'light-background': '#F8FAFC',
+        'light-on-background': '#1A1B23',
+        'light-surface': '#F8FAFC',
+        'light-surface-dim': '#E2E8F0',
+        'light-surface-bright': '#FFFFFF',
+        'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F9',
+        'light-surface-container': '#E2E8F0',
+        'light-surface-container-high': '#CBD5E1',
+        'light-surface-container-highest': '#94A3B8',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#E2E8F0',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#64748B',
+        'light-outline-variant': '#E2E8F0',
+        'light-inverse-surface': '#1E293B',
+        'light-inverse-on-surface': '#F8FAFC',
+        'light-inverse-primary': '#B7C4FF',
+        'light-shadow': '#0F172A',
+        'light-scrim': '#0F172A',
+        'dark-primary': '#B7C4FF',
+        'dark-on-primary': '#002682',
+        'dark-primary-container': '#1D4ED8',
+        'dark-on-primary-container': '#FFFFFF',
+        'dark-primary-tint': '#1D2C63',
+        'dark-on-primary-tint': '#DCE1FF',
+        'dark-secondary': '#B7C4FF',
+        'dark-on-secondary': '#1D2C63',
+        'dark-secondary-container': '#35437B',
+        'dark-on-secondary-container': '#DCE1FF',
+        'dark-tertiary': '#FFB59C',
+        'dark-on-tertiary': '#5C1900',
+        'dark-tertiary-container': '#832700',
+        'dark-on-tertiary-container': '#FFDBCF',
+        'dark-error': '#FFB4AB',
+        'dark-on-error': '#690005',
+        'dark-error-container': '#93000A',
+        'dark-on-error-container': '#FFDAD6',
+        'dark-background': '#0B0F19',
+        'dark-on-background': '#F1F5F9',
+        'dark-surface': '#0B0F19',
+        'dark-surface-dim': '#0B0F19',
+        'dark-surface-bright': '#1E293B',
+        'dark-surface-container-lowest': '#0F172A',
+        'dark-surface-container-low': '#1E293B',
+        'dark-surface-container': '#334155',
+        'dark-surface-container-high': '#475569',
+        'dark-surface-container-highest': '#64748B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#94A3B8',
+        'dark-outline-variant': '#334155',
+        'dark-inverse-surface': '#F1F5F9',
+        'dark-inverse-on-surface': '#0F172A',
+        'dark-inverse-primary': '#1D4ED8',
+        'dark-shadow': '#000000',
+        'dark-scrim': '#000000',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '32px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.25px', fontWeight: '600' }],
+        'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.15px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.1px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '600' }],
+        'mono-sm': ['12px', { lineHeight: '16px', letterSpacing: '0px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '200ms',
+        'surface-exit': '150ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+        'surface-exit': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+        'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>.material-symbols-outlined { display: inline-block; width: 1em; height: 1em; line-height: 1 !important; box-sizing: content-box; overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle; }</style>
+</head>
+<body class="bg-light-surface text-light-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex bg-light-surface" data-stitch-vh="min-h-[1024px]===min-h-screen">
+    <!-- Fixed Left Deep Navy Sidebar -->
+    <aside id="appSidebar" class="hidden lg:flex lg:w-[260px] lg:shrink-0 bg-sidebar text-on-sidebar flex-col border-r border-sidebar-surface min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="h-16 px-5 flex items-center gap-3 border-b border-sidebar-surface shrink-0">
+        <div class="w-8 h-8 rounded bg-sidebar-active flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-sidebar text-[18px]">school</span>
+        </div>
+        <div class="flex flex-col">
+          <span data-design-text-token="title-md" class="font-title text-title-md text-on-sidebar leading-tight">BIXCEL</span>
+          <span data-design-text-token="label-sm" class="font-label text-label-sm text-sidebar-muted">IMS + LMS</span>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto" aria-label="Main Navigation">
+        <a href="../executive-dashboard/ExecutiveDashboard.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">dashboard</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Dashboard</span>
+        </a>
+        <a href="../course-builder/CourseBuilder.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">menu_book</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Course Management</span>
+        </a>
+        <a href="../module-library/ModuleLibrary.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">library_books</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Module Library</span>
+        </a>
+        <a href="../batch-management/BatchManagement.html" class="flex items-center gap-3 px-3 py-2 rounded bg-sidebar-active text-on-sidebar">
+          <span class="material-symbols-outlined text-[18px]">workspaces</span>
+          <span data-design-text-token="label-lg" class="font-label text-label-lg">Batch Management</span>
+        </a>
+        <a href="../timetable/Timetable.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Timetable</span>
+        </a>
+        <a href="../classroom-occupancy/ClassroomOccupancy.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">meeting_room</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Classroom Occupancy</span>
+        </a>
+        <a href="../student-onboarding/StudentOnboarding.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">groups</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Student Management</span>
+        </a>
+        <a href="../tutor-assignment/TutorAssignment.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">co_present</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Tutor Management</span>
+        </a>
+        <a href="../payment-collection/PaymentCollection.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">payments</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Payment Collection</span>
+        </a>
+        <a href="../user-master/UserMaster.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Workspace Column -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <header class="h-16 bg-light-surface-container-lowest border-b border-light-outline-variant px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
+        <div class="flex items-center gap-4 min-w-0">
+          <button type="button" onclick="toggleMobileSidebar()" aria-label="Toggle menu" class="lg:hidden p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low">
+            <span class="material-symbols-outlined text-[20px]">menu</span>
+          </button>
+          <nav aria-label="Breadcrumb" class="hidden sm:flex items-center gap-2 text-light-on-surface-variant whitespace-nowrap min-w-0">
+            <a href="../executive-dashboard/ExecutiveDashboard.html" data-design-text-token="body-sm" class="font-body text-body-sm hover:text-light-on-surface shrink-0">Dashboard</a>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <a href="../batch-management/BatchManagement.html" data-design-text-token="body-sm" class="font-body text-body-sm hover:text-light-on-surface shrink-0">Batch Management</a>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface truncate">Student Enrollment</span>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button type="button" aria-label="4 unread notifications" class="relative p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors shrink-0">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" aria-hidden="true" class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-overdue text-on-overdue tabular-nums">
+              <span data-design-text-token="label-sm" class="font-label text-label-sm">4</span>
+            </span>
+          </button>
+
+          <div class="relative shrink-0">
+            <button type="button" onclick="toggleProfileMenu()" class="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded hover:bg-light-surface-container-low transition-colors whitespace-nowrap">
+              <img src="https://lh3.googleusercontent.com/aida/ALJJyrBd27Pcp-38xV9L7VVALoFkMPFl6P9jkluTbF9AAc-VR9946-u8sITfideqg0hpCVkohixawS6upYk7MErsueQRuq5jqp1kQASv578H2UOWfLASJF8ONheCm4OfreEei9ATFbWUWE9XqEi52cQsH_OmlFXp6A8C_7KT4I-ks8kvl8Yj22f8gpgkcr5pu3YJXIGB90_bu1pEx7kr551LYJvFR9JbrH0YXh7OINEX0VbaWD5Az3PUhQ" alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+              <span data-design-text-token="label-md" class="hidden sm:inline font-label text-label-md text-light-on-surface whitespace-nowrap">Elena Rostova (Super Admin)</span>
+              <span class="material-symbols-outlined text-light-outline text-[18px]">expand_more</span>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-lg py-1.5 z-30">
+              <a href="../executive-dashboard/ExecutiveDashboard.html" class="block px-4 py-2 font-body text-body-sm text-light-on-surface hover:bg-light-surface-container-low">Executive Dashboard</a>
+              <a href="../login-authentication/LoginAuthentication.html" class="block px-4 py-2 font-body text-body-sm text-overdue hover:bg-overdue-container">Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 p-5 lg:p-6 flex flex-col gap-5 max-w-[1360px] w-full mx-auto">
+        <!-- Page Header -->
+        <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex flex-col gap-1">
+            <h1 data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface">Student Enrollment</h1>
+            <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant text-pretty">Verify prerequisites and fee clearance, then bulk-enroll eligible students into the batch.</p>
+          </div>
+          <button id="bulkEnrollBtn" type="button" onclick="bulkEnroll()" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm font-label text-label-lg transition-colors whitespace-nowrap shrink-0">
+            <span class="material-symbols-outlined text-[18px]">group_add</span>
+            <span>Bulk Enroll Selected (3)</span>
+          </button>
+        </section>
+
+        <!-- Target Batch Summary Card -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm px-5 py-3.5 grid grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Target Batch</span>
+            <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-primary">BIX-UX-26D</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Course</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">UI/UX Product Design</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Seat Availability</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface tabular-nums">19 / 25 Enrolled (6 Open)</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Selected for Batch</span>
+            <span id="selectedCountBadge" data-design-text-token="title-md" class="font-title text-title-md text-light-primary tabular-nums">3 Students</span>
+          </div>
+        </section>
+
+        <!-- Search & Filter Bar -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="relative flex items-center flex-1">
+            <span class="material-symbols-outlined text-light-outline text-[18px] absolute left-3 pointer-events-none">search</span>
+            <input id="stuSearch" type="search" oninput="renderStudents()" placeholder="Search by Student ID, name, or phone..." class="w-full pl-9 pr-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-sm placeholder:text-light-outline focus:bg-light-surface-container-lowest focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <select id="feeFilter" onchange="renderStudents()" aria-label="Fee verification filter" class="pl-2.5 pr-7 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="all">Fee Status: All</option>
+              <option value="Verified">Verified</option>
+              <option value="Pending">Pending</option>
+            </select>
+            <button type="button" onclick="selectEligible()" class="px-3 py-2 rounded border border-light-primary/30 bg-light-primary-tint text-light-on-primary-tint font-label text-label-md whitespace-nowrap">Select Eligible</button>
+          </div>
+        </section>
+
+        <!-- Student Selection Table -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-light-surface-container-low border-b border-light-outline-variant text-light-on-surface-variant font-label text-label-sm">
+                  <th class="px-4 py-3 w-10">Select</th>
+                  <th class="px-4 py-3">Student ID</th>
+                  <th class="px-4 py-3">Name &amp; Contact</th>
+                  <th class="px-4 py-3">Selected Course</th>
+                  <th class="px-4 py-3">Prerequisite</th>
+                  <th class="px-4 py-3">Fee Verification</th>
+                  <th class="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="studentTableBody" class="divide-y divide-light-outline-variant">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const students = [
+      { id: 'STU-2026-0142', name: 'Aarav Mehta', phone: '+1 (415) 890-2314', email: 'aarav.m@bixcel.edu', course: 'UI/UX Product Design', prereq: 'Verified', fee: 'Verified', status: 'Ready', selected: true },
+      { id: 'STU-2026-0148', name: 'Chloe Bennett', phone: '+1 (415) 890-4419', email: 'chloe.b@bixcel.edu', course: 'UI/UX Product Design', prereq: 'Verified', fee: 'Verified', status: 'Ready', selected: true },
+      { id: 'STU-2026-0155', name: 'Daniel Okafor', phone: '+1 (415) 890-7712', email: 'daniel.o@bixcel.edu', course: 'UI/UX Product Design', prereq: 'Verified', fee: 'Verified', status: 'Ready', selected: true },
+      { id: 'STU-2026-0161', name: 'Hana Takahashi', phone: '+1 (415) 890-9043', email: 'hana.t@bixcel.edu', course: 'UI/UX Product Design', prereq: 'Verified', fee: 'Pending', status: 'Fee Hold', selected: false },
+      { id: 'STU-2026-0169', name: 'Lucas Fernandez', phone: '+1 (415) 890-6102', email: 'lucas.f@bixcel.edu', course: 'UI/UX Product Design', prereq: 'Missing', fee: 'Verified', status: 'Prereq Hold', selected: false }
+    ];
+
+    function renderStudents() {
+      const q = document.getElementById('stuSearch').value.trim().toLowerCase();
+      const feeFilter = document.getElementById('feeFilter').value;
+      const tbody = document.getElementById('studentTableBody');
+      tbody.innerHTML = '';
+
+      let selectedCount = 0;
+      students.forEach((s) => { if (s.selected) selectedCount++; });
+
+      const filtered = students.filter((s) => {
+        const matchQ = !q || s.id.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || s.phone.toLowerCase().includes(q);
+        const matchFee = feeFilter === 'all' || s.fee === feeFilter;
+        return matchQ && matchFee;
+      });
+
+      filtered.forEach((s) => {
+        const tr = document.createElement('tr');
+        tr.className = 'transition-colors ' + (s.selected ? 'bg-light-primary-tint/25' : 'hover:bg-light-surface-container-low/50');
+        tr.innerHTML = `
+          <td class="px-4 py-3.5 align-middle">
+            <input type="checkbox" ${s.selected ? 'checked' : ''} onchange="toggleStudent('${s.id}')" aria-label="Select ${s.name}" class="w-4 h-4 rounded border-light-outline text-light-primary focus:ring-light-primary-tint">
+          </td>
+          <td class="px-4 py-3.5 align-middle">
+            <span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-primary">${s.id}</span>
+          </td>
+          <td class="px-4 py-3.5 align-middle">
+            <div class="flex flex-col gap-0.5">
+              <span data-design-text-token="body-md" class="font-body font-medium text-body-md text-light-on-surface">${s.name}</span>
+              <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">${s.phone} · ${s.email}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3.5 align-middle">
+            <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface">${s.course}</span>
+          </td>
+          <td class="px-4 py-3.5 align-middle">
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-label text-label-sm whitespace-nowrap ${s.prereq === 'Verified' ? 'bg-success-container text-on-success-container' : 'bg-overdue-container text-on-overdue-container'}">${s.prereq}</span>
+          </td>
+          <td class="px-4 py-3.5 align-middle">
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-label text-label-sm whitespace-nowrap ${s.fee === 'Verified' ? 'bg-success-container text-on-success-container' : 'bg-pending-container text-on-pending-container'}">${s.fee}</span>
+          </td>
+          <td class="px-4 py-3.5 align-middle">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label text-label-sm whitespace-nowrap ${s.status === 'Ready' ? 'bg-light-primary-tint text-light-on-primary-tint' : (s.status === 'Enrolled' ? 'bg-success-container text-on-success-container' : 'bg-pending-container text-on-pending-container')}">${s.status}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('selectedCountBadge').textContent = selectedCount + ' Students';
+      document.getElementById('bulkEnrollBtn').innerHTML = `<span class="material-symbols-outlined text-[18px]">group_add</span><span>Bulk Enroll Selected (${selectedCount})</span>`;
+    }
+
+    function toggleStudent(id) {
+      const s = students.find((x) => x.id === id);
+      if (s) s.selected = !s.selected;
+      renderStudents();
+    }
+
+    function selectEligible() {
+      students.forEach((s) => { s.selected = (s.prereq === 'Verified' && s.fee === 'Verified'); });
+      renderStudents();
+    }
+
+    function bulkEnroll() {
+      students.forEach((s) => { if (s.selected) { s.status = 'Enrolled'; s.selected = false; } });
+      renderStudents();
+    }
+
+    function toggleProfileMenu() { document.getElementById('profileMenu').classList.toggle('hidden'); }
+    function toggleMobileSidebar() {
+      const s = document.getElementById('appSidebar');
+      s.classList.toggle('hidden'); s.classList.toggle('fixed'); s.classList.toggle('inset-y-0'); s.classList.toggle('left-0'); s.classList.toggle('z-40');
+    }
+
+    renderStudents();
+  </script>
+
+
+</body></html>

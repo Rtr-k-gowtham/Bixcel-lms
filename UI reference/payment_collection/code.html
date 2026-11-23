@@ -1,0 +1,945 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Collection — BIXCEL Institute of Technology</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'sidebar': '#0F172A',
+        'on-sidebar': '#FFFFFF',
+        'sidebar-muted': '#94A3B8',
+        'sidebar-surface': '#1E293B',
+        'sidebar-active': '#1D4ED8',
+        'success': '#059669',
+        'on-success': '#1C1C1C',
+        'success-container': '#D1FAE5',
+        'on-success-container': '#065F46',
+        'pending': '#B45309',
+        'on-pending': '#FFFFFF',
+        'pending-container': '#FEF3C7',
+        'on-pending-container': '#92400E',
+        'overdue': '#BE123C',
+        'on-overdue': '#FFFFFF',
+        'overdue-container': '#FFE4E6',
+        'on-overdue-container': '#9F1239',
+        'light-primary': '#0037B0',
+        'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#1D4ED8',
+        'light-on-primary-container': '#FFFFFF',
+        'light-primary-tint': '#EFEFFF',
+        'light-on-primary-tint': '#002682',
+        'light-secondary': '#4D5B94',
+        'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#DCE1FF',
+        'light-on-secondary-container': '#1D2C63',
+        'light-tertiary': '#7F2500',
+        'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#FFDBCF',
+        'light-on-tertiary-container': '#5C1900',
+        'light-error': '#BA1A1A',
+        'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6',
+        'light-on-error-container': '#93000A',
+        'light-background': '#F8FAFC',
+        'light-on-background': '#1A1B23',
+        'light-surface': '#F8FAFC',
+        'light-surface-dim': '#E2E8F0',
+        'light-surface-bright': '#FFFFFF',
+        'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F9',
+        'light-surface-container': '#E2E8F0',
+        'light-surface-container-high': '#CBD5E1',
+        'light-surface-container-highest': '#94A3B8',
+        'light-on-surface': '#0F172A',
+        'light-surface-variant': '#E2E8F0',
+        'light-on-surface-variant': '#475569',
+        'light-outline': '#64748B',
+        'light-outline-variant': '#E2E8F0',
+        'light-inverse-surface': '#1E293B',
+        'light-inverse-on-surface': '#F8FAFC',
+        'light-inverse-primary': '#B7C4FF',
+        'light-shadow': '#0F172A',
+        'light-scrim': '#0F172A',
+        'dark-primary': '#B7C4FF',
+        'dark-on-primary': '#002682',
+        'dark-primary-container': '#1D4ED8',
+        'dark-on-primary-container': '#FFFFFF',
+        'dark-primary-tint': '#1D2C63',
+        'dark-on-primary-tint': '#DCE1FF',
+        'dark-secondary': '#B7C4FF',
+        'dark-on-secondary': '#1D2C63',
+        'dark-secondary-container': '#35437B',
+        'dark-on-secondary-container': '#DCE1FF',
+        'dark-tertiary': '#FFB59C',
+        'dark-on-tertiary': '#5C1900',
+        'dark-tertiary-container': '#832700',
+        'dark-on-tertiary-container': '#FFDBCF',
+        'dark-error': '#FFB4AB',
+        'dark-on-error': '#690005',
+        'dark-error-container': '#93000A',
+        'dark-on-error-container': '#FFDAD6',
+        'dark-background': '#0B0F19',
+        'dark-on-background': '#F1F5F9',
+        'dark-surface': '#0B0F19',
+        'dark-surface-dim': '#0B0F19',
+        'dark-surface-bright': '#1E293B',
+        'dark-surface-container-lowest': '#0F172A',
+        'dark-surface-container-low': '#1E293B',
+        'dark-surface-container': '#334155',
+        'dark-surface-container-high': '#475569',
+        'dark-surface-container-highest': '#64748B',
+        'dark-on-surface': '#F8FAFC',
+        'dark-surface-variant': '#334155',
+        'dark-on-surface-variant': '#CBD5E1',
+        'dark-outline': '#94A3B8',
+        'dark-outline-variant': '#334155',
+        'dark-inverse-surface': '#F1F5F9',
+        'dark-inverse-on-surface': '#0F172A',
+        'dark-inverse-primary': '#1D4ED8',
+        'dark-shadow': '#000000',
+        'dark-scrim': '#000000',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '32px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'display': ['"Inter"', 'sans-serif'],
+        'headline': ['"Inter"', 'sans-serif'],
+        'title': ['"Inter"', 'sans-serif'],
+        'body': ['"Inter"', 'sans-serif'],
+        'label': ['"Inter"', 'sans-serif'],
+        'mono': ['"JetBrains Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.5px', fontWeight: '700' }],
+        'display-lg-mobile': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '700' }],
+        'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.25px', fontWeight: '600' }],
+        'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.15px', fontWeight: '600' }],
+        'title-lg': ['18px', { lineHeight: '26px', letterSpacing: '0px', fontWeight: '600' }],
+        'title-md': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0px', fontWeight: '500' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.1px', fontWeight: '500' }],
+        'label-sm': ['11px', { lineHeight: '16px', letterSpacing: '0.3px', fontWeight: '600' }],
+        'mono-sm': ['12px', { lineHeight: '16px', letterSpacing: '0px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '120ms',
+        'surface-enter': '200ms',
+        'surface-exit': '150ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+        'surface-exit': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+        'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>.material-symbols-outlined { display: inline-block; width: 1em; height: 1em; line-height: 1 !important; box-sizing: content-box; overflow: hidden; white-space: nowrap; direction: ltr; vertical-align: middle; }</style>
+</head>
+<body class="bg-light-surface text-light-on-surface font-body antialiased">
+  <div class="min-h-[1024px] flex bg-light-surface" data-stitch-vh="min-h-[1024px]===min-h-screen">
+    <!-- Fixed Left Deep Navy Sidebar -->
+    <aside id="appSidebar" class="hidden lg:flex lg:w-[260px] lg:shrink-0 bg-sidebar text-on-sidebar flex-col border-r border-sidebar-surface min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen">
+      <div class="h-16 px-5 flex items-center gap-3 border-b border-sidebar-surface shrink-0">
+        <div class="w-8 h-8 rounded bg-sidebar-active flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-on-sidebar text-[18px]">school</span>
+        </div>
+        <div class="flex flex-col">
+          <span data-design-text-token="title-md" class="font-title text-title-md text-on-sidebar leading-tight">BIXCEL</span>
+          <span data-design-text-token="label-sm" class="font-label text-label-sm text-sidebar-muted">IMS + LMS</span>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto" aria-label="Main Navigation">
+        <a href="../executive-dashboard/ExecutiveDashboard.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">dashboard</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Dashboard</span>
+        </a>
+        <a href="../course-builder/CourseBuilder.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">menu_book</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Course Management</span>
+        </a>
+        <a href="../module-library/ModuleLibrary.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">library_books</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Module Library</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">workspaces</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Batch Management</span>
+        </a>
+        <a href="../student-onboarding/StudentOnboarding.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">groups</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Student Management</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">co_present</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Tutor Management</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Attendance</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">assignment</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Assignments &amp; Exams</span>
+        </a>
+        <a href="../payment-collection/PaymentCollection.html" class="flex items-center gap-3 px-3 py-2 rounded bg-sidebar-active text-on-sidebar">
+          <span class="material-symbols-outlined text-[18px]">payments</span>
+          <span data-design-text-token="label-lg" class="font-label text-label-lg">Payment Collection</span>
+        </a>
+        <a href="#paymentHistorySection" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Payment History</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Fee Structure</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">analytics</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Reports &amp; Analytics</span>
+        </a>
+        <a href="../user-master/UserMaster.html" class="flex items-center gap-3 px-3 py-2 rounded text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar transition-colors">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span data-design-text-token="body-sm" class="font-body text-body-sm">Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Workspace Column -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Top Navigation Bar -->
+      <header class="h-16 bg-light-surface-container-lowest border-b border-light-outline-variant px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
+        <div class="flex items-center gap-4 min-w-0">
+          <button type="button" onclick="toggleMobileSidebar()" aria-label="Toggle menu" class="lg:hidden p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low">
+            <span class="material-symbols-outlined text-[20px]">menu</span>
+          </button>
+          <nav aria-label="Breadcrumb" class="hidden sm:flex items-center gap-2 text-light-on-surface-variant whitespace-nowrap min-w-0">
+            <a href="../executive-dashboard/ExecutiveDashboard.html" data-design-text-token="body-sm" class="font-body text-body-sm hover:text-light-on-surface shrink-0">Dashboard</a>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm shrink-0">Finance &amp; Fees</span>
+            <span class="material-symbols-outlined text-[16px] text-light-outline shrink-0">chevron_right</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface truncate">Payment Collection</span>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <div class="relative hidden md:flex items-center w-48">
+            <span class="material-symbols-outlined text-light-outline text-[18px] absolute left-3 pointer-events-none">search</span>
+            <input type="search" placeholder="Search receipts, IDs..." class="w-full pl-9 pr-3 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-sm placeholder:text-light-outline focus:bg-light-surface-container-lowest focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </div>
+
+          <button type="button" aria-label="4 unread notifications" class="relative p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors shrink-0">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" aria-hidden="true" class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-overdue text-on-overdue tabular-nums">
+              <span data-design-text-token="label-sm" class="font-label text-label-sm">4</span>
+            </span>
+          </button>
+
+          <button type="button" aria-label="Help &amp; Documentation" class="p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors shrink-0">
+            <span class="material-symbols-outlined text-[20px]">help</span>
+          </button>
+
+          <div class="relative shrink-0">
+            <button type="button" onclick="toggleProfileMenu()" class="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded hover:bg-light-surface-container-low transition-colors whitespace-nowrap">
+              <img src="https://lh3.googleusercontent.com/aida/ALJJyrBd27Pcp-38xV9L7VVALoFkMPFl6P9jkluTbF9AAc-VR9946-u8sITfideqg0hpCVkohixawS6upYk7MErsueQRuq5jqp1kQASv578H2UOWfLASJF8ONheCm4OfreEei9ATFbWUWE9XqEi52cQsH_OmlFXp6A8C_7KT4I-ks8kvl8Yj22f8gpgkcr5pu3YJXIGB90_bu1pEx7kr551LYJvFR9JbrH0YXh7OINEX0VbaWD5Az3PUhQ" alt="Elena Rostova" class="w-8 h-8 rounded-full object-cover border border-light-outline-variant shrink-0">
+              <span data-design-text-token="label-md" class="hidden sm:inline font-label text-label-md text-light-on-surface whitespace-nowrap">Elena Rostova (Super Admin)</span>
+              <span class="material-symbols-outlined text-light-outline text-[18px]">expand_more</span>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-lg py-1.5 z-30">
+              <a href="../executive-dashboard/ExecutiveDashboard.html" class="block px-4 py-2 font-body text-body-sm text-light-on-surface hover:bg-light-surface-container-low">Executive Dashboard</a>
+              <a href="../login-authentication/LoginAuthentication.html" class="block px-4 py-2 font-body text-body-sm text-overdue hover:bg-overdue-container">Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Workspace Content -->
+      <main class="flex-1 p-6 lg:p-8 flex flex-col gap-6 max-w-[1320px] w-full mx-auto">
+        <!-- Page Header -->
+        <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="flex flex-col gap-1">
+            <h1 data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface">Payment Collection</h1>
+            <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant text-pretty">Manage student fees, collect payments and monitor outstanding balances.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 shrink-0">
+            <button type="button" onclick="showToast(&#39;Fee collection summary prepared for export.&#39;)" class="inline-flex items-center gap-2 px-4 py-2.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface hover:bg-light-surface-container-low transition-colors whitespace-nowrap">
+              <span class="material-symbols-outlined text-[18px] text-light-on-surface-variant" aria-hidden="true">download</span>
+              <span data-design-text-token="label-lg" class="font-label text-label-lg">Export Report</span>
+            </button>
+            <button type="button" onclick="openCollectModal()" data-component-id="button-primary" data-component-type="button" data-component-variant="primary" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-light-primary text-light-on-primary shadow-sm hover:bg-light-primary-container transition-colors whitespace-nowrap">
+              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>
+              <span data-design-text-token="label-lg" class="font-label text-label-lg">Collect Payment</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Toast Banner -->
+        <div id="paymentToast" role="status" class="hidden items-center justify-between gap-3 px-4 py-3 rounded bg-success-container border border-success/30 text-on-success-container">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-success text-[20px]" style="font-variation-settings: &#39;FILL&#39; 1;">check_circle</span>
+            <span id="paymentToastText" data-design-text-token="label-lg" class="font-label text-label-lg">Payment recorded successfully.</span>
+          </div>
+          <a href="../payment-receipt/PaymentReceipt.html" class="font-label text-label-md underline whitespace-nowrap">View Receipt</a>
+        </div>
+
+        <!-- 5 Payment Overview Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" aria-label="Payment Overview">
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between gap-2">
+              <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Total Fees</span>
+              <span class="w-8 h-8 rounded bg-light-primary-tint text-light-primary flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px]">account_balance</span>
+              </span>
+            </div>
+            <span data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface tabular-nums">₹25,00,000</span>
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">FY 2026–27 billable</span>
+          </article>
+
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between gap-2">
+              <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Collected Amount</span>
+              <span class="w-8 h-8 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+              </span>
+            </div>
+            <span data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface tabular-nums">₹18,50,000</span>
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-success-container">74% collected</span>
+          </article>
+
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between gap-2">
+              <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Pending Amount</span>
+              <span class="w-8 h-8 rounded bg-pending-container text-on-pending-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px]">schedule</span>
+              </span>
+            </div>
+            <span data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface tabular-nums">₹4,50,000</span>
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-pending-container">Due this month</span>
+          </article>
+
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between gap-2">
+              <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Overdue Amount</span>
+              <span class="w-8 h-8 rounded bg-overdue-container text-on-overdue-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px]">warning</span>
+              </span>
+            </div>
+            <span data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface tabular-nums">₹2,00,000</span>
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-on-overdue-container">Needs follow-up</span>
+          </article>
+
+          <article class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between gap-2">
+              <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Total Transactions</span>
+              <span class="w-8 h-8 rounded bg-light-secondary-container text-light-on-secondary-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+              </span>
+            </div>
+            <span data-design-text-token="headline-lg" class="font-headline text-headline-lg text-light-on-surface tabular-nums">450</span>
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Verified receipts</span>
+          </article>
+        </section>
+
+        <!-- Fee Analytics: Collection Trend Graph + Fee Breakdown Pie Chart -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch" aria-label="Fee Collection Analytics">
+          <!-- Left 7 Cols: Monthly Collection Graph -->
+          <article class="lg:col-span-7 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-5 flex flex-col justify-between gap-4">
+            <header class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-col gap-0.5">
+                <h2 data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface">Monthly Fee Collection Trend</h2>
+                <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Jun – Nov 2026 (in ₹ Lakhs)</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 font-label text-label-sm text-light-on-surface-variant">
+                  <span class="w-2.5 h-2.5 rounded-sm bg-light-primary"></span>Collected
+                </span>
+                <span class="inline-flex items-center gap-1.5 font-label text-label-sm text-light-on-surface-variant">
+                  <span class="w-2.5 h-2.5 rounded-sm bg-pending"></span>Pending
+                </span>
+              </div>
+            </header>
+
+            <div class="w-full">
+              <svg viewBox="0 0 560 190" class="w-full h-auto" role="img" aria-label="Monthly fee collection bar chart from June to November 2026">
+                <!-- Horizontal Gridlines -->
+                <line x1="40" y1="20" x2="544" y2="20" stroke="#E2E8F0" stroke-dasharray="3 3"></line>
+                <line x1="40" y1="60" x2="544" y2="60" stroke="#E2E8F0" stroke-dasharray="3 3"></line>
+                <line x1="40" y1="100" x2="544" y2="100" stroke="#E2E8F0" stroke-dasharray="3 3"></line>
+                <line x1="40" y1="140" x2="544" y2="140" stroke="#CBD5E1"></line>
+
+                <!-- Y-axis Labels -->
+                <text x="32" y="24" text-anchor="end" fill="#64748B" font-size="10" font-family="Inter, sans-serif">₹6L</text>
+                <text x="32" y="64" text-anchor="end" fill="#64748B" font-size="10" font-family="Inter, sans-serif">₹4L</text>
+                <text x="32" y="104" text-anchor="end" fill="#64748B" font-size="10" font-family="Inter, sans-serif">₹2L</text>
+                <text x="32" y="144" text-anchor="end" fill="#64748B" font-size="10" font-family="Inter, sans-serif">₹0</text>
+
+                <!-- Jun: 2.4L collected, 0.6L pending -->
+                <rect x="64" y="92" width="22" height="48" rx="4" fill="#0037B0"></rect>
+                <rect x="90" y="128" width="16" height="12" rx="3" fill="#B45309"></rect>
+                <text x="85" y="160" text-anchor="middle" fill="#475569" font-size="11" font-family="Inter, sans-serif">Jun</text>
+
+                <!-- Jul: 2.9L collected, 0.8L pending -->
+                <rect x="146" y="82" width="22" height="58" rx="4" fill="#0037B0"></rect>
+                <rect x="172" y="124" width="16" height="16" rx="3" fill="#B45309"></rect>
+                <text x="167" y="160" text-anchor="middle" fill="#475569" font-size="11" font-family="Inter, sans-serif">Jul</text>
+
+                <!-- Aug: 3.1L collected, 0.7L pending -->
+                <rect x="228" y="78" width="22" height="62" rx="4" fill="#0037B0"></rect>
+                <rect x="254" y="126" width="16" height="14" rx="3" fill="#B45309"></rect>
+                <text x="249" y="160" text-anchor="middle" fill="#475569" font-size="11" font-family="Inter, sans-serif">Aug</text>
+
+                <!-- Sep: 3.5L collected, 0.9L pending -->
+                <rect x="310" y="70" width="22" height="70" rx="4" fill="#0037B0"></rect>
+                <rect x="336" y="122" width="16" height="18" rx="3" fill="#B45309"></rect>
+                <text x="331" y="160" text-anchor="middle" fill="#475569" font-size="11" font-family="Inter, sans-serif">Sep</text>
+
+                <!-- Oct: 3.2L collected, 0.8L pending -->
+                <rect x="392" y="76" width="22" height="64" rx="4" fill="#0037B0"></rect>
+                <rect x="418" y="124" width="16" height="16" rx="3" fill="#B45309"></rect>
+                <text x="413" y="160" text-anchor="middle" fill="#475569" font-size="11" font-family="Inter, sans-serif">Oct</text>
+
+                <!-- Nov: 4.4L collected, 0.7L pending -->
+                <rect x="474" y="52" width="22" height="88" rx="4" fill="#0037B0"></rect>
+                <rect x="500" y="126" width="16" height="14" rx="3" fill="#B45309"></rect>
+                <text x="495" y="160" text-anchor="middle" fill="#0F172A" font-weight="600" font-size="11" font-family="Inter, sans-serif">Nov</text>
+              </svg>
+            </div>
+          </article>
+
+          <!-- Right 5 Cols: Fee Status Pie Chart -->
+          <article class="lg:col-span-5 bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-5 flex flex-col justify-between gap-4">
+            <header class="flex items-center justify-between gap-2">
+              <div class="flex flex-col gap-0.5">
+                <h2 data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface">Fee Breakdown</h2>
+                <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Total ₹25,00,000 distribution</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full bg-success-container text-on-success-container font-label text-label-sm">74% Paid</span>
+            </header>
+
+            <div class="flex flex-col sm:flex-row items-center gap-5 my-auto">
+              <!-- SVG Donut Pie Chart (r=56, circumference=351.86) -->
+              <div class="relative w-36 h-36 shrink-0 flex items-center justify-center">
+                <svg viewBox="0 0 140 140" class="w-full h-full -rotate-90" role="img" aria-label="Fee breakdown pie chart: 74% collected, 18% pending, 8% overdue">
+                  <circle cx="70" cy="70" r="56" fill="none" stroke="#E2E8F0" stroke-width="18"></circle>
+                  <!-- Collected: 74% = 260.38 -->
+                  <circle cx="70" cy="70" r="56" fill="none" stroke="#059669" stroke-width="18" stroke-dasharray="260.38 351.86" stroke-dashoffset="0"></circle>
+                  <!-- Pending: 18% = 63.33 -->
+                  <circle cx="70" cy="70" r="56" fill="none" stroke="#B45309" stroke-width="18" stroke-dasharray="63.33 351.86" stroke-dashoffset="-260.38"></circle>
+                  <!-- Overdue: 8% = 28.15 -->
+                  <circle cx="70" cy="70" r="56" fill="none" stroke="#BE123C" stroke-width="18" stroke-dasharray="28.15 351.86" stroke-dashoffset="-323.71"></circle>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface tabular-nums">74%</span>
+                  <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Collected</span>
+                </div>
+              </div>
+
+              <!-- Legend -->
+              <div class="flex-1 w-full flex flex-col gap-2.5">
+                <div class="flex items-center justify-between gap-2 p-2 rounded bg-light-surface-container-low">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-success shrink-0"></span>
+                    <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Collected (74%)</span>
+                  </div>
+                  <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface tabular-nums">₹18.5L</span>
+                </div>
+                <div class="flex items-center justify-between gap-2 p-2 rounded bg-light-surface-container-low">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-pending shrink-0"></span>
+                    <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Pending (18%)</span>
+                  </div>
+                  <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface tabular-nums">₹4.5L</span>
+                </div>
+                <div class="flex items-center justify-between gap-2 p-2 rounded bg-light-surface-container-low">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-overdue shrink-0"></span>
+                    <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Overdue (8%)</span>
+                  </div>
+                  <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface tabular-nums">₹2.0L</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- Payment Collection Filters -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm p-4 flex flex-col gap-3" aria-label="Payment Filters">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div class="relative flex items-center lg:col-span-2">
+              <span class="material-symbols-outlined text-light-outline text-[18px] absolute left-3 pointer-events-none">search</span>
+              <input id="studentFilterInput" type="search" oninput="filterPayments()" placeholder="Search Student Name or ID..." class="w-full pl-9 pr-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-sm placeholder:text-light-outline focus:bg-light-surface-container-lowest focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+            </div>
+
+            <select id="courseFilter" onchange="filterPayments()" aria-label="Filter by course" class="pl-3 pr-8 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="all">All Courses</option>
+              <option value="Graphic Design">Graphic Design</option>
+              <option value="UI/UX Design">UI/UX Design</option>
+              <option value="Full Stack Development">Full Stack Development</option>
+            </select>
+
+            <select id="batchFilter" onchange="filterPayments()" aria-label="Filter by batch" class="pl-3 pr-8 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="all">All Batches</option>
+              <option value="GD-2026-M1">GD-2026-M1</option>
+              <option value="UX-2026-M1">UX-2026-M1</option>
+              <option value="FS-2026-M1">FS-2026-M1</option>
+            </select>
+
+            <select id="statusFilter" onchange="filterPayments()" aria-label="Filter by payment status" class="pl-3 pr-8 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="all">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial Payment">Partial Payment</option>
+              <option value="Unpaid">Unpaid</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+
+            <select id="methodFilter" onchange="filterPayments()" aria-label="Filter by payment method" class="pl-3 pr-8 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="all">All Methods</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Card">Card</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface-variant">Date Range:</span>
+              <input type="date" aria-label="From date" value="2026-11-01" class="px-2.5 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest font-body text-body-sm text-light-on-surface tabular-nums focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">to</span>
+              <input type="date" aria-label="To date" value="2026-11-30" class="px-2.5 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest font-body text-body-sm text-light-on-surface tabular-nums focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+            </div>
+
+            <button type="button" onclick="clearFilters()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface-variant hover:bg-light-surface-container-low font-label text-label-md transition-colors">
+              <span class="material-symbols-outlined text-[16px]">filter_alt_off</span>
+              <span>Clear Filters</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Student Payment Collection Table -->
+        <section class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm flex flex-col">
+          <header class="px-4 py-3.5 border-b border-light-outline-variant flex items-center justify-between gap-4">
+            <h2 data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">Student Fee Ledger</h2>
+            <span id="ledgerCountText" data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">Showing 4 of 4 students</span>
+          </header>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-light-outline-variant bg-light-surface-container-low">
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Student ID</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Student Name</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Course Name</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Batch</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant text-right whitespace-nowrap">Total Fee</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant text-right whitespace-nowrap">Paid</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant text-right whitespace-nowrap">Balance</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Due Date</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Status</th>
+                  <th class="px-2 py-3 font-label text-label-md text-light-on-surface-variant text-right whitespace-nowrap">Action</th>
+                </tr>
+              </thead>
+              <tbody id="paymentTableBody" class="divide-y divide-light-outline-variant">
+                <!-- Student 1 -->
+                <tr data-id="STU001" data-name="Arjun Kumar" data-course="Graphic Design" data-batch="GD-2026-M1" data-status="Partial Payment" data-method="UPI" data-fee="25000" data-paid="15000" data-balance="10000" class="payment-row hover:bg-light-surface-container-low/60 transition-colors">
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">STU001</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Arjun Kumar</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface">Graphic Design</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">GD-2026-M1</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface tabular-nums">₹25,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-on-success-container tabular-nums">₹15,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface tabular-nums">₹10,000</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">25 Nov 2026</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-light-primary-tint text-light-on-primary-tint">
+                      <span class="w-1.5 h-1.5 rounded-full bg-light-primary"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Partial Payment</span>
+                    </span>
+                  </td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap">
+                    <button type="button" onclick="openCollectModal(&#39;STU001&#39;)" class="px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-label-md transition-colors">Collect</button>
+                  </td>
+                </tr>
+
+                <!-- Student 2 -->
+                <tr data-id="STU002" data-name="Priya Sharma" data-course="UI/UX Design" data-batch="UX-2026-M1" data-status="Paid" data-method="Bank Transfer" data-fee="30000" data-paid="30000" data-balance="0" class="payment-row hover:bg-light-surface-container-low/60 transition-colors">
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">STU002</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Priya Sharma</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface">UI/UX Design</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">UX-2026-M1</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface tabular-nums">₹30,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-on-success-container tabular-nums">₹30,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface-variant tabular-nums">₹0</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">20 Nov 2026</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-container text-on-success-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Paid</span>
+                    </span>
+                  </td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap">
+                    <a href="../payment-receipt/PaymentReceipt.html" class="inline-block px-3 py-1.5 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface hover:bg-light-surface-container-low font-label text-label-md transition-colors">Receipt</a>
+                  </td>
+                </tr>
+
+                <!-- Student 3 -->
+                <tr data-id="STU003" data-name="Rahul Kumar" data-course="Full Stack Development" data-batch="FS-2026-M1" data-status="Overdue" data-method="Card" data-fee="45000" data-paid="10000" data-balance="35000" class="payment-row hover:bg-light-surface-container-low/60 transition-colors">
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">STU003</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Rahul Kumar</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface">Full Stack Development</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">FS-2026-M1</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface tabular-nums">₹45,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-on-success-container tabular-nums">₹10,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-on-overdue-container tabular-nums">₹35,000</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-sm" class="font-body text-body-sm text-on-overdue-container tabular-nums">15 Nov 2026</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-overdue-container text-on-overdue-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-overdue"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Overdue</span>
+                    </span>
+                  </td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap">
+                    <button type="button" onclick="openCollectModal(&#39;STU003&#39;)" class="px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-label-md transition-colors">Collect</button>
+                  </td>
+                </tr>
+
+                <!-- Student 4 -->
+                <tr data-id="STU004" data-name="Divya S" data-course="Graphic Design" data-batch="GD-2026-M1" data-status="Unpaid" data-method="Cash" data-fee="25000" data-paid="0" data-balance="25000" class="payment-row hover:bg-light-surface-container-low/60 transition-colors">
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">STU004</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Divya S</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface">Graphic Design</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">GD-2026-M1</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface tabular-nums">₹25,000</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant tabular-nums">₹0</span></td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface tabular-nums">₹25,000</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap"><span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">30 Nov 2026</span></td>
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-pending-container text-on-pending-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-pending"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Unpaid</span>
+                    </span>
+                  </td>
+                  <td class="px-2 py-3 text-right whitespace-nowrap">
+                    <button type="button" onclick="openCollectModal(&#39;STU004&#39;)" class="px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-label-md transition-colors">Collect</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div id="emptyLedgerState" class="hidden p-8 text-center flex-col items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-light-outline text-[32px]">search_off</span>
+            <p data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface">No matching student fee records</p>
+            <p data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant">Try clearing or adjusting your active search and filter criteria.</p>
+          </div>
+        </section>
+
+        <!-- Payment History Section -->
+        <section id="paymentHistorySection" class="bg-light-surface-container-lowest border border-light-outline-variant rounded-md shadow-sm flex flex-col">
+          <header class="px-4 py-3.5 border-b border-light-outline-variant flex items-center justify-between gap-4">
+            <h2 data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">Recent Payment History</h2>
+            <span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">Latest verified transactions</span>
+          </header>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-light-outline-variant bg-light-surface-container-low">
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Transaction ID</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Receipt Number</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Student Name</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Payment Date</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Method</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant text-right whitespace-nowrap">Amount</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant whitespace-nowrap">Status</th>
+                  <th class="px-3 py-3 font-label text-label-md text-light-on-surface-variant text-right whitespace-nowrap">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-light-outline-variant">
+                <tr class="hover:bg-light-surface-container-low/60 transition-colors">
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">TXN-2026-8841</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface">RCP-2026-0449</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Priya Sharma</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">20 Nov 2026</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface">Bank Transfer</span></td>
+                  <td class="px-3 py-3 text-right whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface tabular-nums">₹30,000</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-container text-on-success-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Success</span>
+                    </span>
+                  </td>
+                  <td class="px-3 py-3 text-right whitespace-nowrap">
+                    <div class="inline-flex items-center gap-2">
+                      <a href="../payment-receipt/PaymentReceipt.html" class="font-label text-label-md text-light-primary hover:underline">View Receipt</a>
+                      <button type="button" onclick="showToast(&#39;Receipt RCP-2026-0449 ready.&#39;)" class="font-label text-label-md text-light-on-surface-variant hover:text-light-on-surface">Download</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-light-surface-container-low/60 transition-colors">
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface-variant">TXN-2026-8839</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="mono-sm" class="font-mono text-mono-sm text-light-on-surface">RCP-2026-0448</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface">Arjun Kumar</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="body-sm" class="font-body text-body-sm text-light-on-surface-variant tabular-nums">18 Nov 2026</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap"><span data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface">UPI</span></td>
+                  <td class="px-3 py-3 text-right whitespace-nowrap"><span data-design-text-token="label-lg" class="font-label text-label-lg text-light-on-surface tabular-nums">₹15,000</span></td>
+                  <td class="px-3 py-3 whitespace-nowrap">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-container text-on-success-container">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      <span data-design-text-token="label-md" class="font-label text-label-md">Success</span>
+                    </span>
+                  </td>
+                  <td class="px-3 py-3 text-right whitespace-nowrap">
+                    <div class="inline-flex items-center gap-2">
+                      <a href="../payment-receipt/PaymentReceipt.html" class="font-label text-label-md text-light-primary hover:underline">View Receipt</a>
+                      <button type="button" onclick="showToast(&#39;Receipt RCP-2026-0448 ready.&#39;)" class="font-label text-label-md text-light-on-surface-variant hover:text-light-on-surface">Download</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Collect Student Payment Modal -->
+  <div id="collectPaymentModal" role="dialog" aria-modal="true" aria-labelledby="collectModalTitle" class="hidden fixed inset-0 z-50 bg-light-scrim/50 flex items-center justify-center p-4">
+    <div class="bg-light-surface-container-lowest border border-light-outline-variant rounded-lg shadow-xl w-full max-w-[680px] flex flex-col">
+      <header class="px-6 py-4 border-b border-light-outline-variant flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-light-primary text-[22px]">payments</span>
+          <h2 id="collectModalTitle" data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">Collect Student Payment</h2>
+        </div>
+        <button type="button" onclick="closeCollectModal()" aria-label="Close modal" class="p-1.5 rounded text-light-on-surface-variant hover:bg-light-surface-container-low">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </header>
+
+      <form class="p-6 flex flex-col gap-5" onsubmit="submitPayment(event)">
+        <!-- Student Information -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Student ID</span>
+            <select id="modalStudentSelect" onchange="populateModalStudent(this.value)" class="pl-3 pr-8 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-mono text-mono-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="STU001">STU001 — Arjun Kumar</option>
+              <option value="STU003">STU003 — Rahul Kumar</option>
+              <option value="STU004">STU004 — Divya S</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Student Name</span>
+            <input id="modalStudentName" type="text" readonly value="Arjun Kumar" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-md">
+          </label>
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Course Name</span>
+            <input id="modalCourseName" type="text" readonly value="Graphic Design" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-body text-body-md">
+          </label>
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Batch Name</span>
+            <input id="modalBatchName" type="text" readonly value="GD-2026-M1" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-low text-light-on-surface font-mono text-mono-sm">
+          </label>
+        </div>
+
+        <!-- Fee Information -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded bg-light-surface-container-low border border-light-outline-variant">
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Total Fee</span>
+            <span id="modalTotalFee" data-design-text-token="title-md" class="font-title text-title-md text-light-on-surface tabular-nums">₹25,000</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Previously Paid</span>
+            <span id="modalPrevPaid" data-design-text-token="title-md" class="font-title text-title-md text-on-success-container tabular-nums">₹15,000</span>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface-variant">Balance Due</span>
+            <span id="modalBalance" data-design-text-token="title-md" class="font-title text-title-md text-on-overdue-container tabular-nums">₹10,000</span>
+          </div>
+          <label class="flex flex-col gap-1">
+            <span data-design-text-token="label-sm" class="font-label text-label-sm text-light-on-surface">Collect Now (₹)</span>
+            <input id="modalPayAmount" type="number" min="1" value="10000" required class="px-2.5 py-1 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-md tabular-nums focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </label>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Payment Date</span>
+            <input type="date" value="2026-11-21" required class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm tabular-nums focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </label>
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Payment Method</span>
+            <select class="pl-3 pr-8 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+              <option value="UPI" selected>UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Card">Card</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1.5">
+            <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Transaction ID</span>
+            <input type="text" value="TXN-2026-8842" required class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-mono text-mono-sm focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+          </label>
+        </div>
+
+        <label class="flex flex-col gap-1.5">
+          <span data-design-text-token="label-md" class="font-label text-label-md text-light-on-surface">Payment Remarks</span>
+          <input type="text" placeholder="e.g. Final installment received via UPI" class="px-3 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-body text-body-md placeholder:text-light-outline focus:border-light-primary focus:ring-2 focus:ring-light-primary-tint focus:outline-none">
+        </label>
+
+        <footer class="pt-3 border-t border-light-outline-variant flex items-center justify-end gap-3">
+          <button type="button" onclick="closeCollectModal()" class="px-4 py-2 rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface font-label text-label-lg hover:bg-light-surface-container-low">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded bg-light-primary text-light-on-primary font-label text-label-lg hover:bg-light-primary-container shadow-sm">Collect Payment</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const studentMap = {
+      STU001: { name: 'Arjun Kumar', course: 'Graphic Design', batch: 'GD-2026-M1', total: '₹25,000', paid: '₹15,000', balance: '₹10,000', rawBal: 10000 },
+      STU003: { name: 'Rahul Kumar', course: 'Full Stack Development', batch: 'FS-2026-M1', total: '₹45,000', paid: '₹10,000', balance: '₹35,000', rawBal: 35000 },
+      STU004: { name: 'Divya S', course: 'Graphic Design', batch: 'GD-2026-M1', total: '₹25,000', paid: '₹0', balance: '₹25,000', rawBal: 25000 }
+    };
+
+    function openCollectModal(studentId) {
+      const id = studentId || 'STU001';
+      document.getElementById('modalStudentSelect').value = id;
+      populateModalStudent(id);
+      document.getElementById('collectPaymentModal').classList.remove('hidden');
+    }
+
+    function closeCollectModal() {
+      document.getElementById('collectPaymentModal').classList.add('hidden');
+    }
+
+    function populateModalStudent(id) {
+      const s = studentMap[id] || studentMap.STU001;
+      document.getElementById('modalStudentName').value = s.name;
+      document.getElementById('modalCourseName').value = s.course;
+      document.getElementById('modalBatchName').value = s.batch;
+      document.getElementById('modalTotalFee').textContent = s.total;
+      document.getElementById('modalPrevPaid').textContent = s.paid;
+      document.getElementById('modalBalance').textContent = s.balance;
+      document.getElementById('modalPayAmount').value = s.rawBal;
+    }
+
+    function submitPayment(e) {
+      e.preventDefault();
+      const name = document.getElementById('modalStudentName').value;
+      const amt = document.getElementById('modalPayAmount').value;
+      closeCollectModal();
+      showToast('Payment of ₹' + Number(amt).toLocaleString('en-IN') + ' recorded for ' + name + '.');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('paymentToast');
+      document.getElementById('paymentToastText').textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+    }
+
+    function filterPayments() {
+      const q = document.getElementById('studentFilterInput').value.trim().toLowerCase();
+      const course = document.getElementById('courseFilter').value;
+      const batch = document.getElementById('batchFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const method = document.getElementById('methodFilter').value;
+      const rows = document.querySelectorAll('.payment-row');
+      let visible = 0;
+
+      rows.forEach((row) => {
+        const id = row.getAttribute('data-id').toLowerCase();
+        const name = row.getAttribute('data-name').toLowerCase();
+        const rCourse = row.getAttribute('data-course');
+        const rBatch = row.getAttribute('data-batch');
+        const rStatus = row.getAttribute('data-status');
+        const rMethod = row.getAttribute('data-method');
+
+        const matchQ = !q || id.includes(q) || name.includes(q);
+        const matchCourse = course === 'all' || rCourse === course;
+        const matchBatch = batch === 'all' || rBatch === batch;
+        const matchStatus = status === 'all' || rStatus === status;
+        const matchMethod = method === 'all' || rMethod === method;
+
+        if (matchQ && matchCourse && matchBatch && matchStatus && matchMethod) {
+          row.classList.remove('hidden');
+          visible += 1;
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+
+      document.getElementById('ledgerCountText').textContent = 'Showing ' + visible + ' of 4 students';
+      const empty = document.getElementById('emptyLedgerState');
+      if (visible === 0) {
+        empty.classList.remove('hidden');
+        empty.classList.add('flex');
+      } else {
+        empty.classList.add('hidden');
+        empty.classList.remove('flex');
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById('studentFilterInput').value = '';
+      document.getElementById('courseFilter').value = 'all';
+      document.getElementById('batchFilter').value = 'all';
+      document.getElementById('statusFilter').value = 'all';
+      document.getElementById('methodFilter').value = 'all';
+      filterPayments();
+    }
+
+    function toggleProfileMenu() {
+      document.getElementById('profileMenu').classList.toggle('hidden');
+    }
+
+    function toggleMobileSidebar() {
+      const aside = document.getElementById('appSidebar');
+      aside.classList.toggle('hidden');
+      aside.classList.toggle('fixed');
+      aside.classList.toggle('inset-y-0');
+      aside.classList.toggle('left-0');
+      aside.classList.toggle('z-40');
+      aside.classList.toggle('w-[260px]');
+      aside.classList.toggle('flex');
+    }
+  </script>
+
+</body></html>
