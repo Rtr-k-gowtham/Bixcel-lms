@@ -196,16 +196,16 @@ export function RoleMaster({ onNavigateToMatrix }) {
       )}
 
       {/* Top Banner Card */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="w-9 h-9 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-[20px]">badge</span>
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-2.5">
+          <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
+            <span className="material-symbols-outlined text-[17px]">badge</span>
           </span>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Role Master
             </h1>
-            <p className="font-body text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
               Define authority tiers, departmental responsibilities, and operational scope boundaries
             </p>
           </div>
@@ -214,29 +214,29 @@ export function RoleMaster({ onNavigateToMatrix }) {
         <button
           type="button"
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-label-md font-semibold shadow-sm transition-colors duration-state-change shrink-0"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-xs font-semibold shadow-xs transition-colors duration-state-change shrink-0"
         >
-          <span className="material-symbols-outlined text-[18px]">add_moderator</span>
+          <span className="material-symbols-outlined text-[16px]">add_moderator</span>
           <span>Create New Role</span>
         </button>
       </section>
 
       {/* Role Cards Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
         {roles.map((r) => (
           <article
             key={r.id}
-            className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-sm flex flex-col justify-between gap-3 hover:shadow-md transition-shadow"
+            className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-2 hover:shadow-sm transition-shadow"
           >
-            <div className="flex flex-col gap-2">
-              <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-start justify-between gap-1.5">
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-title text-[13.5px] font-bold text-light-on-surface dark:text-dark-on-surface">
                       {r.name}
                     </h3>
                     {r.is_system && (
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                      <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                         System
                       </span>
                     )}

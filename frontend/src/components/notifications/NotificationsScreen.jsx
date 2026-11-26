@@ -186,21 +186,21 @@ export function NotificationsScreen({ onNavigate }) {
       )}
 
       {/* Header Card */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="w-9 h-9 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-[20px]">notifications_active</span>
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5">
+          <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[17px]">notifications_active</span>
           </span>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-2">
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-2">
               <span>Notifications &amp; System Alerts</span>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-overdue text-white tabular-nums">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-overdue text-white tabular-nums">
                   {unreadCount} Unread
                 </span>
               )}
             </h1>
-            <p className="font-body text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
               Real-time operational alerts, academic timetable conflicts, fee installments, and security notices
             </p>
           </div>
@@ -211,16 +211,16 @@ export function NotificationsScreen({ onNavigate }) {
             type="button"
             onClick={markAllRead}
             disabled={unreadCount === 0}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright hover:bg-light-surface-container-low text-light-on-surface dark:text-dark-on-surface font-label text-label-md font-semibold shadow-sm transition-colors duration-state-change disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright hover:bg-light-surface-container-low text-light-on-surface dark:text-dark-on-surface font-label text-xs font-semibold shadow-xs transition-colors duration-state-change disabled:opacity-40"
           >
-            <span className="material-symbols-outlined text-[17px]">done_all</span>
+            <span className="material-symbols-outlined text-[15px]">done_all</span>
             <span>Mark All Read</span>
           </button>
         </div>
       </section>
 
       {/* Filter Tabs */}
-      <section className="flex flex-wrap items-center gap-2">
+      <section className="flex flex-wrap items-center gap-1.5">
         {[
           { id: 'ALL', label: `All Alerts (${notifications.length})` },
           { id: 'UNREAD', label: `Unread (${unreadCount})` },
@@ -233,9 +233,9 @@ export function NotificationsScreen({ onNavigate }) {
             key={tab.id}
             type="button"
             onClick={() => setActiveFilter(tab.id)}
-            className={`px-3 py-1.5 rounded font-label text-label-sm font-semibold transition-all ${
+            className={`px-2.5 py-1 rounded font-label text-xs font-semibold transition-all ${
               activeFilter === tab.id
-                ? 'bg-light-primary text-light-on-primary shadow-sm'
+                ? 'bg-light-primary text-light-on-primary shadow-xs'
                 : 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant hover:text-light-on-surface'
             }`}
           >

@@ -255,135 +255,135 @@ export function ModuleLibrary() {
   const categoriesCount = new Set(modules.map((m) => m.category)).size
 
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-4 w-full">
       {/* Toast Notification */}
       {toast && (
-        <div className="p-3 rounded-md bg-success-container text-on-success-container font-label text-label-md font-semibold flex items-center justify-between shadow-sm animate-in fade-in duration-200">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+        <div className="p-2.5 rounded bg-success-container text-on-success-container font-label text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in duration-200">
+          <div className="flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[16px]">check_circle</span>
             <span>{toast}</span>
           </div>
-          <button type="button" onClick={() => setToast('')}>
-            <span className="material-symbols-outlined text-[16px]">close</span>
+          <button type="button" onClick={() => setToast('')} className="p-0.5 opacity-70 hover:opacity-100">
+            <span className="material-symbols-outlined text-[14px]">close</span>
           </button>
         </div>
       )}
 
       {/* Page Header */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
             Module Library
           </h1>
-          <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
             Manage and reuse standardized curriculum modules across active courses.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => {
               setToast('Import curriculum dialog opened')
               setTimeout(() => setToast(''), 3000)
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low transition-colors whitespace-nowrap font-label text-label-lg"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low transition-colors whitespace-nowrap font-label text-xs font-semibold"
           >
-            <span className="material-symbols-outlined text-[18px]">upload_file</span>
+            <span className="material-symbols-outlined text-[16px]">upload_file</span>
             <span>Import Module</span>
           </button>
           <button
             type="button"
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm transition-colors whitespace-nowrap font-label text-label-lg"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-xs transition-colors whitespace-nowrap font-label text-xs font-semibold"
           >
-            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span className="material-symbols-outlined text-[16px]">add</span>
             <span>Create Custom Module</span>
           </button>
         </div>
       </section>
 
       {/* 4 Statistics Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Module Statistics">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5" aria-label="Module Statistics">
         {/* Total Modules */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-4.5 flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Total Modules
             </span>
-            <span className="font-headline text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+            <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
               {modules.length < 10 ? `0${modules.length}` : modules.length}
             </span>
-            <span className="inline-flex items-center gap-1 text-light-primary text-label-sm font-medium">
-              <span className="material-symbols-outlined text-[14px]">layers</span>
+            <span className="inline-flex items-center gap-1 text-light-primary text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">layers</span>
               <span>Versioned blocks</span>
             </span>
           </div>
-          <div className="w-10 h-10 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[20px]">library_books</span>
+          <div className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">library_books</span>
           </div>
         </article>
 
         {/* Published Modules */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-4.5 flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Published Modules
             </span>
-            <span className="font-headline text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+            <span className="font-headline text-[17px] font-bold text-success tabular-nums">
               {publishedCount < 10 ? `0${publishedCount}` : publishedCount}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-on-success-container text-label-sm font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-              <span>Ready for courses</span>
+            <span className="inline-flex items-center gap-1 text-success text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">check_circle</span>
+              <span>Available in catalog</span>
             </span>
           </div>
-          <div className="w-10 h-10 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[20px]">check_circle</span>
+          <div className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">verified</span>
           </div>
         </article>
 
-        {/* Draft Modules */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-4.5 flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+        {/* In-Review Drafts */}
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Draft Modules
             </span>
-            <span className="font-headline text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+            <span className="font-headline text-[17px] font-bold text-pending tabular-nums">
               {draftCount < 10 ? `0${draftCount}` : draftCount}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-on-pending-container text-label-sm font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-pending"></span>
-              <span>In curriculum QA</span>
+            <span className="inline-flex items-center gap-1 text-pending text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">pending</span>
+              <span>Under curriculum review</span>
             </span>
           </div>
-          <div className="w-10 h-10 rounded bg-pending-container text-on-pending-container flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[20px]">edit_note</span>
+          <div className="w-7 h-7 rounded bg-pending-container text-on-pending-container flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">edit_note</span>
           </div>
         </article>
 
-        {/* Categories */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-4.5 flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
-              Categories
+        {/* Active Domains */}
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Subject Domains
             </span>
-            <span className="font-headline text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+            <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
               {categoriesCount < 10 ? `0${categoriesCount}` : categoriesCount}
             </span>
-            <span className="inline-flex items-center gap-1 text-light-on-surface-variant text-label-sm font-medium">
-              <span className="material-symbols-outlined text-[14px]">category</span>
-              <span>Departmental tags</span>
+            <span className="inline-flex items-center gap-1 text-light-on-surface-variant text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">category</span>
+              <span>Design, Dev &amp; Cloud</span>
             </span>
           </div>
-          <div className="w-10 h-10 rounded bg-light-secondary-container text-light-on-secondary-container flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[20px]">folder_copy</span>
+          <div className="w-7 h-7 rounded bg-light-surface-container-high dark:bg-dark-surface-container text-light-on-surface-variant flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">domain</span>
           </div>
         </article>
       </section>
 
       {/* Filter and Search Bar */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
         <div className="relative flex items-center w-full lg:w-80">
           <span className="material-symbols-outlined text-light-outline text-[18px] absolute left-3 pointer-events-none">
             search

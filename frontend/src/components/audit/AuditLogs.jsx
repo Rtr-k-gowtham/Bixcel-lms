@@ -211,16 +211,16 @@ export function AuditLogs() {
       )}
 
       {/* Header Banner */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="w-9 h-9 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-[20px]">history</span>
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5">
+          <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[17px]">history</span>
           </span>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Audit Logs &amp; Operational Telemetry
             </h1>
-            <p className="font-body text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
               Immutable activity ledger tracking administrative actions, authentication events, and data mutations
             </p>
           </div>
@@ -229,60 +229,60 @@ export function AuditLogs() {
         <button
           type="button"
           onClick={handleExport}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright hover:bg-light-surface-container-low text-light-on-surface dark:text-dark-on-surface font-label text-label-md font-semibold shadow-sm transition-colors duration-state-change shrink-0"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright hover:bg-light-surface-container-low text-light-on-surface dark:text-dark-on-surface font-label text-xs font-semibold shadow-xs transition-colors duration-state-change shrink-0"
         >
-          <span className="material-symbols-outlined text-[18px]">download</span>
+          <span className="material-symbols-outlined text-[16px]">download</span>
           <span>Export Audit Trail</span>
         </button>
       </section>
 
       {/* 4 Stat Metric Tiles */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        <div className="p-2.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Total Audit Events</span>
-            <div className="text-title-lg font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface mt-0.5">
+            <span className="text-[10px] font-label text-light-on-surface-variant uppercase font-medium">Total Audit Events</span>
+            <div className="text-[17px] font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface mt-0.5">
               1,420
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+          <span className="w-7 h-7 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">receipt_long</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+        <div className="p-2.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Auth &amp; Access</span>
-            <div className="text-title-lg font-bold tabular-nums text-on-success-container mt-0.5">
+            <span className="text-[10px] font-label text-light-on-surface-variant uppercase font-medium">Auth &amp; Access</span>
+            <div className="text-[17px] font-bold tabular-nums text-on-success-container mt-0.5">
               38 Today
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-success-container text-on-success-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">verified_user</span>
+          <span className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">verified_user</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+        <div className="p-2.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Data Mutations</span>
-            <div className="text-title-lg font-bold tabular-nums text-light-primary mt-0.5">
+            <span className="text-[10px] font-label text-light-on-surface-variant uppercase font-medium">Data Mutations</span>
+            <div className="text-[17px] font-bold tabular-nums text-light-primary mt-0.5">
               14 Logged
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-light-secondary-container text-light-on-secondary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">edit_note</span>
+          <span className="w-7 h-7 rounded bg-light-secondary-container text-light-on-secondary-container flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">edit_note</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+        <div className="p-2.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Security Alerts</span>
-            <div className="text-title-lg font-bold tabular-nums text-on-overdue-container mt-0.5">
+            <span className="text-[10px] font-label text-light-on-surface-variant uppercase font-medium">Security Alerts</span>
+            <div className="text-[17px] font-bold tabular-nums text-on-overdue-container mt-0.5">
               1 Blocked
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-overdue-container text-on-overdue-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">gpp_bad</span>
+          <span className="w-7 h-7 rounded bg-overdue-container text-on-overdue-container flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">gpp_bad</span>
           </span>
         </div>
       </section>

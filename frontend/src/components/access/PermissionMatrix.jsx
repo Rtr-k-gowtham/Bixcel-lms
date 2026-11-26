@@ -191,16 +191,16 @@ export function PermissionMatrix({ initialRole = 'Super Admin' }) {
       )}
 
       {/* Top Banner Card: Title, Description, and Actions */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="w-9 h-9 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-[20px]">verified_user</span>
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5">
+          <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[17px]">verified_user</span>
           </span>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-2">
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-2">
               Permission Matrix &amp; Operational Controls
             </h1>
-            <p className="font-body text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
               Granular action-level access control across ERP Foundation and academic business modules
             </p>
           </div>
@@ -212,9 +212,9 @@ export function PermissionMatrix({ initialRole = 'Super Admin' }) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#2B1B54] hover:bg-[#3B2570] text-white font-label text-label-md font-semibold shadow-sm transition-colors duration-state-change disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#2B1B54] hover:bg-[#3B2570] text-white font-label text-xs font-semibold shadow-xs transition-colors duration-state-change disabled:opacity-50"
           >
-            <span className="material-symbols-outlined text-[18px]">save</span>
+            <span className="material-symbols-outlined text-[16px]">save</span>
             <span>{saving ? 'Saving...' : 'Save Matrix Changes'}</span>
           </button>
 
@@ -226,16 +226,16 @@ export function PermissionMatrix({ initialRole = 'Super Admin' }) {
               setTimeout(() => setSaveToast(''), 3000)
             }}
             title="Reload Matrix"
-            className="p-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors"
+            className="p-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">refresh</span>
+            <span className="material-symbols-outlined text-[16px]">refresh</span>
           </button>
         </div>
       </section>
 
       {/* Role Pill Selector Row */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md px-4 py-2.5 shadow-sm flex flex-wrap items-center gap-2">
-        <span className="font-label text-label-sm font-bold text-light-on-surface-variant dark:text-dark-on-surface-variant uppercase tracking-wider mr-2">
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md px-3 py-2 shadow-xs flex flex-wrap items-center gap-1.5">
+        <span className="font-label text-xs font-bold text-light-on-surface-variant dark:text-dark-on-surface-variant uppercase tracking-wider mr-1.5">
           ROLE:
         </span>
         {ROLES.map((role) => {

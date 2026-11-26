@@ -341,46 +341,46 @@ export function FeesPayment({ onNavigate }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Page Header */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col gap-1">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-light-primary text-[22px]">payments</span>
-            <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+            <span className="material-symbols-outlined text-light-primary text-[18px]">payments</span>
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Fees &amp; Payment Collection
             </h1>
           </div>
-          <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
             Manage student fees, collect payments and monitor outstanding balances.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {onNavigate && (
             <button
               type="button"
               onClick={() => onNavigate('balance')}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded bg-amber-600 text-white hover:bg-amber-700 font-label text-label-md font-semibold shadow-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-700 font-label text-xs font-semibold shadow-xs transition-colors"
             >
-              <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+              <span className="material-symbols-outlined text-[16px]">account_balance_wallet</span>
               <span>Aging &amp; Balance Dues</span>
             </button>
           )}
           <button
             type="button"
             onClick={() => alert('Exporting fee collection report...')}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low transition-colors font-label text-label-md"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low transition-colors font-label text-xs font-semibold"
           >
-            <span className="material-symbols-outlined text-[18px]">download</span>
+            <span className="material-symbols-outlined text-[16px]">download</span>
             <span>Export Report</span>
           </button>
           <button
             type="button"
             onClick={() => handleOpenCollect()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm font-label text-label-md font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-xs font-label text-xs font-semibold transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span className="material-symbols-outlined text-[16px]">add</span>
             <span>Collect Payment</span>
           </button>
         </div>
@@ -388,17 +388,17 @@ export function FeesPayment({ onNavigate }) {
 
       {/* Success Toast */}
       {successToast && (
-        <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-md bg-success-container text-on-success-container border border-success/30 shadow-sm animate-fadeIn">
-          <div className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-[20px] text-success">check_circle</span>
-            <span className="font-body text-body-md font-medium">{successToast}</span>
+        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded bg-success-container text-on-success-container border border-success/30 shadow-xs animate-fadeIn text-xs">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px] text-success">check_circle</span>
+            <span className="font-body font-medium">{successToast}</span>
           </div>
           <div className="flex items-center gap-2">
             {viewingReceipt && (
               <button
                 type="button"
                 onClick={() => setViewingReceipt(viewingReceipt)}
-                className="px-2.5 py-1 text-label-sm font-semibold rounded bg-white text-success shadow-xs hover:bg-slate-50 transition-colors"
+                className="px-2 py-0.5 text-xs font-semibold rounded bg-white text-success shadow-xs hover:bg-slate-50 transition-colors"
               >
                 View Receipt
               </button>
@@ -408,41 +408,41 @@ export function FeesPayment({ onNavigate }) {
               onClick={() => setSuccessToast('')}
               className="text-on-success-container/70 hover:text-on-success-container"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <span className="material-symbols-outlined text-[16px]">close</span>
             </button>
           </div>
         </div>
       )}
 
       {/* 5 Payment Overview Cards (From UI reference/payment_collection) */}
-      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" aria-label="Payment Overview">
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-3.5 flex flex-col justify-between gap-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5" aria-label="Payment Overview">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Total Fees
             </span>
-            <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[16px]">account_balance</span>
+            <span className="w-6 h-6 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[15px]">account_balance</span>
             </span>
           </div>
-          <span className="font-headline text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+          <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
             ₹{totalFees.toLocaleString()}
           </span>
-          <span className="font-label text-label-xs text-light-on-surface-variant">
+          <span className="font-label text-[10px] text-light-on-surface-variant">
             FY 2026–27 billable
           </span>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-3.5 flex flex-col justify-between gap-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Collected Amount
             </span>
-            <span className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[16px]">check_circle</span>
+            <span className="w-6 h-6 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[15px]">check_circle</span>
             </span>
           </div>
-          <span className="font-headline text-headline-md font-bold text-success tabular-nums">
+          <span className="font-headline text-[17px] font-bold text-success tabular-nums">
             ₹{totalCollected.toLocaleString()}
           </span>
           <span className="font-label text-label-xs text-on-success-container font-semibold">

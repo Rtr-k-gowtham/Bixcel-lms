@@ -303,81 +303,81 @@ export function BatchManagement() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       {/* Page Header */}
-      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-light-primary text-[22px]">workspaces</span>
-            <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+            <span className="material-symbols-outlined text-light-primary text-[18px]">workspaces</span>
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Batch Management
             </h1>
           </div>
-          <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
             Monitor active cohorts, seat capacity, tutor assignments, and schedule readiness.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => alert('Opening institutional timetable view...')}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low transition-colors font-label text-label-md"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low transition-colors font-label text-xs font-semibold"
           >
-            <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+            <span className="material-symbols-outlined text-[16px]">calendar_month</span>
             <span>Timetable</span>
           </button>
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm font-label text-label-md font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-xs font-label text-xs font-semibold transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span className="material-symbols-outlined text-[16px]">add</span>
             <span>Create Batch</span>
           </button>
         </div>
       </section>
 
       {/* 4 KPI Metrics Grid (matching UI reference) */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-sm flex flex-col gap-1.5">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Active Batches
             </span>
-            <span className="material-symbols-outlined text-light-primary text-[18px]">workspaces</span>
+            <span className="material-symbols-outlined text-light-primary text-[16px]">workspaces</span>
           </div>
-          <span className="font-headline text-headline-lg text-light-on-surface dark:text-dark-on-surface tabular-nums font-bold">
+          <span className="font-headline text-[17px] text-light-on-surface dark:text-dark-on-surface tabular-nums font-bold">
             {activeBatchesCount || 18}
           </span>
-          <span className="font-body text-body-sm text-on-success-container font-medium">
+          <span className="font-body text-[10px] text-on-success-container font-medium">
             {enrollingCount} enrolling for upcoming term
           </span>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-sm flex flex-col gap-1.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Enrolled Students
             </span>
-            <span className="material-symbols-outlined text-light-primary text-[18px]">groups</span>
+            <span className="material-symbols-outlined text-light-primary text-[16px]">groups</span>
           </div>
-          <span className="font-headline text-headline-lg text-light-on-surface dark:text-dark-on-surface tabular-nums font-bold">
+          <span className="font-headline text-[17px] text-light-on-surface dark:text-dark-on-surface tabular-nums font-bold">
             {totalEnrolled || 412}
           </span>
-          <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <span className="font-body text-[10px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
             Across 6 institutional wings
           </span>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-sm flex flex-col gap-1.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Seat Utilization
             </span>
-            <span className="material-symbols-outlined text-success text-[18px]">event_seat</span>
+            <span className="material-symbols-outlined text-success text-[16px]">event_seat</span>
           </div>
-          <span className="font-headline text-headline-lg text-light-on-surface dark:text-dark-on-surface tabular-nums font-bold">
+          <span className="font-headline text-[17px] text-light-on-surface dark:text-dark-on-surface tabular-nums font-bold">
             {seatUtilization || 86.4}%
           </span>
           <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">

@@ -293,16 +293,16 @@ export function UserMaster() {
       )}
 
       {/* Top Header Card */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="w-9 h-9 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-2.5">
+          <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
+            <span className="material-symbols-outlined text-[17px]">manage_accounts</span>
           </span>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               User Master
             </h1>
-            <p className="font-body text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
               Manage platform users, faculty members, administrative staff, and student accounts
             </p>
           </div>
@@ -311,43 +311,43 @@ export function UserMaster() {
         <button
           type="button"
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-label-md font-semibold shadow-sm transition-colors duration-state-change shrink-0"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-xs font-semibold shadow-xs transition-colors duration-state-change shrink-0"
         >
-          <span className="material-symbols-outlined text-[18px]">person_add</span>
+          <span className="material-symbols-outlined text-[16px]">person_add</span>
           <span>Add New User</span>
         </button>
       </section>
 
       {/* 4 Quick Stat Tiles */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        <div className="p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Total Users</span>
-            <div className="text-title-lg font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface mt-0.5">
+            <span className="text-[10.5px] font-label text-light-on-surface-variant uppercase font-medium">Total Users</span>
+            <div className="text-[17px] font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface mt-0.5">
               {users.length}
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">group</span>
+          <span className="w-7 h-7 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">group</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+        <div className="p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Active Staff</span>
-            <div className="text-title-lg font-bold tabular-nums text-on-success-container mt-0.5">
+            <span className="text-[10.5px] font-label text-light-on-surface-variant uppercase font-medium">Active Staff</span>
+            <div className="text-[17px] font-bold tabular-nums text-on-success-container mt-0.5">
               {users.filter((u) => u.status === 'Active' && u.role !== 'Student / Learner').length}
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-success-container text-on-success-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">badge</span>
+          <span className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center">
+            <span className="material-symbols-outlined text-[16px]">badge</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+        <div className="p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Faculty Tutors</span>
-            <div className="text-title-lg font-bold tabular-nums text-light-primary mt-0.5">
+            <span className="text-[10.5px] font-label text-light-on-surface-variant uppercase font-medium">Faculty Tutors</span>
+            <div className="text-[17px] font-bold tabular-nums text-light-primary mt-0.5">
               {users.filter((u) => u.role === 'Tutor / Faculty').length}
             </div>
           </div>

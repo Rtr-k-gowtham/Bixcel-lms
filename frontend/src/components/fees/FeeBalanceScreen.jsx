@@ -470,17 +470,17 @@ export function FeeBalanceScreen({ onNavigate }) {
       )}
 
       {/* Screen Header */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-light-outline-variant dark:border-dark-outline-variant">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-light-outline-variant dark:border-dark-outline-variant">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center">
-              <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+          <div className="flex items-center gap-2">
+            <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center">
+              <span className="material-symbols-outlined text-[17px]">account_balance_wallet</span>
             </span>
-            <h1 className="font-headline text-headline-sm font-bold text-light-on-surface dark:text-dark-on-surface">
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Student Fee Balance &amp; Aging Dues
             </h1>
           </div>
-          <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5">
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5">
             Accounts receivable aging analysis, payment commitments, defaulter tracking, and recovery notifications.
           </p>
         </div>
@@ -490,9 +490,9 @@ export function FeeBalanceScreen({ onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate('fees')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface font-label text-label-sm hover:bg-light-surface-container-low transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface font-label text-xs font-semibold hover:bg-light-surface-container-low transition-colors"
             >
-              <span className="material-symbols-outlined text-[16px]">payments</span>
+              <span className="material-symbols-outlined text-[15px]">payments</span>
               <span>Fee Payments Mode</span>
             </button>
           )}
@@ -500,9 +500,9 @@ export function FeeBalanceScreen({ onNavigate }) {
             type="button"
             onClick={loadBalanceData}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface font-label text-label-sm hover:bg-light-surface-container-low transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface font-label text-xs font-semibold hover:bg-light-surface-container-low transition-colors"
           >
-            <span className={`material-symbols-outlined text-[16px] ${loading ? 'animate-spin' : ''}`}>sync</span>
+            <span className={`material-symbols-outlined text-[15px] ${loading ? 'animate-spin' : ''}`}>sync</span>
             <span>Refresh</span>
           </button>
 
@@ -514,20 +514,20 @@ export function FeeBalanceScreen({ onNavigate }) {
                 showToast(`Bulk payment notices queued for ${overdueCount} student guardians.`)
               }
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-700 font-label text-label-sm shadow-sm transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-700 font-label text-xs font-semibold shadow-xs transition-colors"
           >
-            <span className="material-symbols-outlined text-[16px]">campaign</span>
+            <span className="material-symbols-outlined text-[15px]">campaign</span>
             <span>Broadcast Overdue Reminders</span>
           </button>
         </div>
       </section>
 
       {/* 5 Compact Aging & Financial Health Metric Cards */}
-      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5">
         {/* Metric 1: Total Outstanding Balance */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Total Outstanding
             </span>
             <span className="w-6 h-6 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 inline-flex items-center justify-center">
@@ -535,19 +535,19 @@ export function FeeBalanceScreen({ onNavigate }) {
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-headline text-headline-sm font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+            <span className="font-headline text-[17px] font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
               ₹{totalOutstanding.toLocaleString()}
             </span>
-            <span className="font-label text-[11px] text-rose-600 dark:text-rose-400 font-semibold">
+            <span className="font-label text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
               {ledgers.filter((l) => l.balance_due > 0).length} Unpaid
             </span>
           </div>
         </article>
 
         {/* Metric 2: Critical Overdue (>30 Days) */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Overdue Dues (&gt;0d)
             </span>
             <span className="w-6 h-6 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 inline-flex items-center justify-center">
@@ -555,19 +555,19 @@ export function FeeBalanceScreen({ onNavigate }) {
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-headline text-headline-sm font-bold tabular-nums text-amber-600 dark:text-amber-400">
+            <span className="font-headline text-[17px] font-bold tabular-nums text-amber-600 dark:text-amber-400">
               ₹{totalOverdue.toLocaleString()}
             </span>
-            <span className="font-label text-[11px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300 font-semibold">
+            <span className="font-label text-[10px] px-1 py-0.2 rounded bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300 font-semibold">
               {defaultersCount} Defaulters
             </span>
           </div>
         </article>
 
         {/* Metric 3: Active Promises & Commitments */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Promised Commitments
             </span>
             <span className="w-6 h-6 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 inline-flex items-center justify-center">
@@ -575,19 +575,19 @@ export function FeeBalanceScreen({ onNavigate }) {
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-headline text-headline-sm font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+            <span className="font-headline text-[17px] font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
               ₹{totalPromised.toLocaleString()}
             </span>
-            <span className="font-label text-[11px] text-blue-600 dark:text-blue-400 font-semibold">
+            <span className="font-label text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
               {ledgers.filter((l) => l.commitment).length} Scheduled
             </span>
           </div>
         </article>
 
         {/* Metric 4: Collection Rate */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Clearance Rate
             </span>
             <span className="w-6 h-6 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center">
@@ -595,19 +595,19 @@ export function FeeBalanceScreen({ onNavigate }) {
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-headline text-headline-sm font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+            <span className="font-headline text-[17px] font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
               {collectionRate}%
             </span>
-            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[10px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
               Billed: ₹{totalBilled.toLocaleString()}
             </span>
           </div>
         </article>
 
         {/* Metric 5: Average Overdue Days */}
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col justify-between gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Recovery Cycle
             </span>
             <span className="w-6 h-6 rounded bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 inline-flex items-center justify-center">
@@ -615,10 +615,10 @@ export function FeeBalanceScreen({ onNavigate }) {
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-headline text-headline-sm font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+            <span className="font-headline text-[17px] font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
               18.5 Days
             </span>
-            <span className="font-label text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+            <span className="font-label text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
               Target &lt; 25d
             </span>
           </div>

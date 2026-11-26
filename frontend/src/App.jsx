@@ -34,7 +34,7 @@ function Dashboard() {
   // API State
   const [health, setHealth] = useState(null)
   const [courses, setCourses] = useState([])
-  const [coursesLoading, setCoursesLoading] = useState(true)
+  const [_coursesLoading, setCoursesLoading] = useState(true)
 
   // Create Course Modal State
   const [showModal, setShowModal] = useState(false)
@@ -167,7 +167,7 @@ function Dashboard() {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 lg:p-8 flex flex-col gap-6 max-w-[1440px] w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-4 lg:p-5 flex flex-col gap-3.5 max-w-[1480px] w-full mx-auto">
           {/* Sub-navigation Tab Pills for Access Control Suite */}
           {['users', 'roles', 'permissions'].includes(currentTab) && (
             <div className="flex flex-wrap items-center gap-2 border-b border-light-outline-variant dark:border-dark-outline-variant pb-3 mb-1">
@@ -246,27 +246,27 @@ function Dashboard() {
           ) : (
             <>
               {/* Page Header */}
-              <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex flex-col gap-0.5">
-                  <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+                  <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
                     Dashboard
                   </h1>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
                   {/* Date pill */}
-                  <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface whitespace-nowrap">
-                    <span className="material-symbols-outlined text-[18px] text-light-outline">calendar_today</span>
-                    <span className="font-label text-label-md tabular-nums font-medium">Nov 26, 2026</span>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface whitespace-nowrap text-xs">
+                    <span className="material-symbols-outlined text-[16px] text-light-outline">calendar_today</span>
+                    <span className="font-label tabular-nums font-medium">Nov 26, 2026</span>
                   </div>
 
                   {/* Add Course Button */}
                   <button
                     type="button"
                     onClick={() => setShowModal(true)}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary shadow-sm hover:bg-light-primary-container transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary shadow-xs hover:bg-light-primary-container transition-colors duration-state-change whitespace-nowrap font-label text-xs font-semibold"
                   >
-                    <span className="material-symbols-outlined text-[18px]">add</span>
+                    <span className="material-symbols-outlined text-[16px]">add</span>
                     <span>Create Course</span>
                   </button>
 
@@ -274,9 +274,9 @@ function Dashboard() {
                   <button
                     type="button"
                     onClick={() => alert('Exporting executive telemetry report...')}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface shadow-sm hover:bg-light-surface-container-low transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface shadow-xs hover:bg-light-surface-container-low transition-colors duration-state-change whitespace-nowrap font-label text-xs font-semibold"
                   >
-                    <span className="material-symbols-outlined text-[18px]">download</span>
+                    <span className="material-symbols-outlined text-[16px]">download</span>
                     <span>Export Report</span>
                   </button>
                 </div>

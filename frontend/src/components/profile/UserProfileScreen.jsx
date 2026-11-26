@@ -161,26 +161,26 @@ export function UserProfileScreen() {
       )}
 
       {/* Profile Header Hero Card */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center md:items-start justify-between gap-5">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 sm:p-4 shadow-xs flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-center sm:text-left">
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-light-primary text-white flex items-center justify-center font-bold text-2xl shadow-md border-2 border-light-surface-container-lowest dark:border-dark-surface-bright overflow-hidden">
+            <div className="w-14 h-14 rounded-full bg-light-primary text-white flex items-center justify-center font-bold text-xl shadow-xs border-2 border-light-surface-container-lowest dark:border-dark-surface-bright overflow-hidden">
               {profile.name.charAt(0)}
             </div>
-            <span className="w-5 h-5 rounded-full bg-success border-2 border-light-surface-container-lowest dark:border-dark-surface-bright absolute bottom-0 right-0" title="Online" />
+            <span className="w-4 h-4 rounded-full bg-success border-2 border-light-surface-container-lowest dark:border-dark-surface-bright absolute bottom-0 right-0" title="Online" />
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h1 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+              <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
                 {profile.name}
               </h1>
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200">
+              <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200">
                 {profile.role}
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant font-mono">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant font-mono">
               <span>{profile.email}</span>
               <span>•</span>
               <span>{profile.emp_id}</span>
@@ -188,7 +188,7 @@ export function UserProfileScreen() {
               <span className="font-body">{profile.department}</span>
             </div>
 
-            <p className="font-body text-body-xs text-light-on-surface-variant max-w-xl mt-1">
+            <p className="font-body text-xs text-light-on-surface-variant max-w-xl mt-0.5">
               {profile.bio}
             </p>
           </div>
@@ -198,16 +198,16 @@ export function UserProfileScreen() {
           <button
             type="button"
             onClick={() => setActiveTab('INFO')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-label-md font-semibold shadow-sm transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-xs font-semibold shadow-xs transition-colors"
           >
-            <span className="material-symbols-outlined text-[17px]">edit</span>
+            <span className="material-symbols-outlined text-[15px]">edit</span>
             <span>Edit Profile</span>
           </button>
         </div>
       </section>
 
       {/* Sub Tabs */}
-      <section className="flex flex-wrap items-center gap-2 border-b border-light-outline-variant dark:border-dark-outline-variant pb-2">
+      <section className="flex flex-wrap items-center gap-1.5 border-b border-light-outline-variant dark:border-dark-outline-variant pb-2">
         {[
           { id: 'INFO', label: 'Personal Information', icon: 'person' },
           { id: 'SECURITY', label: 'Security & Credentials', icon: 'shield' },

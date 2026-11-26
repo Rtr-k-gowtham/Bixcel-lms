@@ -292,44 +292,44 @@ export function TutorManagement() {
   return (
     <div className="flex flex-col gap-6">
       {/* Page Header */}
-      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-light-primary text-[22px]">co_present</span>
-            <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+            <span className="material-symbols-outlined text-light-primary text-[18px]">co_present</span>
+            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Tutor Management &amp; Allocation
             </h1>
           </div>
-          <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
             Assign certified primary and supporting tutors to cohorts based on expertise and weekly workload.
           </p>
         </div>
 
         {/* View Switcher Pills & Action */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 p-1 rounded-md bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant">
+          <div className="flex items-center gap-1 p-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant">
             <button
               type="button"
               onClick={() => setActiveTab('assignment')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded font-label text-label-md font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${
                 activeTab === 'assignment'
-                  ? 'bg-light-primary text-light-on-primary shadow-sm'
+                  ? 'bg-light-primary text-light-on-primary shadow-xs'
                   : 'text-light-on-surface-variant hover:text-light-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[17px]">assignment_ind</span>
+              <span className="material-symbols-outlined text-[15px]">assignment_ind</span>
               <span>Batch Assignment</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('directory')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded font-label text-label-md font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${
                 activeTab === 'directory'
-                  ? 'bg-light-primary text-light-on-primary shadow-sm'
+                  ? 'bg-light-primary text-light-on-primary shadow-xs'
                   : 'text-light-on-surface-variant hover:text-light-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[17px]">badge</span>
+              <span className="material-symbols-outlined text-[15px]">badge</span>
               <span>Faculty Roster ({tutors.length})</span>
             </button>
           </div>
@@ -337,42 +337,42 @@ export function TutorManagement() {
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm font-label text-label-md font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-xs font-label text-xs font-semibold transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">person_add</span>
+            <span className="material-symbols-outlined text-[16px]">person_add</span>
             <span>Onboard Tutor</span>
           </button>
         </div>
       </section>
 
       {/* KPI Cards Grid */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col gap-1">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Certified Faculty
             </span>
-            <span className="material-symbols-outlined text-light-primary text-[18px]">co_present</span>
+            <span className="material-symbols-outlined text-light-primary text-[16px]">co_present</span>
           </div>
-          <span className="font-headline text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+          <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
             {activeFacultyCount || 24}
           </span>
-          <span className="font-body text-body-xs text-on-success-container font-medium">
+          <span className="font-body text-[10px] text-on-success-container font-medium">
             100% verified credentials
           </span>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col gap-1">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Weekly Teaching Hours
             </span>
-            <span className="material-symbols-outlined text-light-primary text-[18px]">schedule</span>
+            <span className="material-symbols-outlined text-light-primary text-[16px]">schedule</span>
           </div>
-          <span className="font-headline text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+          <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
             {totalWeeklyHours || 384}h
           </span>
-          <span className="font-body text-body-xs text-light-on-surface-variant">
+          <span className="font-body text-[10px] text-light-on-surface-variant">
             Institutional load
           </span>
         </article>
