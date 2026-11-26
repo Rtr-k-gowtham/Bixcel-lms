@@ -189,6 +189,32 @@ export const apiService = {
     const response = await apiClient.delete(`/batches/${id}`)
     return response.data
   },
+
+  // Tutor Management & Allocation API
+  getTutors: async (params = {}) => {
+    const response = await apiClient.get('/tutors', { params })
+    return response.data
+  },
+  getTutor: async (id) => {
+    const response = await apiClient.get(`/tutors/${id}`)
+    return response.data
+  },
+  createTutor: async (tutorData) => {
+    const response = await apiClient.post('/tutors', tutorData)
+    return response.data
+  },
+  updateTutor: async (id, tutorData) => {
+    const response = await apiClient.put(`/tutors/${id}`, tutorData)
+    return response.data
+  },
+  deleteTutor: async (id) => {
+    const response = await apiClient.delete(`/tutors/${id}`)
+    return response.data
+  },
+  assignTutor: async (assignmentData) => {
+    const response = await apiClient.post('/tutors/assign', assignmentData)
+    return response.data
+  },
 }
 
 export default apiService

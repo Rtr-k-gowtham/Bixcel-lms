@@ -19,6 +19,7 @@ import { UserProfileScreen } from './components/profile/UserProfileScreen'
 import ModuleLibrary from './components/modules/ModuleLibrary'
 import StudentOnboarding from './components/students/StudentOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
+import TutorManagement from './components/tutors/TutorManagement'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -127,6 +128,8 @@ function Dashboard() {
               ? 'Module Library'
               : ['students', 'onboarding'].includes(currentTab)
               ? 'Student Onboarding & Enrollment'
+              : currentTab === 'tutors'
+              ? 'Tutor Management & Allocation'
               : currentTab === 'batches'
               ? 'Batch Management'
               : currentTab === 'users'
@@ -194,7 +197,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'batches' ? (
+          {currentTab === 'tutors' ? (
+            <TutorManagement />
+          ) : currentTab === 'batches' ? (
             <BatchManagement />
           ) : ['students', 'onboarding'].includes(currentTab) ? (
             <StudentOnboarding />

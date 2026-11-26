@@ -16,6 +16,8 @@ $routes->group('api', static function ($routes) {
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
     $routes->resource('modules', ['controller' => 'Api\ModuleController']);
     $routes->resource('batches', ['controller' => 'Api\BatchController']);
+    $routes->post('tutors/assign', 'Api\TutorController::assign');
+    $routes->resource('tutors', ['controller' => 'Api\TutorController']);
     $routes->get('students/tracks', 'Api\StudentController::tracks');
     $routes->resource('students', ['controller' => 'Api\StudentController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);
