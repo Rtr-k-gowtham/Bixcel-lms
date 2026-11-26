@@ -25,10 +25,100 @@ import StudentCalendar from './components/calendar/StudentCalendar'
 import LoginScreen from './components/auth/LoginScreen'
 import { apiService } from './services/api'
 
+const VALID_TABS = new Set([
+  'dashboard', 'courses', 'modules', 'builder', 'curriculum', 'lessons',
+  'students', 'onboarding', 'tutors', 'batches', 'timetable', 'attendance',
+  'assignments', 'exams', 'milestones', 'calendar', 'progress', 'feedback',
+  'fees', 'balance', 'analytics', 'users', 'roles', 'permissions',
+  'notifications', 'audit', 'profile', 'settings'
+])
+
+function getInitialTab() {
+  if (typeof window === 'undefined') return 'dashboard'
+
+  // 1. Check URL hash (e.g. #modules or #/modules)
+  const hash = window.location.hash.replace(/^#\/?/, '').trim().toLowerCase()
+  if (hash && VALID_TABS.has(hash)) {
+    return hash
+  }
+
+  // 2. Check query parameter (?tab=modules)
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const tabParam = params.get('tab')?.toLowerCase()
+    if (tabParam && VALID_TABS.has(tabParam)) {
+      return tabParam
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 3. Check pathname (e.g. /modules)
+  const path = window.location.pathname.replace(/^\//, '').split('/')[0].trim().toLowerCase()
+  if (path && VALID_TABS.has(path)) {
+    return path
+  }
+
+  // 4. Check localStorage
+  try {
+    const saved = localStorage.getItem('bx_active_tab')?.trim().toLowerCase()
+    if (saved && VALID_TABS.has(saved)) {
+      return saved
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return 'dashboard'
+}
+
 function Dashboard({ currentUser, onLogout }) {
-  const [currentTab, setCurrentTab] = useState('dashboard')
+  const [currentTab, setCurrentTab] = useState(getInitialTab)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [matrixPreselectedRole, setMatrixPreselectedRole] = useState('Super Admin')
+
+  // Keep URL Hash and localStorage synchronized whenever currentTab changes
+  useEffect(() => {
+    if (!currentTab) return
+    try {
+      localStorage.setItem('bx_active_tab', currentTab)
+      if (window.location.hash.replace(/^#\/?/, '') !== currentTab) {
+        window.history.replaceState(null, '', `#${currentTab}`)
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [currentTab])
+
+  // Listen to browser Back / Forward buttons & Hash changes
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const active = getInitialTab()
+      if (active && active !== currentTab) {
+        setCurrentTab(active)
+      }
+    }
+
+    window.addEventListener('popstate', handleUrlChange)
+    window.addEventListener('hashchange', handleUrlChange)
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange)
+      window.removeEventListener('hashchange', handleUrlChange)
+    }
+  }, [currentTab])
+
+  const handleTabChange = (newTab) => {
+    if (!newTab) return
+    setCurrentTab(newTab)
+    try {
+      localStorage.setItem('bx_active_tab', newTab)
+      if (window.location.hash.replace(/^#\/?/, '') !== newTab) {
+        window.history.pushState(null, '', `#${newTab}`)
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
 
   // API State
   const [health, setHealth] = useState(null)
@@ -115,7 +205,7 @@ function Dashboard({ currentUser, onLogout }) {
       {/* Persistent Deep Navy Sidebar with Negative Bixcel Logo */}
       <Sidebar
         currentTab={currentTab}
-        onSelectTab={setCurrentTab}
+        onSelectTab={handleTabChange}
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}
       />
@@ -158,7 +248,7 @@ function Dashboard({ currentUser, onLogout }) {
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           health={health}
           onRefresh={fetchData}
-          onNavigate={(tab) => setCurrentTab(tab)}
+          onNavigate={(tab) => handleTabChange(tab)}
           currentUser={currentUser}
           onLogout={onLogout}
         />
@@ -170,7 +260,7 @@ function Dashboard({ currentUser, onLogout }) {
             <div className="flex flex-wrap items-center gap-2 border-b border-light-outline-variant dark:border-dark-outline-variant pb-3 mb-1">
               <button
                 type="button"
-                onClick={() => setCurrentTab('users')}
+                onClick={() => handleTabChange('users')}
                 className={`px-3.5 py-1.5 rounded font-label text-label-md font-semibold inline-flex items-center gap-2 transition-colors ${currentTab === 'users'
                   ? 'bg-light-primary text-light-on-primary shadow-sm'
                   : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface'
@@ -181,7 +271,7 @@ function Dashboard({ currentUser, onLogout }) {
               </button>
               <button
                 type="button"
-                onClick={() => setCurrentTab('roles')}
+                onClick={() => handleTabChange('roles')}
                 className={`px-3.5 py-1.5 rounded font-label text-label-md font-semibold inline-flex items-center gap-2 transition-colors ${currentTab === 'roles'
                   ? 'bg-light-primary text-light-on-primary shadow-sm'
                   : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface'
@@ -192,7 +282,7 @@ function Dashboard({ currentUser, onLogout }) {
               </button>
               <button
                 type="button"
-                onClick={() => setCurrentTab('permissions')}
+                onClick={() => handleTabChange('permissions')}
                 className={`px-3.5 py-1.5 rounded font-label text-label-md font-semibold inline-flex items-center gap-2 transition-colors ${currentTab === 'permissions'
                   ? 'bg-[#2B1B54] text-white shadow-sm'
                   : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface'
@@ -225,7 +315,7 @@ function Dashboard({ currentUser, onLogout }) {
             <RoleMaster
               onNavigateToMatrix={(roleName) => {
                 setMatrixPreselectedRole(roleName)
-                setCurrentTab('permissions')
+                handleTabChange('permissions')
               }}
             />
           ) : currentTab === 'permissions' ? (
@@ -233,7 +323,7 @@ function Dashboard({ currentUser, onLogout }) {
           ) : currentTab === 'audit' ? (
             <AuditLogs />
           ) : currentTab === 'notifications' ? (
-            <NotificationsScreen onNavigate={(tab) => setCurrentTab(tab)} />
+            <NotificationsScreen onNavigate={(tab) => handleTabChange(tab)} />
           ) : currentTab === 'profile' ? (
             <UserProfileScreen />
           ) : (
@@ -740,6 +830,12 @@ export default function App() {
 
   const handleLogout = async () => {
     await apiService.logout()
+    try {
+      localStorage.removeItem('bx_active_tab')
+      window.history.replaceState(null, '', window.location.pathname)
+    } catch {
+      // ignore
+    }
     setCurrentUser(null)
   }
 
