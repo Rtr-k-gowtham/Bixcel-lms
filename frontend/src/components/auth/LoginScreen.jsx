@@ -4,67 +4,12 @@ import { apiService } from '../../services/api'
 
 export default function LoginScreen({ onLoginSuccess }) {
   const { theme, toggleTheme } = useTheme()
-  const [email, setEmail] = useState('admin@bixcel.edu')
-  const [password, setPassword] = useState('Admin@123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [activePreset, setActivePreset] = useState('admin')
-
-  const demoAccounts = [
-    {
-      id: 'admin',
-      role: 'Super Admin',
-      name: 'Elena Rostova',
-      email: 'admin@bixcel.edu',
-      password: 'Admin@123',
-      badge: 'Full Access',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=faces',
-      icon: 'admin_panel_settings',
-      color: 'border-light-primary text-light-primary bg-light-primary/5 dark:bg-light-primary/10',
-    },
-    {
-      id: 'dean',
-      role: 'Academic Dean',
-      name: 'Dr. Marcus Vance',
-      email: 'dean@bixcel.edu',
-      password: 'Dean@123',
-      badge: 'Academic Lead',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
-      icon: 'school',
-      color: 'border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-500/5 dark:bg-purple-500/10',
-    },
-    {
-      id: 'faculty',
-      role: 'Faculty / Tutor',
-      name: 'Sophia Chen',
-      email: 'faculty@bixcel.edu',
-      password: 'Faculty@123',
-      badge: 'Instructor',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces',
-      icon: 'co_present',
-      color: 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-500/5 dark:bg-blue-500/10',
-    },
-    {
-      id: 'student',
-      role: 'Student',
-      name: 'Marcus Vance',
-      email: 'student@bixcel.edu',
-      password: 'Student@123',
-      badge: 'Learner',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces',
-      icon: 'person',
-      color: 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 dark:bg-emerald-500/10',
-    },
-  ]
-
-  const handleSelectDemo = (acc) => {
-    setActivePreset(acc.id)
-    setEmail(acc.email)
-    setPassword(acc.password)
-    setError('')
-  }
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -81,13 +26,13 @@ export default function LoginScreen({ onLoginSuccess }) {
       if (res && res.status === 'success' && res.user) {
         onLoginSuccess(res.user)
       } else {
-        setError(res?.message || 'Invalid credentials. Please verify your details.')
+        setError(res?.message || 'Invalid credentials. Please verify your email and password.')
       }
     } catch (err) {
       const msg =
         err.response?.data?.message ||
         err.response?.data?.messages?.error ||
-        'Authentication failed. Please check credentials or connectivity.'
+        'Authentication failed. Please verify your credentials or network connectivity.'
       setError(msg)
     } finally {
       setLoading(false)
@@ -123,7 +68,7 @@ export default function LoginScreen({ onLoginSuccess }) {
           <button
             onClick={toggleTheme}
             type="button"
-            className="p-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+            className="p-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
             title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
             aria-label="Toggle color theme"
           >
@@ -138,7 +83,7 @@ export default function LoginScreen({ onLoginSuccess }) {
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
         <div className="w-full max-w-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           {/* Card Header */}
-          <div className="p-6 pb-4 text-center border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-low/40 dark:bg-dark-surface-container/20">
+          <div className="p-6 pb-5 text-center border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-low/40 dark:bg-dark-surface-container/20">
             <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-light-primary/10 dark:bg-light-primary/20 text-light-primary flex items-center justify-center shadow-inner">
               <span className="material-symbols-outlined text-[26px]">lock</span>
             </div>
@@ -146,59 +91,16 @@ export default function LoginScreen({ onLoginSuccess }) {
               Sign In to Bixcel LMS
             </h1>
             <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-              Select a quick demo persona or enter institutional credentials
+              Enter your institutional credentials to access your workspace
             </p>
           </div>
 
           <div className="p-6 space-y-5">
-            {/* Quick Demo Credentials Switcher */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="font-label text-label-xs font-semibold uppercase tracking-wider text-light-on-surface-variant dark:text-dark-on-surface-variant flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[15px] text-light-primary">bolt</span>
-                  Quick Demo Credentials (1-Click Fill)
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {demoAccounts.map((acc) => {
-                  const isSelected = activePreset === acc.id
-                  return (
-                    <button
-                      key={acc.id}
-                      type="button"
-                      onClick={() => handleSelectDemo(acc)}
-                      className={`text-left p-2.5 rounded-lg border transition-all text-xs flex flex-col justify-between ${
-                        isSelected
-                          ? `${acc.color} border-2 shadow-sm font-semibold`
-                          : 'border-light-outline-variant dark:border-dark-outline-variant hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container text-light-on-surface-variant'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <img
-                          src={acc.avatar}
-                          alt={acc.name}
-                          className="w-6 h-6 rounded-full object-cover shrink-0 ring-1 ring-black/10"
-                        />
-                        <div className="min-w-0">
-                          <p className="font-label text-[12px] font-semibold truncate leading-tight text-light-on-surface dark:text-dark-on-surface">
-                            {acc.role}
-                          </p>
-                          <p className="text-[10px] text-light-outline truncate">{acc.badge}</p>
-                        </div>
-                      </div>
-                      <div className="text-[10px] opacity-80 font-mono truncate">{acc.email}</div>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
             {/* Error Banner */}
             {error && (
               <div
                 role="alert"
-                className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs flex items-start gap-2.5"
+                className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-150"
               >
                 <span className="material-symbols-outlined text-[18px] shrink-0">error</span>
                 <div className="flex-1 font-body text-body-sm leading-snug">{error}</div>
@@ -223,11 +125,9 @@ export default function LoginScreen({ onLoginSuccess }) {
                     id="login-email"
                     type="email"
                     required
+                    autoFocus
                     value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value)
-                      setActivePreset('')
-                    }}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@bixcel.edu"
                     className="w-full pl-9 pr-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-body text-body-sm placeholder:text-light-outline focus:outline-none focus:ring-2 focus:ring-light-primary focus:bg-light-surface-container-lowest"
                   />
@@ -236,18 +136,12 @@ export default function LoginScreen({ onLoginSuccess }) {
 
               {/* Password */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label
-                    htmlFor="login-password"
-                    className="block font-label text-label-sm font-medium text-light-on-surface dark:text-dark-on-surface"
-                  >
-                    Password
-                  </label>
-                  <span className="text-[11px] font-mono text-light-outline">
-                    Default:{' '}
-                    <code className="text-light-primary font-bold">Admin@123</code>
-                  </span>
-                </div>
+                <label
+                  htmlFor="login-password"
+                  className="block font-label text-label-sm font-medium text-light-on-surface dark:text-dark-on-surface mb-1"
+                >
+                  Password
+                </label>
                 <div className="relative">
                   <span className="material-symbols-outlined text-[18px] text-light-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     lock
@@ -257,17 +151,14 @@ export default function LoginScreen({ onLoginSuccess }) {
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value)
-                      setActivePreset('')
-                    }}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     className="w-full pl-9 pr-10 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-body text-body-sm placeholder:text-light-outline focus:outline-none focus:ring-2 focus:ring-light-primary focus:bg-light-surface-container-lowest"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-light-outline hover:text-light-on-surface dark:hover:text-dark-on-surface"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-light-outline hover:text-light-on-surface dark:hover:text-dark-on-surface cursor-pointer"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     <span className="material-symbols-outlined text-[18px]">
@@ -295,7 +186,7 @@ export default function LoginScreen({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-4 rounded-lg bg-light-primary text-light-on-primary font-label text-label-md font-semibold hover:bg-light-primary-container shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-lg bg-light-primary text-light-on-primary font-label text-label-md font-semibold hover:bg-light-primary-container shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
               >
                 {loading ? (
                   <>
@@ -313,16 +204,6 @@ export default function LoginScreen({ onLoginSuccess }) {
               </button>
             </form>
           </div>
-
-          {/* Footer Credentials Reminder */}
-          <div className="p-4 bg-light-surface-container-low/60 dark:bg-dark-surface-container/40 border-t border-light-outline-variant/60 dark:border-dark-outline-variant/60 text-center">
-            <p className="text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
-              Master credentials also accepted:{' '}
-              <span className="font-mono font-semibold text-light-on-surface dark:text-dark-on-surface">
-                Gowtham@1472004
-              </span>
-            </p>
-          </div>
         </div>
       </main>
 
@@ -332,9 +213,9 @@ export default function LoginScreen({ onLoginSuccess }) {
         <div className="flex items-center gap-4">
           <span>Version 2.4.0</span>
           <span>•</span>
-          <span>CodeIgniter 4 Backend</span>
+          <span>CodeIgniter 4 Cloud Backend</span>
           <span>•</span>
-          <span>React 19 Frontend</span>
+          <span>React 19 Enterprise Client</span>
         </div>
       </footer>
     </div>
