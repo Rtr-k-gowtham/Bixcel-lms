@@ -35,6 +35,52 @@ export const apiService = {
     const response = await apiClient.post('/courses', courseData)
     return response.data
   },
+
+  // Users API
+  getUsers: async () => {
+    const response = await apiClient.get('/users')
+    return response.data
+  },
+  createUser: async (userData) => {
+    const response = await apiClient.post('/users', userData)
+    return response.data
+  },
+  updateUser: async (id, userData) => {
+    const response = await apiClient.put(`/users/${id}`, userData)
+    return response.data
+  },
+  deleteUser: async (id) => {
+    const response = await apiClient.delete(`/users/${id}`)
+    return response.data
+  },
+
+  // Roles API
+  getRoles: async () => {
+    const response = await apiClient.get('/roles')
+    return response.data
+  },
+  createRole: async (roleData) => {
+    const response = await apiClient.post('/roles', roleData)
+    return response.data
+  },
+  updateRole: async (id, roleData) => {
+    const response = await apiClient.put(`/roles/${id}`, roleData)
+    return response.data
+  },
+  deleteRole: async (id) => {
+    const response = await apiClient.delete(`/roles/${id}`)
+    return response.data
+  },
+
+  // Permission Matrix API
+  getPermissions: async () => {
+    const response = await apiClient.get('/permissions')
+    return response.data
+  },
+  savePermissions: async (payload) => {
+    const response = await apiClient.post('/permissions', payload)
+    return response.data
+  },
 }
 
 export default apiService

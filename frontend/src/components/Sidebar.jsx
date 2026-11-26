@@ -45,9 +45,16 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
       ],
     },
     {
+      group: 'Access Control',
+      items: [
+        { id: 'users', label: 'User Master', icon: 'manage_accounts' },
+        { id: 'roles', label: 'Role Master', icon: 'badge' },
+        { id: 'permissions', label: 'Permission Matrix', icon: 'security' },
+      ],
+    },
+    {
       group: 'Settings',
       items: [
-        { id: 'users', label: 'Users & Permissions', icon: 'manage_accounts' },
         { id: 'notifications', label: 'Notifications', icon: 'notifications_active' },
         { id: 'audit', label: 'Audit Logs', icon: 'history' },
         { id: 'settings', label: 'Institute Settings', icon: 'settings' },

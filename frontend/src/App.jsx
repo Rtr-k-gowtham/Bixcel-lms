@@ -12,11 +12,13 @@ import {
   ClassroomOccupancyHeatmap,
   CourseCompletionFunnel,
 } from './components/charts'
+import { UserMaster, RoleMaster, PermissionMatrix } from './components/access'
 import { apiService } from './services/api'
 
 function Dashboard() {
   const [currentTab, setCurrentTab] = useState('dashboard')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [matrixPreselectedRole, setMatrixPreselectedRole] = useState('Super Admin')
 
   // API State
   const [health, setHealth] = useState(null)
@@ -117,7 +119,13 @@ function Dashboard() {
               ? 'Course Management'
               : currentTab === 'batches'
               ? 'Batch Management'
-              : 'Executive Overview'
+              : currentTab === 'users'
+              ? 'User Master'
+              : currentTab === 'roles'
+              ? 'Role Master'
+              : currentTab === 'permissions'
+              ? 'Permission Matrix'
+              : 'Dashboard'
           }
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           health={health}
@@ -126,42 +134,98 @@ function Dashboard() {
 
         {/* Main Content Area */}
         <main className="flex-1 p-6 lg:p-8 flex flex-col gap-6 max-w-[1440px] w-full mx-auto">
-          {/* Page Header */}
-          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-col gap-0.5">
-              <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
-                Dashboard
-              </h1>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              {/* Date pill */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface whitespace-nowrap">
-                <span className="material-symbols-outlined text-[18px] text-light-outline">calendar_today</span>
-                <span className="font-label text-label-md tabular-nums font-medium">Nov 26, 2026</span>
-              </div>
-
-              {/* Add Course Button */}
+          {/* Sub-navigation Tab Pills for Access Control Suite */}
+          {['users', 'roles', 'permissions'].includes(currentTab) && (
+            <div className="flex flex-wrap items-center gap-2 border-b border-light-outline-variant dark:border-dark-outline-variant pb-3 mb-1">
               <button
                 type="button"
-                onClick={() => setShowModal(true)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary shadow-sm hover:bg-light-primary-container transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+                onClick={() => setCurrentTab('users')}
+                className={`px-3.5 py-1.5 rounded font-label text-label-md font-semibold inline-flex items-center gap-2 transition-colors ${
+                  currentTab === 'users'
+                    ? 'bg-light-primary text-light-on-primary shadow-sm'
+                    : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface'
+                }`}
               >
-                <span className="material-symbols-outlined text-[18px]">add</span>
-                <span>Create Course</span>
+                <span className="material-symbols-outlined text-[17px]">manage_accounts</span>
+                <span>User Master</span>
               </button>
-
-              {/* Export Report Button */}
               <button
                 type="button"
-                onClick={() => alert('Exporting executive telemetry report...')}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface shadow-sm hover:bg-light-surface-container-low transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+                onClick={() => setCurrentTab('roles')}
+                className={`px-3.5 py-1.5 rounded font-label text-label-md font-semibold inline-flex items-center gap-2 transition-colors ${
+                  currentTab === 'roles'
+                    ? 'bg-light-primary text-light-on-primary shadow-sm'
+                    : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface'
+                }`}
               >
-                <span className="material-symbols-outlined text-[18px]">download</span>
-                <span>Export Report</span>
+                <span className="material-symbols-outlined text-[17px]">badge</span>
+                <span>Role Master</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentTab('permissions')}
+                className={`px-3.5 py-1.5 rounded font-label text-label-md font-semibold inline-flex items-center gap-2 transition-colors ${
+                  currentTab === 'permissions'
+                    ? 'bg-[#2B1B54] text-white shadow-sm'
+                    : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[17px]">security</span>
+                <span>Permission Matrix</span>
               </button>
             </div>
-          </section>
+          )}
+
+          {/* Conditional Screen Rendering */}
+          {currentTab === 'users' ? (
+            <UserMaster />
+          ) : currentTab === 'roles' ? (
+            <RoleMaster
+              onNavigateToMatrix={(roleName) => {
+                setMatrixPreselectedRole(roleName)
+                setCurrentTab('permissions')
+              }}
+            />
+          ) : currentTab === 'permissions' ? (
+            <PermissionMatrix initialRole={matrixPreselectedRole} />
+          ) : (
+            <>
+              {/* Page Header */}
+              <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col gap-0.5">
+                  <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+                    Dashboard
+                  </h1>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                  {/* Date pill */}
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface whitespace-nowrap">
+                    <span className="material-symbols-outlined text-[18px] text-light-outline">calendar_today</span>
+                    <span className="font-label text-label-md tabular-nums font-medium">Nov 26, 2026</span>
+                  </div>
+
+                  {/* Add Course Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(true)}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary shadow-sm hover:bg-light-primary-container transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">add</span>
+                    <span>Create Course</span>
+                  </button>
+
+                  {/* Export Report Button */}
+                  <button
+                    type="button"
+                    onClick={() => alert('Exporting executive telemetry report...')}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface shadow-sm hover:bg-light-surface-container-low transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">download</span>
+                    <span>Export Report</span>
+                  </button>
+                </div>
+              </section>
 
           {/* 6 Compact KPI Cards Grid */}
           <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-stretch">
@@ -493,6 +557,8 @@ function Dashboard() {
               </article>
             </div>
           </section>
+            </>
+          )}
         </main>
       </div>
 
