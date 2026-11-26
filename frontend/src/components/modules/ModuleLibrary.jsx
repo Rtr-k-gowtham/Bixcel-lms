@@ -186,6 +186,14 @@ export function ModuleLibrary() {
     setTimeout(() => setToast(''), 3000)
   }
 
+  const handleDelete = (id, title) => {
+    if (window.confirm(`Are you sure you want to delete module "${title}"?`)) {
+      setModules((prev) => prev.filter((m) => m.id !== id))
+      setToast(`Module "${title}" deleted successfully`)
+      setTimeout(() => setToast(''), 3000)
+    }
+  }
+
   const toggleAddedToCourse = (id, title) => {
     const newState = !addedModules[id]
     setAddedModules((prev) => ({ ...prev, [id]: newState }))
@@ -423,136 +431,185 @@ export function ModuleLibrary() {
         </div>
       </section>
 
-      {/* Module Cards Grid (2-columns matching reference) */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
-        {filteredModules.map((m) => {
-          const isAdded = addedModules[m.id]
-          return (
-            <article
-              key={m.id}
-              className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm p-5 flex flex-col justify-between gap-4 h-full hover:shadow-md transition-shadow"
-            >
-              <div className="flex flex-col gap-4">
-                {/* Header Tag Bar */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-mono-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-semibold">
-                        {m.code}
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant font-mono text-[11px]">
-                        {m.version}
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint dark:text-dark-on-primary-tint font-label text-[11px] font-semibold">
-                        {m.category}
-                      </span>
-                    </div>
-                    <h2 className="font-title text-[16px] font-bold text-light-on-surface dark:text-dark-on-surface mt-0.5">
-                      {m.title}
-                    </h2>
-                  </div>
+      {/* Module List Table */}
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm overflow-hidden flex flex-col">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant dark:text-dark-on-surface-variant font-label text-label-xs uppercase tracking-wider">
+                <th className="py-3 px-4 font-semibold">Module Code & Version</th>
+                <th className="py-3 px-4 font-semibold">Module Title & Description</th>
+                <th className="py-3 px-4 font-semibold">Duration & Lessons</th>
+                <th className="py-3 px-4 font-semibold">Curriculum Breakdown</th>
+                <th className="py-3 px-4 font-semibold text-center">Status</th>
+                <th className="py-3 px-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant font-body text-body-sm">
+              {filteredModules.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="py-12 text-center text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    <span className="material-symbols-outlined text-[40px] mb-2 opacity-50 block">search_off</span>
+                    <p className="font-semibold text-body-md">No modules found</p>
+                    <p className="text-body-xs mt-1">Try adjusting your search query or filter options</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredModules.map((m) => {
+                  const isAdded = addedModules[m.id]
+                  return (
+                    <tr
+                      key={m.id}
+                      className="hover:bg-light-surface-container-low/50 dark:hover:bg-dark-surface-container/50 transition-colors"
+                    >
+                      {/* Code & Version */}
+                      <td className="py-3.5 px-4 whitespace-nowrap align-top">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-mono text-mono-sm font-bold text-light-on-surface dark:text-dark-on-surface">
+                            {m.code}
+                          </span>
+                          <span className="inline-flex items-center w-fit px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant font-mono text-[11px] font-semibold border border-light-outline-variant/60 dark:border-dark-outline-variant/60">
+                            {m.version}
+                          </span>
+                        </div>
+                      </td>
 
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-semibold shrink-0 ${
-                      m.status === 'Published'
-                        ? 'bg-success-container text-on-success-container'
-                        : 'bg-pending-container text-on-pending-container'
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        m.status === 'Published' ? 'bg-success' : 'bg-pending'
-                      }`}
-                    />
-                    <span>{m.status}</span>
-                  </span>
-                </div>
+                      {/* Title, Category & Description */}
+                      <td className="py-3.5 px-4 align-top">
+                        <div className="flex flex-col gap-1 max-w-md">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-title text-[14px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                              {m.title}
+                            </span>
+                            <span className="px-2 py-0.5 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint dark:text-dark-on-primary-tint font-label text-[11px] font-semibold">
+                              {m.category}
+                            </span>
+                          </div>
+                          <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant line-clamp-2 leading-relaxed">
+                            {m.description}
+                          </p>
+                        </div>
+                      </td>
 
-                {/* 6 Metric Boxes */}
-                <div className="grid grid-cols-3 gap-2.5">
-                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
-                    <span className="font-label text-[11px] text-light-on-surface-variant">Duration</span>
-                    <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                      {m.days} Days
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
-                    <span className="font-label text-[11px] text-light-on-surface-variant">Lessons</span>
-                    <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                      {m.lessons} Lessons
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
-                    <span className="font-label text-[11px] text-light-on-surface-variant">Practical Tasks</span>
-                    <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                      {m.tasks} Tasks
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
-                    <span className="font-label text-[11px] text-light-on-surface-variant">Assignments</span>
-                    <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                      {m.assignments}
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
-                    <span className="font-label text-[11px] text-light-on-surface-variant">Tests</span>
-                    <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                      {m.tests}
-                    </span>
-                  </div>
-                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
-                    <span className="font-label text-[11px] text-light-on-surface-variant">Milestones</span>
-                    <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                      {m.milestones}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                      {/* Duration & Lessons */}
+                      <td className="py-3.5 px-4 whitespace-nowrap align-top">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-label text-label-md font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+                            {m.days} Days
+                          </span>
+                          <span className="font-label text-label-xs text-light-on-surface-variant dark:text-dark-on-surface-variant tabular-nums">
+                            {m.lessons} Lessons
+                          </span>
+                        </div>
+                      </td>
 
-              {/* Card Footer Actions */}
-              <footer className="pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setInspectModule(m)}
-                    className="px-2.5 py-1.5 rounded text-light-on-surface-variant hover:bg-light-surface-container-low font-label text-label-sm font-medium transition-colors"
-                  >
-                    View Details
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(m)}
-                    className="px-2.5 py-1.5 rounded text-light-on-surface-variant hover:bg-light-surface-container-low font-label text-label-sm font-medium transition-colors"
-                  >
-                    Edit Module
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDuplicate(m)}
-                    className="px-2.5 py-1.5 rounded text-light-on-surface-variant hover:bg-light-surface-container-low font-label text-label-sm font-medium transition-colors"
-                  >
-                    Duplicate
-                  </button>
-                </div>
+                      {/* Curriculum Breakdown */}
+                      <td className="py-3.5 px-4 align-top">
+                        <div className="grid grid-cols-2 gap-1.5 min-w-[190px]">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[11px] font-medium">
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tasks}</span> Tasks
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[11px] font-medium">
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.assignments}</span> Assign.
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[11px] font-medium">
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tests}</span> Tests
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[11px] font-medium">
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.milestones}</span> Milestones
+                          </span>
+                        </div>
+                      </td>
 
-                <button
-                  type="button"
-                  onClick={() => toggleAddedToCourse(m.id, m.title)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded font-label text-label-sm font-semibold transition-colors whitespace-nowrap ${
-                    isAdded
-                      ? 'bg-success text-white'
-                      : 'bg-light-primary text-light-on-primary hover:bg-light-primary-container'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[16px]">
-                    {isAdded ? 'check' : 'add'}
-                  </span>
-                  <span>{isAdded ? 'Added to Course' : 'Add to Course'}</span>
-                </button>
-              </footer>
-            </article>
-          )
-        })}
+                      {/* Status */}
+                      <td className="py-3.5 px-4 whitespace-nowrap text-center align-top">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-xs font-semibold ${
+                            m.status === 'Published'
+                              ? 'bg-success-container text-on-success-container'
+                              : 'bg-pending-container text-on-pending-container'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              m.status === 'Published' ? 'bg-success' : 'bg-pending'
+                            }`}
+                          />
+                          <span>{m.status}</span>
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3.5 px-4 whitespace-nowrap text-right align-top">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => toggleAddedToCourse(m.id, m.title)}
+                            title={isAdded ? 'Remove from Course' : 'Add to Course'}
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded font-label text-label-xs font-semibold transition-colors ${
+                              isAdded
+                                ? 'bg-success text-white'
+                                : 'bg-light-primary text-light-on-primary hover:bg-light-primary-container'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-[15px]">
+                              {isAdded ? 'check' : 'add'}
+                            </span>
+                            <span>{isAdded ? 'Added' : 'Add to Course'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setInspectModule(m)}
+                            title="View Details"
+                            className="p-1.5 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">visibility</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(m)}
+                            title="Edit Module"
+                            className="p-1.5 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDuplicate(m)}
+                            title="Duplicate Module"
+                            className="p-1.5 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(m.id, m.title)}
+                            title="Delete Module"
+                            className="p-1.5 rounded text-light-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Footer */}
+        <div className="p-3 border-t border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/40 flex items-center justify-between text-label-xs text-light-on-surface-variant">
+          <span>Showing <strong>{filteredModules.length}</strong> of <strong>{modules.length}</strong> modules</span>
+          <div className="flex items-center gap-2">
+            <span>Standardized enterprise curriculum units</span>
+          </div>
+        </div>
       </section>
 
       {/* View Details Drawer / Modal */}
