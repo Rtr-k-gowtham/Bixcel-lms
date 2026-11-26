@@ -11,7 +11,61 @@ export const apiClient = axios.create({
   timeout: 10000,
 })
 
+// Attach auth token if available
+apiClient.interceptors.request.use(
+  (config) => {
+    try {
+      const token = localStorage.getItem('bx_auth_token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch {
+      // ignore
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
 export const apiService = {
+  // Authentication API
+  login: async (credentials) => {
+    const response = await apiClient.post('/auth/login', credentials)
+    if (response.data && response.data.token) {
+      try {
+        localStorage.setItem('bx_auth_token', response.data.token)
+        localStorage.setItem('bx_auth_user', JSON.stringify(response.data.user))
+      } catch {
+        // ignore
+      }
+    }
+    return response.data
+  },
+
+  logout: async () => {
+    try {
+      await apiClient.post('/auth/logout')
+    } catch {
+      // Silently handle network errors
+    } finally {
+      try {
+        localStorage.removeItem('bx_auth_token')
+        localStorage.removeItem('bx_auth_user')
+      } catch {
+        // ignore
+      }
+    }
+  },
+
+  getCurrentUser: () => {
+    try {
+      const stored = localStorage.getItem('bx_auth_user')
+      return stored ? JSON.parse(stored) : null
+    } catch {
+      return null
+    }
+  },
+
   // Check backend health
   checkHealth: async () => {
     const response = await apiClient.get('/health')

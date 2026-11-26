@@ -8,9 +8,26 @@ export function Header({
   health,
   onRefresh,
   onNavigate,
+  currentUser,
+  onLogout,
 }) {
   const { theme, toggleTheme } = useTheme()
   const [profileOpen, setProfileOpen] = useState(false)
+
+  const userName = currentUser?.name || 'Elena Rostova'
+  const userRole = currentUser?.role || 'Super Admin'
+  const userEmail = currentUser?.email || 'admin@bixcel.edu'
+  const userEmpId = currentUser?.emp_id || 'BX-ADM-002'
+  const userAvatar = currentUser?.avatar || ''
+
+  // Compute initials
+  const initials = userName
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'ER'
 
   return (
     <header className="h-16 bg-light-surface-container-lowest dark:bg-dark-surface-bright border-b border-light-outline-variant dark:border-dark-outline-variant px-6 flex items-center justify-between gap-4 sticky top-0 z-20 transition-colors duration-state-change">
@@ -108,17 +125,25 @@ export function Header({
           <button
             type="button"
             onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-3 pl-2 pr-1.5 py-1 rounded hover:bg-light-surface-container-low transition-colors whitespace-nowrap"
+            className="flex items-center gap-3 pl-2 pr-1.5 py-1 rounded hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors whitespace-nowrap"
           >
-            <div className="w-8 h-8 rounded-full bg-light-primary text-light-on-primary flex items-center justify-center font-semibold text-sm shrink-0">
-              ER
-            </div>
+            {userAvatar ? (
+              <img
+                src={userAvatar}
+                alt={userName}
+                className="w-8 h-8 rounded-full object-cover ring-1 ring-light-outline-variant dark:ring-dark-outline-variant shrink-0"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-light-primary text-light-on-primary flex items-center justify-center font-semibold text-sm shrink-0">
+                {initials}
+              </div>
+            )}
             <div className="hidden sm:flex flex-col items-start text-left">
               <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface leading-tight whitespace-nowrap">
-                Elena Rostova
+                {userName}
               </span>
               <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                Super Admin
+                {userRole}
               </span>
             </div>
             <span className="material-symbols-outlined text-light-outline text-[18px]">
@@ -127,9 +152,20 @@ export function Header({
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-52 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-lg py-1.5 z-30 animate-in fade-in zoom-in-95 duration-state-change">
-              <div className="px-4 py-2 border-b border-light-outline-variant dark:border-dark-outline-variant text-label-sm text-light-on-surface-variant">
-                Academic Year 2026-2027
+            <div className="absolute right-0 mt-2 w-60 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-xl py-1.5 z-30 animate-in fade-in zoom-in-95 duration-state-change">
+              <div className="px-4 py-2.5 border-b border-light-outline-variant dark:border-dark-outline-variant">
+                <p className="font-label text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface truncate">
+                  {userName}
+                </p>
+                <p className="font-body text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
+                  {userEmail}
+                </p>
+                <div className="mt-1 flex items-center justify-between text-[10px] text-light-outline">
+                  <span>ID: {userEmpId}</span>
+                  <span className="px-1.5 py-0.2 rounded bg-light-surface-container-high dark:bg-dark-surface-container font-medium text-light-primary">
+                    {userRole}
+                  </span>
+                </div>
               </div>
               <button
                 type="button"
@@ -156,9 +192,14 @@ export function Header({
               <div className="my-1 border-t border-light-outline-variant dark:border-dark-outline-variant" />
               <button
                 type="button"
-                className="w-full text-left block px-4 py-2 font-body text-body-sm text-overdue hover:bg-overdue-container"
+                onClick={() => {
+                  setProfileOpen(false)
+                  if (onLogout) onLogout()
+                }}
+                className="w-full text-left px-4 py-2 font-body text-body-sm text-overdue hover:bg-overdue-container flex items-center gap-2 cursor-pointer font-medium"
               >
-                Sign Out
+                <span className="material-symbols-outlined text-[16px]">logout</span>
+                <span>Sign Out</span>
               </button>
             </div>
           )}

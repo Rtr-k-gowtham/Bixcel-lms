@@ -22,9 +22,10 @@ import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
 import StudentCalendar from './components/calendar/StudentCalendar'
+import LoginScreen from './components/auth/LoginScreen'
 import { apiService } from './services/api'
 
-function Dashboard() {
+function Dashboard({ currentUser, onLogout }) {
   const [currentTab, setCurrentTab] = useState('dashboard')
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [matrixPreselectedRole, setMatrixPreselectedRole] = useState('Super Admin')
@@ -158,6 +159,8 @@ function Dashboard() {
           health={health}
           onRefresh={fetchData}
           onNavigate={(tab) => setCurrentTab(tab)}
+          currentUser={currentUser}
+          onLogout={onLogout}
         />
 
         {/* Main Content Area */}
@@ -733,9 +736,20 @@ function Dashboard() {
 }
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState(() => apiService.getCurrentUser())
+
+  const handleLogout = async () => {
+    await apiService.logout()
+    setCurrentUser(null)
+  }
+
   return (
     <ThemeProvider>
-      <Dashboard />
+      {!currentUser ? (
+        <LoginScreen onLoginSuccess={(user) => setCurrentUser(user)} />
+      ) : (
+        <Dashboard currentUser={currentUser} onLogout={handleLogout} />
+      )}
     </ThemeProvider>
   )
 }

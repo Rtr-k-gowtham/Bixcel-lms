@@ -12,6 +12,11 @@ $routes->options('(:any)', static function () {
 
 // API Routes definition function (supports both /api/path and /path)
 $defineApiRoutes = static function ($routes) {
+    // Auth Routes
+    $routes->post('auth/login', 'Api\AuthController::login');
+    $routes->get('auth/me', 'Api\AuthController::me');
+    $routes->post('auth/logout', 'Api\AuthController::logout');
+
     $routes->get('health', 'Api\HealthController::index');
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
     $routes->resource('modules', ['controller' => 'Api\ModuleController']);
