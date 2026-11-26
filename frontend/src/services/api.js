@@ -145,6 +145,28 @@ export const apiService = {
     const response = await apiClient.delete(`/profile/sessions/${sessionId}`)
     return response.data
   },
+
+  // Student Onboarding & Enrollment API
+  getStudents: async (params = {}) => {
+    const response = await apiClient.get('/students', { params })
+    return response.data
+  },
+  getStudent: async (id) => {
+    const response = await apiClient.get(`/students/${id}`)
+    return response.data
+  },
+  getStudentTracks: async () => {
+    const response = await apiClient.get('/students/tracks')
+    return response.data
+  },
+  createStudent: async (studentData) => {
+    const response = await apiClient.post('/students', studentData)
+    return response.data
+  },
+  deleteStudent: async (id) => {
+    const response = await apiClient.delete(`/students/${id}`)
+    return response.data
+  },
 }
 
 export default apiService

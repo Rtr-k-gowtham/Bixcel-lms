@@ -17,6 +17,7 @@ import { AuditLogs } from './components/audit/AuditLogs'
 import { NotificationsScreen } from './components/notifications/NotificationsScreen'
 import { UserProfileScreen } from './components/profile/UserProfileScreen'
 import ModuleLibrary from './components/modules/ModuleLibrary'
+import StudentOnboarding from './components/students/StudentOnboarding'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -123,6 +124,8 @@ function Dashboard() {
               ? 'Course Management'
               : currentTab === 'modules'
               ? 'Module Library'
+              : ['students', 'onboarding'].includes(currentTab)
+              ? 'Student Onboarding & Enrollment'
               : currentTab === 'batches'
               ? 'Batch Management'
               : currentTab === 'users'
@@ -190,7 +193,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'modules' ? (
+          {['students', 'onboarding'].includes(currentTab) ? (
+            <StudentOnboarding />
+          ) : currentTab === 'modules' ? (
             <ModuleLibrary />
           ) : currentTab === 'users' ? (
             <UserMaster />
