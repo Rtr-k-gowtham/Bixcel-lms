@@ -31,7 +31,7 @@ class ModuleController extends BaseApiController
                     : $mod['curriculum_lessons'];
             }
             if (empty($curriculum) || !is_array($curriculum)) {
-                $curriculum = $this->generateDefaultCurriculum($mod['title'], (int) ($mod['duration_days'] ?? 7));
+                $curriculum = [];
             }
 
             $totalLessons = 0;
@@ -57,12 +57,12 @@ class ModuleController extends BaseApiController
                 'version'            => 'v2.0',
                 'category'           => $mod['category'] ?? 'Engineering',
                 'status'             => $mod['status'] ?? 'Published',
-                'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 10),
-                'lessons'            => $totalLessons > 0 ? $totalLessons : (int) (($mod['duration_days'] ?? 10) * 2),
+                'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 1),
+                'lessons'            => $totalLessons,
                 'curriculum_lessons' => $curriculum,
-                'tasks'              => $totalTasks > 0 ? $totalTasks : 4,
-                'assignments'        => $totalTasks > 0 ? $totalTasks : 3,
-                'tests'              => $totalTests > 0 ? $totalTests : 2,
+                'tasks'              => $totalTasks,
+                'assignments'        => 0,
+                'tests'              => $totalTests,
                 'milestones'         => 1,
                 'updated_at'         => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
                 'description'        => $mod['description'] ?? '',
@@ -92,7 +92,7 @@ class ModuleController extends BaseApiController
                 : $mod['curriculum_lessons'];
         }
         if (empty($curriculum) || !is_array($curriculum)) {
-            $curriculum = $this->generateDefaultCurriculum($mod['title'], (int) ($mod['duration_days'] ?? 7));
+            $curriculum = [];
         }
 
         $totalLessons = 0;
@@ -120,13 +120,13 @@ class ModuleController extends BaseApiController
                 'version'            => 'v2.0',
                 'category'           => $mod['category'],
                 'status'             => $mod['status'],
-                'days'               => count($curriculum) > 0 ? count($curriculum) : (int) $mod['duration_days'],
-                'lessons'            => $totalLessons > 0 ? $totalLessons : (int) ($mod['duration_days'] * 2),
+                'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 1),
+                'lessons'            => $totalLessons,
                 'curriculum_lessons' => $curriculum,
-                'tasks'              => $totalTasks > 0 ? $totalTasks : 4,
-                'assignments'        => $totalTasks > 0 ? $totalTasks : 3,
-                'tests'              => $totalTests > 0 ? $totalTests : 2,
-                'milestones'         => 1,
+                'tasks'              => $totalTasks,
+                'assignments'        => 0,
+                'tests'              => $totalTests,
+                'milestones'         => 0,
                 'updated_at'         => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
                 'description'        => $mod['description'],
             ],

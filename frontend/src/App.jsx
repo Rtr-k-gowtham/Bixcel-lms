@@ -124,6 +124,11 @@ function Dashboard({ currentUser, onLogout }) {
   const [health, setHealth] = useState(null)
   const [courses, setCourses] = useState([])
   const [_coursesLoading, setCoursesLoading] = useState(true)
+  const [metrics, setMetrics] = useState({
+    students: 0,
+    tutors: 0,
+    batches: 0,
+  })
 
   // Create Course Modal State
   const [showModal, setShowModal] = useState(false)
@@ -144,9 +149,12 @@ function Dashboard({ currentUser, onLogout }) {
   const fetchData = async () => {
     setCoursesLoading(true)
     try {
-      const [healthData, coursesData] = await Promise.allSettled([
+      const [healthData, coursesData, studentsData, tutorsData, batchesData] = await Promise.allSettled([
         apiService.checkHealth(),
         apiService.getCourses(),
+        apiService.getStudents(),
+        apiService.getTutors(),
+        apiService.getBatches(),
       ])
 
       if (healthData.status === 'fulfilled') {
@@ -157,7 +165,15 @@ function Dashboard({ currentUser, onLogout }) {
 
       if (coursesData.status === 'fulfilled' && coursesData.value?.data) {
         setCourses(coursesData.value.data)
+      } else {
+        setCourses([])
       }
+
+      setMetrics({
+        students: studentsData.status === 'fulfilled' && Array.isArray(studentsData.value?.data) ? studentsData.value.data.length : 0,
+        tutors: tutorsData.status === 'fulfilled' && Array.isArray(tutorsData.value?.data) ? tutorsData.value.data.length : 0,
+        batches: batchesData.status === 'fulfilled' && Array.isArray(batchesData.value?.data) ? batchesData.value.data.length : 0,
+      })
     } catch {
       // Handled silently
     } finally {
@@ -379,10 +395,10 @@ function Dashboard({ currentUser, onLogout }) {
                   </div>
                   <div className="flex items-baseline justify-between gap-1">
                     <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
-                      2,840
+                      {metrics.students}
                     </span>
                     <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded tabular-nums font-semibold">
-                      +8.4%
+                      {metrics.students > 0 ? 'Active' : 'Empty'}
                     </span>
                   </div>
                 </article>
@@ -399,10 +415,10 @@ function Dashboard({ currentUser, onLogout }) {
                   </div>
                   <div className="flex items-baseline justify-between gap-1">
                     <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
-                      64
+                      {metrics.tutors}
                     </span>
                     <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded tabular-nums font-semibold">
-                      +3 Active
+                      {metrics.tutors > 0 ? 'Active' : 'Unassigned'}
                     </span>
                   </div>
                 </article>
@@ -439,10 +455,10 @@ function Dashboard({ currentUser, onLogout }) {
                   </div>
                   <div className="flex items-baseline justify-between gap-1">
                     <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
-                      24
+                      {metrics.batches}
                     </span>
                     <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded font-semibold">
-                      On track
+                      {metrics.batches > 0 ? 'Active' : 'No Batches'}
                     </span>
                   </div>
                 </article>
@@ -583,36 +599,46 @@ function Dashboard({ currentUser, onLogout }) {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
-                        {courses.map((course, idx) => (
-                          <tr key={course.id || idx} className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors">
-                            <td className="px-4 py-2.5 whitespace-nowrap">
-                              <div className="flex flex-col">
-                                <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-medium">
-                                  {course.title}
-                                </span>
-                                <span className="font-mono text-mono-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                                  CRS-{100 + Number(course.id || idx + 1)}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-2.5 whitespace-nowrap">
-                              <span className="font-body text-body-sm text-light-on-surface dark:text-dark-on-surface">
-                                {course.instructor || 'Dr. Marcus Vance'}
-                              </span>
-                            </td>
-                            <td className="px-4 py-2.5 tabular-nums whitespace-nowrap">
-                              <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                                {course.duration || '6 Weeks'} • {course.level || 'Intermediate'}
-                              </span>
-                            </td>
-                            <td className="px-4 py-2.5 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success-container text-on-success-container whitespace-nowrap font-label text-label-sm font-semibold">
-                                <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
-                                <span>Active (CI4)</span>
-                              </span>
+                        {courses.length === 0 ? (
+                          <tr>
+                            <td colSpan="4" className="px-4 py-12 text-center text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                              <span className="material-symbols-outlined text-[36px] opacity-40 block mb-1">school</span>
+                              <p className="font-semibold text-xs">No active courses registered</p>
+                              <p className="text-[11px] opacity-70 mt-0.5">Click &quot;+ Create Course&quot; to add your first curriculum program</p>
                             </td>
                           </tr>
-                        ))}
+                        ) : (
+                          courses.map((course, idx) => (
+                            <tr key={course.id || idx} className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors">
+                              <td className="px-4 py-2.5 whitespace-nowrap">
+                                <div className="flex flex-col">
+                                  <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-medium">
+                                    {course.title}
+                                  </span>
+                                  <span className="font-mono text-mono-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                                    CRS-{100 + Number(course.id || idx + 1)}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-2.5 whitespace-nowrap">
+                                <span className="font-body text-body-sm text-light-on-surface dark:text-dark-on-surface">
+                                  {course.instructor || 'Unassigned'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2.5 tabular-nums whitespace-nowrap">
+                                <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                                  {course.duration || '6 Weeks'} • {course.level || 'Intermediate'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2.5 whitespace-nowrap">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success-container text-on-success-container whitespace-nowrap font-label text-label-sm font-semibold">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
+                                  <span>Active (CI4)</span>
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -664,34 +690,14 @@ function Dashboard({ currentUser, onLogout }) {
                       <h2 className="font-title text-[15px] text-light-on-surface dark:text-dark-on-surface font-semibold">
                         Notifications
                       </h2>
-                      <span className="font-label text-label-sm text-light-primary font-semibold whitespace-nowrap">
-                        4 Active
+                      <span className="font-label text-label-sm text-light-on-surface-variant font-medium whitespace-nowrap">
+                        0 Active
                       </span>
                     </header>
-                    <ul className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
-                      <li className="py-2 flex items-center gap-3">
-                        <span className="w-2 h-2 rounded-full bg-overdue shrink-0"></span>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-label text-label-sm text-light-on-surface dark:text-dark-on-surface font-medium">
-                            14 fee installments overdue in Batch B26-FS-A
-                          </span>
-                          <span className="font-label text-label-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                            Finance • 18 mins ago
-                          </span>
-                        </div>
-                      </li>
-                      <li className="py-2 flex items-center gap-3">
-                        <span className="w-2 h-2 rounded-full bg-pending shrink-0"></span>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-label text-label-sm text-light-on-surface dark:text-dark-on-surface font-medium">
-                            Room 204 scheduling conflict detected for Nov 28
-                          </span>
-                          <span className="font-label text-label-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                            Timetable • 1 hour ago
-                          </span>
-                        </div>
-                      </li>
-                    </ul>
+                    <div className="py-6 text-center text-light-on-surface-variant dark:text-dark-on-surface-variant text-xs">
+                      <span className="material-symbols-outlined text-[24px] opacity-40 block mb-1">notifications_paused</span>
+                      <span>No pending system alerts or notifications</span>
+                    </div>
                   </article>
                 </div>
               </section>

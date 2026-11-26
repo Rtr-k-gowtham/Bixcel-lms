@@ -1,89 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../../services/api'
 
-const DEFAULT_NOTIFICATIONS = [
-  {
-    id: 'NOTIF-101',
-    type: 'finance',
-    priority: 'critical',
-    title: '14 Fee Installments Overdue in Batch B26-FS-A',
-    message: 'Tuition installment deadline expired 48 hours ago for 14 enrolled learners. Automated collection notices queued for dispatch.',
-    category: 'Finance & Payments',
-    timestamp: '18 mins ago',
-    is_read: false,
-    action_label: 'Review Fee Ledger',
-    action_tab: 'fees',
-    icon: 'payments',
-  },
-  {
-    id: 'NOTIF-102',
-    type: 'timetable',
-    priority: 'warning',
-    title: 'Room 204 Scheduling Conflict Detected for Nov 28',
-    message: 'Simultaneous booking requested for Lab 204 by CS-401 (Dr. Vance) and UX-110 (Sophia Chen) at 02:00 PM.',
-    category: 'Timetable & Rooms',
-    timestamp: '1 hour ago',
-    is_read: false,
-    action_label: 'Resolve Room Conflict',
-    action_tab: 'timetable',
-    icon: 'meeting_room',
-  },
-  {
-    id: 'NOTIF-103',
-    type: 'security',
-    priority: 'critical',
-    title: 'IP Blacklist Action Triggered: 45.33.32.156',
-    message: 'Automated rate-limiter blocked repeated brute-force authentication attempts targeting administrator portal.',
-    category: 'Security & Audit',
-    timestamp: '2 hours ago',
-    is_read: false,
-    action_label: 'Inspect Security Logs',
-    action_tab: 'audit',
-    icon: 'gpp_bad',
-  },
-  {
-    id: 'NOTIF-104',
-    type: 'academic',
-    priority: 'info',
-    title: 'Final Midterm Grades Submitted for DS-204',
-    message: 'Dr. Marcus Vance published verified assessment evaluation for 32 students in Data Engineering cohort with 94% pass rate.',
-    category: 'Academic & Exams',
-    timestamp: '3 hours ago',
-    is_read: false,
-    action_label: 'View Grade Spread',
-    action_tab: 'exams',
-    icon: 'quiz',
-  },
-  {
-    id: 'NOTIF-105',
-    type: 'system',
-    priority: 'info',
-    title: 'CodeIgniter 4 REST API Auto-Backup Finished',
-    message: 'Nightly snapshot of course catalog, permission matrices, and user registry completed without discrepancies.',
-    category: 'System & Maintenance',
-    timestamp: 'Yesterday at 03:00 AM',
-    is_read: true,
-    action_label: 'View System Diagnostics',
-    action_tab: 'settings',
-    icon: 'cloud_done',
-  },
-  {
-    id: 'NOTIF-106',
-    type: 'admissions',
-    priority: 'info',
-    title: '6 New Student Applications Pending Dean Review',
-    message: 'Undergraduate admission candidates submitted credential portfolios for Spring 2027 intake cohort.',
-    category: 'Student Admissions',
-    timestamp: 'Yesterday',
-    is_read: true,
-    action_label: 'Review Applications',
-    action_tab: 'students',
-    icon: 'how_to_reg',
-  },
-]
+const DEFAULT_NOTIFICATIONS = []
 
 export function NotificationsScreen({ onNavigate }) {
-  const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState([])
   const [activeFilter, setActiveFilter] = useState('ALL')
   const [toast, setToast] = useState('')
 

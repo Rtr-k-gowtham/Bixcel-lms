@@ -1,98 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../../services/api'
 
-const DEFAULT_TUTORS = [
-  {
-    id: 1,
-    staff_id: 'TUT-101',
-    name: 'Sofia Alvarez',
-    role: 'Lead Product Designer',
-    expertise: 'UI/UX Design, Figma, Design Systems',
-    courses: 'UI/UX Product Design, Design Systems',
-    availability: 'Available',
-    hours: 12,
-    max_hours: 24,
-    rating: 4.9,
-    email: 'sofia.alvarez@bixcel.edu',
-    phone: '+1 (555) 234-8901',
-    assigned_batches: ['BIX-UX-26D', 'BIX-UX-26A'],
-  },
-  {
-    id: 2,
-    staff_id: 'TUT-104',
-    name: 'Marcus Vance',
-    role: 'Senior Brand & Visual Tutor',
-    expertise: 'Graphic Design, Typography, Branding',
-    courses: 'Graphic Design Master Course',
-    availability: 'Partial',
-    hours: 18,
-    max_hours: 24,
-    rating: 4.8,
-    email: 'marcus.vance@bixcel.edu',
-    phone: '+1 (555) 345-9012',
-    assigned_batches: ['BIX-GD-26A', 'BIX-GD-26B'],
-  },
-  {
-    id: 3,
-    staff_id: 'TUT-109',
-    name: 'Priya Nair',
-    role: 'Creative Studio Mentor',
-    expertise: 'Photoshop, UI Prototyping, Accessibility',
-    courses: 'Graphic Design, UI/UX Product Design',
-    availability: 'Available',
-    hours: 10,
-    max_hours: 24,
-    rating: 4.7,
-    email: 'priya.nair@bixcel.edu',
-    phone: '+1 (555) 456-0123',
-    assigned_batches: ['BIX-GD-26A', 'BIX-UX-26D'],
-  },
-  {
-    id: 4,
-    staff_id: 'TUT-112',
-    name: 'Dr. Aris Thorne',
-    role: 'Principal Engineering Tutor',
-    expertise: 'Full-Stack Web, Data Science, Cloud',
-    courses: 'Full-Stack Web, Data Science',
-    availability: 'Full',
-    hours: 24,
-    max_hours: 24,
-    rating: 4.95,
-    email: 'aris.thorne@bixcel.edu',
-    phone: '+1 (555) 567-1234',
-    assigned_batches: ['BIX-FS-26C', 'BIX-DS-26E'],
-  },
-  {
-    id: 5,
-    staff_id: 'TUT-115',
-    name: 'Tariq Al-Mansoor',
-    role: 'Cloud Solutions Architect',
-    expertise: 'AWS, Terraform, Kubernetes, DevOps',
-    courses: 'Cloud & DevOps Engineering',
-    availability: 'Available',
-    hours: 14,
-    max_hours: 24,
-    rating: 4.85,
-    email: 'tariq.mansoor@bixcel.edu',
-    phone: '+1 (555) 678-2345',
-    assigned_batches: ['BIX-CLD-26F'],
-  },
-  {
-    id: 6,
-    staff_id: 'TUT-118',
-    name: 'Elena Rostova',
-    role: 'Cybersecurity Specialist',
-    expertise: 'Network Defense, SOC Operations, Ethical Hacking',
-    courses: 'Cybersecurity Operations',
-    availability: 'Partial',
-    hours: 16,
-    max_hours: 24,
-    rating: 4.9,
-    email: 'elena.rostova@bixcel.edu',
-    phone: '+1 (555) 789-3456',
-    assigned_batches: ['BIX-SEC-09F'],
-  },
-]
+const DEFAULT_TUTORS = []
 
 const BATCH_TARGETS = [
   { code: 'BIX-UX-26D', title: 'UI/UX Product Evening (UI/UX Product Design)' },
@@ -104,7 +13,7 @@ const BATCH_TARGETS = [
 
 export function TutorManagement() {
   const [activeTab, setActiveTab] = useState('assignment') // 'assignment' | 'directory'
-  const [tutors, setTutors] = useState(DEFAULT_TUTORS)
+  const [tutors, setTutors] = useState([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [availFilter, setAvailFilter] = useState('all')

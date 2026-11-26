@@ -30,7 +30,7 @@ class CourseController extends BaseApiController
                 'instructor' => $c['instructor'] ?? 'Lead Instructor',
                 'level' => $c['level'] ?? 'Intermediate',
                 'duration' => $c['duration'] ?? '8 Weeks',
-                'enrolled' => 124,
+                'enrolled' => 0,
                 'description' => $c['description'] ?? '',
             ];
         }
@@ -59,7 +59,7 @@ class CourseController extends BaseApiController
                 'instructor' => $c['instructor'],
                 'level' => $c['level'],
                 'duration' => $c['duration'],
-                'enrolled' => 124,
+                'enrolled' => 0,
                 'description' => $c['description'],
             ],
         ]);

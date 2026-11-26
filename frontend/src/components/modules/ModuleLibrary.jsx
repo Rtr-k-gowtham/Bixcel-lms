@@ -59,191 +59,24 @@ export function createDefaultQuizQuestions(topicTitle = 'Curriculum Knowledge Ch
   ]
 }
 
-// Helper to generate rich day-by-day lessons with sno, title, description, and duration
-export function generateDefaultCurriculum(title, days = 7) {
-  const dCount = Math.max(1, Math.min(60, Number(days) || 7))
+// Helper to generate a clean day-by-day lesson skeleton
+export function generateDefaultCurriculum(title = 'Module', days = 1) {
+  const dCount = Math.max(1, Math.min(60, Number(days) || 1))
   const curriculum = []
-
-  const seedTopics = [
-    {
-      title: 'Foundations & Visual Core Principles',
-      items: [
-        { sno: 1, type: 'lesson', title: 'Introduction & Core Conceptual Principles', duration: '45 mins', description: 'Theoretical foundations, fundamental terminology, and industry standard mental models.', format: 'Video Lecture' },
-        { sno: 2, type: 'task', title: 'Project Scaffolding & Design Tokens Setup', duration: '60 mins', description: 'Configure workspace, import token libraries, and verify color contrast ratios.', doc_link: 'https://bixcel.edu/docs/foundations-setup.pdf', image_url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=500' },
-      ],
-    },
-    {
-      title: 'Structural Architecture & Component Design',
-      items: [
-        { sno: 1, type: 'lesson', title: 'Component Hierarchy & Composition', duration: '50 mins', description: 'Breaking complex workflows into modular, reusable, and maintainable building blocks.', format: 'Interactive Lab' },
-        { sno: 2, type: 'task', title: 'Atomic Buttons & Form Inputs Exercise', duration: '55 mins', description: 'Construct atomic button states (hover, focus, disabled) matching WCAG AAA specs.', doc_link: 'https://figma.com/@bixcel-design-system', image_url: '' },
-        { sno: 3, type: 'quiz', title: 'Component Anatomy Checkpoint', duration: '20 mins', description: 'Verify understanding of props, slots, and design constraints.', questions_count: 5, pass_score: '80%', quiz_questions: createDefaultQuizQuestions('Component Architecture') },
-      ],
-    },
-    {
-      title: 'Data Flow, State & Async Interactions',
-      items: [
-        { sno: 1, type: 'lesson', title: 'Unidirectional Data Flow & State Hooks', duration: '55 mins', description: 'Managing local state, derived computations, and predictable state transitions.', format: 'Video Lecture' },
-        { sno: 2, type: 'task', title: 'Async API Data Binding Assignment', duration: '60 mins', description: 'Implement fetch hooks with loading skeletons and robust error boundaries.', doc_link: 'https://github.com/bixcel-lms/api-specs', image_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500' },
-      ],
-    },
-    {
-      title: 'Advanced Patterns & Design Systems',
-      items: [
-        { sno: 1, type: 'lesson', title: 'Scalable Token Architecture & Theme Variables', duration: '45 mins', description: 'Atomic tokens, semantic color mappings, dark/light aliases, and WCAG AAA compliance.', format: 'Live Workshop' },
-        { sno: 2, type: 'test', title: 'Design System Practical Milestone Test', duration: '90 mins', description: 'Comprehensive practical benchmark creating an enterprise component suite.', total_marks: 100, passing_marks: 50 },
-      ],
-    },
-  ]
-
   for (let d = 1; d <= dCount; d++) {
-    const template = seedTopics[(d - 1) % seedTopics.length]
     curriculum.push({
       day: d,
-      day_title: `Day ${d}: ${template.title}`,
-      lessons: template.items.map((item) => ({
-        ...item,
-        sno: item.sno,
-        title: item.title,
-        duration: item.duration,
-        description: item.description,
-      })),
+      day_title: `Day ${d}`,
+      lessons: [],
     })
   }
-
   return curriculum
 }
 
-const DEFAULT_MODULES = [
-  {
-    id: 1,
-    title: 'Introduction to Graphic Design',
-    code: 'MOD-DES-101',
-    version: 'v2.1',
-    category: 'Design',
-    status: 'Published',
-    days: 7,
-    lessons: 10,
-    tasks: 4,
-    assignments: 3,
-    tests: 1,
-    milestones: 1,
-    updated_at: '2026-11-18',
-    description: 'Fundamental principles of color theory, typography, grid layouts, and visual hierarchy using industry tools.',
-    curriculum_lessons: [
-      {
-        day: 1,
-        day_title: 'Day 1: Foundations of Visual Design & Hierarchy',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Principles of Visual Hierarchy & Balance', duration: '45 mins', description: 'Rule of thirds, optical center, focal points, scale contrast, and cognitive visual flow.', format: 'Video Lecture' },
-          { sno: 2, type: 'task', title: 'Layout Balance & Alignment Exercise', duration: '50 mins', description: 'Create 3 layout compositions following the rule of thirds and optical balancing.', doc_link: 'https://bixcel.edu/resources/visual-hierarchy.pdf', image_url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=500' },
-        ],
-      },
-      {
-        day: 2,
-        day_title: 'Day 2: Typography & Composition Layouts',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Anatomy of Type & Font Pairings', duration: '45 mins', description: 'Serif vs sans-serif, kerning, leading, tracking, hierarchy pairing display titles with body text.', format: 'Interactive Lab' },
-          { sno: 2, type: 'quiz', title: 'Typography Fundamentals Quiz', duration: '15 mins', description: 'Evaluation of font scales, line heights, and readability principles.', questions_count: 5, pass_score: '80%' },
-        ],
-      },
-      {
-        day: 3,
-        day_title: 'Day 3: Vector Graphics & Pen Tool Mastery',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Bézier Curves & Path Geometries', duration: '55 mins', description: 'Vector control handles, node points, boolean operations (union, subtract, intersect).', format: 'Live Workshop' },
-          { sno: 2, type: 'task', title: 'Vector Icon Set Construction', duration: '60 mins', description: 'Design a cohesive 6-piece icon set on a 24x24 pixel grid with 2px uniform stroke.', doc_link: 'https://figma.com/@bixcel-icons', image_url: '' },
-        ],
-      },
-      {
-        day: 4,
-        day_title: 'Day 4: Image Masking & Raster Editing',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Non-Destructive Layer Masking', duration: '45 mins', description: 'Clipping masks, alpha channels, blend modes, and isolating complex edges.', format: 'Video Lecture' },
-          { sno: 2, type: 'task', title: 'Selective Color Grading & Retouching', duration: '50 mins', description: 'Perform tone curves and histogram balancing on provided RAW photographic assets.', doc_link: '', image_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500' },
-        ],
-      },
-      {
-        day: 5,
-        day_title: 'Day 5: Digital Branding & Identity Assets',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Brand Guidelines & Style Guides', duration: '45 mins', description: 'Logo clear-space specifications, primary/secondary palette documentation, and voice.', format: 'Interactive Lab' },
-          { sno: 2, type: 'quiz', title: 'Brand Identity Standards Quiz', duration: '20 mins', description: 'Assessment of trademark clearance, asset ratios, and typography specifications.', questions_count: 6, pass_score: '85%' },
-        ],
-      },
-      {
-        day: 6,
-        day_title: 'Day 6: Print Production & Prepress Standards',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Bleed, Slug, & CMYK Color Separations', duration: '50 mins', description: '300 DPI resolution requirements, crop marks, rich black vs 100K black, and paper stock.', format: 'Video Lecture' },
-          { sno: 2, type: 'task', title: 'Print-Ready PDF Preflight Export', duration: '40 mins', description: 'Export PDF/X-1a files verifying embedded fonts, ink limits, and bleed borders.', doc_link: 'https://bixcel.edu/print-specs.pdf', image_url: '' },
-        ],
-      },
-      {
-        day: 7,
-        day_title: 'Day 7: Capstone Portfolio Evaluation & Benchmark Test',
-        lessons: [
-          { sno: 1, type: 'lesson', title: 'Case Study Storytelling & Mockups', duration: '50 mins', description: 'Presenting design solutions in realistic 3D isometric mockups with clear rationale.', format: 'Live Workshop' },
-          { sno: 2, type: 'test', title: 'Final Graphic Design Benchmark Examination', duration: '90 mins', description: 'Comprehensive design assessment covering branding, typography, vector assets, and preflight.', total_marks: 100, passing_marks: 60 },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: 'UI Wireframing & Prototyping in Figma',
-    code: 'MOD-UIX-204',
-    version: 'v1.4',
-    category: 'UI/UX',
-    status: 'Published',
-    days: 5,
-    lessons: 8,
-    tasks: 4,
-    assignments: 2,
-    tests: 1,
-    milestones: 1,
-    updated_at: '2026-11-20',
-    description: 'Rapid low-fidelity to high-fidelity wireframing, auto-layout mastery, interactive component prototyping, and user testing.',
-    curriculum_lessons: generateDefaultCurriculum('UI Wireframing in Figma', 5),
-  },
-  {
-    id: 3,
-    title: 'Full-Stack JavaScript & Node.js Runtime',
-    code: 'MOD-DEV-301',
-    version: 'v3.0',
-    category: 'Programming',
-    status: 'Published',
-    days: 6,
-    lessons: 10,
-    tasks: 5,
-    assignments: 3,
-    tests: 2,
-    milestones: 2,
-    updated_at: '2026-11-22',
-    description: 'Asynchronous event loops, REST API design, Express middleware architecture, database integration, and deployment pipelines.',
-    curriculum_lessons: generateDefaultCurriculum('Full-Stack JavaScript & Node.js', 6),
-  },
-  {
-    id: 4,
-    title: 'Cloud Architecture & DevOps Deployment',
-    code: 'MOD-CLD-402',
-    version: 'v1.1',
-    category: 'Cloud Computing',
-    status: 'Draft',
-    days: 5,
-    lessons: 8,
-    tasks: 3,
-    assignments: 2,
-    tests: 1,
-    milestones: 1,
-    updated_at: '2026-11-24',
-    description: 'Containerization with Docker, Kubernetes orchestration, CI/CD pipelines, SSL automation, and cloud server provisioning.',
-    curriculum_lessons: generateDefaultCurriculum('Cloud Architecture & DevOps', 5),
-  },
-]
+const DEFAULT_MODULES = []
 
 export function ModuleLibrary() {
-  const [modules, setModules] = useState(DEFAULT_MODULES)
+  const [modules, setModules] = useState([])
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -299,10 +132,9 @@ export function ModuleLibrary() {
         const res = await apiService.getModules()
         if (res && res.status === 'success' && res.data && isMounted) {
           const normalized = res.data.map((m) => {
-            const days = Number(m.days) || 7
-            const cur = (m.curriculum_lessons && Array.isArray(m.curriculum_lessons) && m.curriculum_lessons.length > 0)
+            const cur = (m.curriculum_lessons && Array.isArray(m.curriculum_lessons))
               ? m.curriculum_lessons
-              : generateDefaultCurriculum(m.title, days)
+              : []
             
             let lCount = 0
             let tCount = 0
@@ -316,15 +148,18 @@ export function ModuleLibrary() {
             return {
               ...m,
               curriculum_lessons: cur,
-              days: cur.length,
-              lessons: lCount > 0 ? lCount : (Number(m.lessons) || days * 2),
-              tasks: tCount > 0 ? tCount : (Number(m.tasks) || 4),
+              days: cur.length || Number(m.days) || 1,
+              lessons: lCount,
+              tasks: tCount,
             }
           })
           setModules(normalized)
+        } else if (isMounted) {
+          setModules([])
         }
       } catch (err) {
-        console.warn('Using fallback modules:', err)
+        console.warn('Error fetching modules:', err)
+        if (isMounted) setModules([])
       }
     }
     fetchModules()
@@ -340,10 +175,16 @@ export function ModuleLibrary() {
       category: 'UI/UX',
       version: 'v1.0',
       status: 'Published',
-      days: 7,
+      days: 1,
       description: '',
     })
-    const initialDays = generateDefaultCurriculum('New Module', 7)
+    const initialDays = [
+      {
+        day: 1,
+        day_title: 'Day 1',
+        lessons: [],
+      },
+    ]
     setCurriculumDays(initialDays)
     setActiveDayNumber(1)
     setShowItemForm(false)
@@ -361,12 +202,12 @@ export function ModuleLibrary() {
       category: m.category || 'UI/UX',
       version: m.version || 'v1.0',
       status: m.status || 'Published',
-      days: m.days || 7,
+      days: m.days || 1,
       description: m.description || '',
     })
-    const initialDays = (m.curriculum_lessons && m.curriculum_lessons.length > 0)
+    const initialDays = (m.curriculum_lessons && Array.isArray(m.curriculum_lessons) && m.curriculum_lessons.length > 0)
       ? JSON.parse(JSON.stringify(m.curriculum_lessons))
-      : generateDefaultCurriculum(m.title, m.days || 7)
+      : [{ day: 1, day_title: 'Day 1', lessons: [] }]
     setCurriculumDays(initialDays)
     setActiveDayNumber(initialDays[0]?.day || 1)
     setShowItemForm(false)
@@ -754,7 +595,7 @@ export function ModuleLibrary() {
       code: `${m.code}-COPY`,
       version: 'v1.0',
       status: 'Draft',
-      curriculum_lessons: JSON.parse(JSON.stringify(m.curriculum_lessons || generateDefaultCurriculum(m.title, m.days))),
+      curriculum_lessons: JSON.parse(JSON.stringify(m.curriculum_lessons || [])),
     }
     setModules([duplicated, ...modules])
     setToast(`Module duplicated as "${duplicated.title}"`)

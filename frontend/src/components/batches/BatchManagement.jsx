@@ -1,92 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../../services/api'
 
-const DEFAULT_BATCHES = [
-  {
-    id: 1,
-    code: 'BIX-GD-26A',
-    name: 'Graphic Design Morning',
-    course: 'Graphic Design Master Course',
-    start: '2026-11-02',
-    end: '2027-01-15',
-    enrolled: 26,
-    capacity: 30,
-    primary_tutor: 'Marcus Vance',
-    co_tutor: 'Priya Nair',
-    room: 'Studio Lab 204',
-    status: 'Active',
-  },
-  {
-    id: 2,
-    code: 'BIX-FS-26C',
-    name: 'Full-Stack Cohort C',
-    course: 'Full-Stack Web Engineering',
-    start: '2026-11-10',
-    end: '2027-03-24',
-    enrolled: 28,
-    capacity: 28,
-    primary_tutor: 'Dr. Aris Thorne',
-    co_tutor: 'Liam Chen',
-    room: 'Lab 101',
-    status: 'Active',
-  },
-  {
-    id: 3,
-    code: 'BIX-UX-26D',
-    name: 'UI/UX Product Evening',
-    course: 'UI/UX Product Design',
-    start: '2026-12-01',
-    end: '2027-02-18',
-    enrolled: 19,
-    capacity: 25,
-    primary_tutor: 'Sofia Alvarez',
-    co_tutor: 'Unassigned',
-    room: 'Design Room 302',
-    status: 'Enrolling',
-  },
-  {
-    id: 4,
-    code: 'BIX-DS-26E',
-    name: 'Data Science Weekend',
-    course: 'Data Science & Analytics',
-    start: '2026-12-07',
-    end: '2027-04-04',
-    enrolled: 14,
-    capacity: 30,
-    primary_tutor: 'Dr. Aris Thorne',
-    co_tutor: 'Maya Lin',
-    room: 'Analytics Hub 105',
-    status: 'Upcoming',
-  },
-  {
-    id: 5,
-    code: 'BIX-GD-26B',
-    name: 'Graphic Design Afternoon',
-    course: 'Graphic Design Master Course',
-    start: '2026-08-18',
-    end: '2026-10-30',
-    enrolled: 24,
-    capacity: 24,
-    primary_tutor: 'Priya Nair',
-    co_tutor: 'Marcus Vance',
-    room: 'Studio Lab 204',
-    status: 'Completed',
-  },
-  {
-    id: 6,
-    code: 'BIX-CLD-26F',
-    name: 'Cloud & DevOps Accelerated',
-    course: 'Cloud & DevOps Engineering',
-    start: '2026-12-15',
-    end: '2027-03-30',
-    enrolled: 12,
-    capacity: 25,
-    primary_tutor: 'Tariq Al-Mansoor',
-    co_tutor: 'Chen Wei',
-    room: 'Lab 102',
-    status: 'Enrolling',
-  },
-]
+const DEFAULT_BATCHES = []
 
 const CLASSROOM_OPTIONS = [
   { name: 'Design Room 302', capacity: 28 },
@@ -107,7 +22,7 @@ const COURSE_PRESETS = [
 ]
 
 export function BatchManagement() {
-  const [batches, setBatches] = useState(DEFAULT_BATCHES)
+  const [batches, setBatches] = useState([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [courseFilter, setCourseFilter] = useState('all')
@@ -117,16 +32,16 @@ export function BatchManagement() {
   const [showModal, setShowModal] = useState(false)
   const [editingBatch, setEditingBatch] = useState(null)
   const [formData, setFormData] = useState({
-    name: 'UI/UX Product Design Cohort D',
-    code: 'BIX-UX-26D',
-    course: 'UI/UX Product Design',
-    start: '2026-12-01',
-    end: '2027-02-18',
-    capacity: 25,
-    room: 'Design Room 302',
+    name: '',
+    code: '',
+    course: '',
+    start: new Date().toISOString().substring(0, 10),
+    end: new Date(Date.now() + 75 * 86400000).toISOString().substring(0, 10),
+    capacity: 30,
+    room: '',
     status: 'Enrolling',
-    primary_tutor: 'Sofia Alvarez',
-    co_tutor: 'Unassigned',
+    primary_tutor: '',
+    co_tutor: '',
   })
 
   // Quick Enrollment Modal State
@@ -144,9 +59,11 @@ export function BatchManagement() {
       const res = await apiService.getBatches()
       if (res && res.data && Array.isArray(res.data)) {
         setBatches(res.data)
+      } else {
+        setBatches([])
       }
     } catch {
-      // Keep default mock data
+      setBatches([])
     } finally {
       setLoading(false)
     }
@@ -156,16 +73,16 @@ export function BatchManagement() {
   const handleOpenCreate = () => {
     setEditingBatch(null)
     setFormData({
-      name: 'UI/UX Product Design Cohort G',
-      code: `BIX-UX-26${String.fromCharCode(65 + batches.length)}`,
-      course: 'UI/UX Product Design',
+      name: '',
+      code: `BIX-BATCH-${101 + batches.length}`,
+      course: '',
       start: new Date().toISOString().substring(0, 10),
       end: new Date(Date.now() + 75 * 86400000).toISOString().substring(0, 10),
-      capacity: 25,
-      room: 'Design Room 302',
+      capacity: 30,
+      room: '',
       status: 'Enrolling',
-      primary_tutor: 'Sofia Alvarez',
-      co_tutor: 'Unassigned',
+      primary_tutor: '',
+      co_tutor: '',
     })
     setShowModal(true)
   }
