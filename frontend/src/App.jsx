@@ -3,7 +3,19 @@ import { ThemeProvider } from './context/ThemeContext'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Badge from './components/Badge'
-import Button from './components/Button'
+import Card from './components/Card'
+import {
+  PerformanceBarChart,
+  EnrollmentAreaChart,
+  FeeCollectionDonutChart,
+  DepartmentPieChart,
+  ClassroomOccupancyHeatmap,
+  CourseCompletionFunnel,
+  TutorRatingBreakdown,
+  GradeHistogramChart,
+  PlatformEngagementLineChart,
+  BudgetProgressChart,
+} from './components/charts'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -92,7 +104,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface font-body antialiased transition-colors duration-state-change">
-      {/* Persistent Deep Navy Sidebar */}
+      {/* Persistent Deep Navy Sidebar with Negative Bixcel Logo */}
       <Sidebar
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
@@ -122,10 +134,10 @@ function Dashboard() {
           <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex flex-col gap-1">
               <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
-                Executive Dashboard
+                Executive Analytics Dashboard
               </h1>
               <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                Overview of institute performance and academic operations.
+                Comprehensive institutional performance metrics, financial ledgers, and academic telemetry.
               </p>
             </div>
 
@@ -133,7 +145,7 @@ function Dashboard() {
               {/* Date pill */}
               <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface whitespace-nowrap">
                 <span className="material-symbols-outlined text-[18px] text-light-outline">calendar_today</span>
-                <span className="font-label text-label-md tabular-nums">Nov 26, 2026</span>
+                <span className="font-label text-label-md tabular-nums font-medium">Nov 26, 2026</span>
               </div>
 
               {/* Add Course Button */}
@@ -149,7 +161,7 @@ function Dashboard() {
               {/* Export Report Button */}
               <button
                 type="button"
-                onClick={() => alert('Exporting executive report...')}
+                onClick={() => alert('Exporting executive telemetry report...')}
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface shadow-sm hover:bg-light-surface-container-low transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
               >
                 <span className="material-symbols-outlined text-[18px]">download</span>
@@ -261,159 +273,119 @@ function Dashboard() {
             </article>
           </section>
 
-          {/* Primary Analytics & Live Classes Row */}
-          <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
-            {/* Student Performance Analytics Chart (7 cols) */}
-            <article className="xl:col-span-7 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col justify-between gap-5">
-              <header className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
-                    Student Performance Analytics
-                  </h2>
-                  <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    Average assessment score vs. curriculum completion across active cohorts
-                  </p>
-                </div>
-                <span className="font-label text-label-md text-light-on-primary-tint bg-light-primary-tint px-3 py-1 rounded-full shrink-0 whitespace-nowrap font-medium">
-                  Fall 2026
-                </span>
-              </header>
+          {/* ========================================================================= */}
+          {/* 10 ENTERPRISE CHARTS & GRAPHS SECTION                                     */}
+          {/* ========================================================================= */}
 
-              <div className="grid grid-cols-6 gap-4 items-end h-44 pt-4 border-b border-light-outline-variant dark:border-dark-outline-variant pb-3">
-                {[
-                  { cohort: 'CS-401', score: 82, completion: 74 },
-                  { cohort: 'DS-204', score: 88, completion: 91 },
-                  { cohort: 'CA-302', score: 76, completion: 68 },
-                  { cohort: 'UX-110', score: 92, completion: 86 },
-                  { cohort: 'SE-215', score: 79, completion: 81 },
-                  { cohort: 'AI-501', score: 85, completion: 79 },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end">
-                    <div className="w-full max-w-[40px] flex items-end gap-1 h-32">
-                      <div
-                        className="flex-1 bg-light-primary rounded-t"
-                        style={{ height: `${item.score}%` }}
-                        title={`Academic Score: ${item.score}%`}
-                      />
-                      <div
-                        className="flex-1 bg-light-secondary-container dark:bg-dark-secondary-container rounded-t"
-                        style={{ height: `${item.completion}%` }}
-                        title={`Curriculum Completion: ${item.completion}%`}
-                      />
-                    </div>
-                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
-                      {item.cohort}
-                    </span>
-                  </div>
-                ))}
-              </div>
+          {/* CHARTS ROW 1: Major Academic & Admissions Growth (2 Charts: 6 cols each) */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            {/* Chart 1: Grouped Bar Chart */}
+            <Card
+              title="1. Student Performance Analytics"
+              subtitle="Average assessment score vs. curriculum completion across active cohorts"
+              action={<span className="font-label text-label-sm text-light-primary font-semibold">Cohorts Fall 2026</span>}
+            >
+              <PerformanceBarChart />
+            </Card>
 
-              <footer className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-5">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-sm bg-light-primary"></span>
-                    <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                      Academic Score (83.7% avg)
-                    </span>
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-sm bg-light-secondary-container"></span>
-                    <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                      Curriculum Completion (79.8% avg)
-                    </span>
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => alert('Opening full cohort analytics view...')}
-                  className="font-label text-label-md text-light-primary hover:underline whitespace-nowrap font-semibold"
-                >
-                  View Analytics →
-                </button>
-              </footer>
-            </article>
-
-            {/* Attendance Summary & Smart Notifications (5 cols) */}
-            <div className="xl:col-span-5 flex flex-col gap-6">
-              {/* Attendance Card */}
-              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col gap-4">
-                <header className="flex items-center justify-between gap-2">
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
-                    Attendance Summary
-                  </h2>
-                  <span className="font-label text-label-md text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
-                    92.4% Today
-                  </span>
-                </header>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
-                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                      Present
-                    </span>
-                    <span className="font-title text-title-lg tabular-nums text-on-success-container font-semibold">
-                      1,412
-                    </span>
-                  </div>
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
-                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                      Late / Leave
-                    </span>
-                    <span className="font-title text-title-lg tabular-nums text-on-pending-container font-semibold">
-                      74
-                    </span>
-                  </div>
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
-                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                      Absent
-                    </span>
-                    <span className="font-title text-title-lg tabular-nums text-on-overdue-container font-semibold">
-                      42
-                    </span>
-                  </div>
-                </div>
-              </article>
-
-              {/* Smart Notifications */}
-              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex-1 flex flex-col gap-3">
-                <header className="flex items-center justify-between gap-2">
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
-                    Smart Notifications
-                  </h2>
-                  <span className="font-label text-label-sm text-light-primary font-semibold whitespace-nowrap">
-                    4 Active
-                  </span>
-                </header>
-                <ul className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
-                  <li className="py-2.5 flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-overdue shrink-0"></span>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
-                        14 fee installments overdue in Batch B26-FS-A
-                      </span>
-                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        Finance • 18 mins ago
-                      </span>
-                    </div>
-                  </li>
-                  <li className="py-2.5 flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-pending shrink-0"></span>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
-                        Room 204 scheduling conflict detected for Nov 28
-                      </span>
-                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        Timetable • 1 hour ago
-                      </span>
-                    </div>
-                  </li>
-                </ul>
-              </article>
-            </div>
+            {/* Chart 2: Curved Area Line Chart */}
+            <Card
+              title="2. Monthly Admissions & Enrollment Trend"
+              subtitle="6-month timeline tracking actual student intake against institutional goals"
+              action={<span className="font-mono text-mono-sm text-on-success-container font-semibold">Target: 600/mo</span>}
+            >
+              <EnrollmentAreaChart />
+            </Card>
           </section>
 
-          {/* Today's Live Classes & CI4 Course Catalog Row */}
+          {/* CHARTS ROW 2: Finance, Distribution & Facilities (3 Charts: 4 cols each) */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            {/* Chart 3: Donut / Pie Chart */}
+            <Card
+              title="3. Fee Collection Breakdown"
+              subtitle="Real-time collection ratio & overdue installments"
+              action={<span className="font-mono text-mono-sm text-success font-semibold">68% Reconciled</span>}
+            >
+              <FeeCollectionDonutChart />
+            </Card>
+
+            {/* Chart 4: Departmental Share Multi-Slice Chart */}
+            <Card
+              title="4. Faculty Enrollment Share"
+              subtitle="Student enrollment ratio across 5 academic departments"
+              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">2,840 Students</span>}
+            >
+              <DepartmentPieChart />
+            </Card>
+
+            {/* Chart 5: Room Occupancy Heatmap Matrix */}
+            <Card
+              title="5. Weekly Classroom Utilization"
+              subtitle="5-day matrix mapping physical and virtual lecture hall loads"
+              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">20 Rooms</span>}
+            >
+              <ClassroomOccupancyHeatmap />
+            </Card>
+          </section>
+
+          {/* CHARTS ROW 3: Student Retention & Faculty Rating (2 Charts: 6 cols each) */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            {/* Chart 6: Horizontal Retention Funnel */}
+            <Card
+              title="6. Academic Retention & Graduation Funnel"
+              subtitle="Cohort progression from admission to verified credential issuance"
+              action={<span className="font-mono text-mono-sm text-success font-semibold">5.7% Attrition</span>}
+            >
+              <CourseCompletionFunnel />
+            </Card>
+
+            {/* Chart 7: Faculty Rating & Feedback Gauges */}
+            <Card
+              title="7. Faculty Competency & Feedback"
+              subtitle="Evaluated across 2,340 verified student submissions this term"
+              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">★ 4.82 Avg</span>}
+            >
+              <TutorRatingBreakdown />
+            </Card>
+          </section>
+
+          {/* CHARTS ROW 4: Grade Spread, Concurrent Activity & Budget (3 Charts: 4 cols each) */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            {/* Chart 8: Histogram Bell Curve */}
+            <Card
+              title="8. Term Examination Grade Spread"
+              subtitle="Standard bell curve distribution of midterm assessments"
+              action={<span className="font-mono text-mono-sm text-success font-semibold">95% Pass</span>}
+            >
+              <GradeHistogramChart />
+            </Card>
+
+            {/* Chart 9: Hourly LMS Activity Wave Curve */}
+            <Card
+              title="9. Concurrent LMS Activity Today"
+              subtitle="Hourly platform load & active student learning telemetry"
+              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">1,240 Peak</span>}
+            >
+              <PlatformEngagementLineChart />
+            </Card>
+
+            {/* Chart 10: Departmental Operating Budget Stacked Bar */}
+            <Card
+              title="10. Operating Budget Allocation"
+              subtitle="Fiscal expenditure tracking across academic resources"
+              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">$215K Fiscal</span>}
+            >
+              <BudgetProgressChart />
+            </Card>
+          </section>
+
+          {/* ========================================================================= */}
+          {/* OPERATIONAL TABLES & CODEIGNITER 4 INTEGRATION                            */}
+          {/* ========================================================================= */}
+
+          {/* Today's Live Classes & CI4 Courses Row */}
           <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            {/* Today's Live Classes Table (7 cols) */}
+            {/* Table (7 cols) */}
             <div className="xl:col-span-7 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm overflow-hidden flex flex-col">
               <header className="px-6 py-4 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-4">
                 <div>
@@ -487,43 +459,80 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* Pending Grading & Upcoming Exams (5 cols) */}
+            {/* Attendance & Smart Alerts (5 cols) */}
             <div className="xl:col-span-5 flex flex-col gap-6">
+              {/* Attendance Card */}
               <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col gap-4">
                 <header className="flex items-center justify-between gap-2">
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-semibold">
-                    Pending Grading &amp; Exams
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                    Attendance Summary
                   </h2>
-                  <span className="font-label text-label-md text-on-pending-container bg-pending-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap shrink-0 font-semibold">
-                    38 Pending
+                  <span className="font-label text-label-md text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                    92.4% Today
                   </span>
                 </header>
-
-                <div className="space-y-3">
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex items-center justify-between">
-                    <div>
-                      <p className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-semibold">
-                        CS-401 Mid-Term Evaluation
-                      </p>
-                      <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        Batch B26-FS-A • 48 Submissions
-                      </p>
-                    </div>
-                    <Badge variant="pending" dot>Due in 2 days</Badge>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Present
+                    </span>
+                    <span className="font-title text-title-lg tabular-nums text-on-success-container font-semibold">
+                      1,412
+                    </span>
                   </div>
-
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex items-center justify-between">
-                    <div>
-                      <p className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-semibold">
-                        DS-204 Neural Network Project
-                      </p>
-                      <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        Batch B26-DS-B • 42 Submissions
-                      </p>
-                    </div>
-                    <Badge variant="verified">Graded</Badge>
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Late / Leave
+                    </span>
+                    <span className="font-title text-title-lg tabular-nums text-on-pending-container font-semibold">
+                      74
+                    </span>
+                  </div>
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Absent
+                    </span>
+                    <span className="font-title text-title-lg tabular-nums text-on-overdue-container font-semibold">
+                      42
+                    </span>
                   </div>
                 </div>
+              </article>
+
+              {/* Smart Notifications */}
+              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex-1 flex flex-col gap-3">
+                <header className="flex items-center justify-between gap-2">
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                    Smart Notifications
+                  </h2>
+                  <span className="font-label text-label-sm text-light-primary font-semibold whitespace-nowrap">
+                    4 Active
+                  </span>
+                </header>
+                <ul className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
+                  <li className="py-2.5 flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-overdue shrink-0"></span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
+                        14 fee installments overdue in Batch B26-FS-A
+                      </span>
+                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        Finance • 18 mins ago
+                      </span>
+                    </div>
+                  </li>
+                  <li className="py-2.5 flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-pending shrink-0"></span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
+                        Room 204 scheduling conflict detected for Nov 28
+                      </span>
+                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        Timetable • 1 hour ago
+                      </span>
+                    </div>
+                  </li>
+                </ul>
               </article>
             </div>
           </section>
