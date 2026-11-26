@@ -1,62 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../../services/api'
 
-// Helper to generate rich quiz questions supporting multiple choice, multi-select, short answer, true/false, and code
-export function createDefaultQuizQuestions(topicTitle = 'Curriculum Knowledge Check') {
-  return [
-    {
-      id: 1,
-      type: 'multiple_choice',
-      question: `What is the primary role of architectural design tokens in ${topicTitle}?`,
-      options: [
-        { id: 'opt_1', text: 'Store atomic design decisions (color, typography, spacing) that scale across platforms', isCorrect: true },
-        { id: 'opt_2', text: 'Render final static HTML without CSS variables', isCorrect: false },
-        { id: 'opt_3', text: 'Replace relational database schemas', isCorrect: false },
-        { id: 'opt_4', text: 'Generate random unverified style palettes', isCorrect: false },
-      ],
-      explanation: 'Design tokens encapsulate platform-agnostic design decisions that transform into CSS, iOS, and Android variables.',
-      points: 10,
-    },
-    {
-      id: 2,
-      type: 'short_answer',
-      question: 'State the minimum contrast ratio required by WCAG 2.1 AA for regular body text.',
-      expected_answer: '4.5:1',
-      explanation: 'WCAG 2.1 AA mandates a 4.5:1 contrast ratio against the background for body text.',
-      points: 10,
-    },
-    {
-      id: 3,
-      type: 'true_false',
-      question: 'True or False: Design tokens can be synchronized directly between Figma and version-controlled repositories.',
-      is_true: true,
-      explanation: 'Modern design token pipelines support bidirectional synchronization between design tools and Git repos.',
-      points: 5,
-    },
-    {
-      id: 4,
-      type: 'multi_select',
-      question: 'Select ALL key attributes of responsive layout architecture (Choose all that apply):',
-      options: [
-        { id: 'opt_ms_1', text: 'Fluid typography scales using rem and clamp() units', isCorrect: true },
-        { id: 'opt_ms_2', text: 'Flexible CSS grid tracks and adaptive flexbox wrapping', isCorrect: true },
-        { id: 'opt_ms_3', text: 'Hardcoded pixel widths locked to desktop resolutions only', isCorrect: false },
-        { id: 'opt_ms_4', text: 'Touch targets meeting 44x44 CSS pixel accessibility requirements', isCorrect: true },
-      ],
-      explanation: 'Fluid units, adaptive tracks, and accessible touch target sizes are essential for responsiveness.',
-      points: 15,
-    },
-    {
-      id: 5,
-      type: 'code',
-      question: 'Write a CSS custom property declaration for a primary brand color variable.',
-      language: 'css',
-      starter_code: ':root {\n  /* Declare brand color variable here */\n}',
-      sample_solution: ':root {\n  --color-primary: #2563eb;\n}',
-      explanation: 'CSS custom properties are defined with double-dash prefixes (--name: value) on root or selector scope.',
-      points: 10,
-    },
-  ]
+// Helper to generate quiz questions (defaults to empty so user adds custom questions)
+export function createDefaultQuizQuestions(topicTitle = '') {
+  return []
 }
 
 // Helper to generate a clean day-by-day lesson skeleton
@@ -96,7 +43,7 @@ export function ModuleLibrary() {
     category: 'UI/UX',
     version: 'v1.0',
     status: 'Published',
-    days: 7,
+    days: 1,
     description: '',
   })
   const [curriculumDays, setCurriculumDays] = useState([])
@@ -112,12 +59,12 @@ export function ModuleLibrary() {
     type: 'lesson', // 'lesson' | 'task' | 'quiz' | 'test'
     sno: 1,
     title: '',
-    duration: '45 mins',
+    duration: '',
     description: '',
     format: 'Video Lecture',
     doc_link: '',
     image_url: '',
-    questions_count: 5,
+    questions_count: 0,
     pass_score: '80%',
     total_marks: 100,
     passing_marks: 50,
@@ -219,7 +166,7 @@ export function ModuleLibrary() {
   // Active day object in curriculum builder
   const activeDay = curriculumDays.find((d) => d.day === activeDayNumber) || curriculumDays[0] || {
     day: 1,
-    day_title: 'Day 1: Curriculum Overview',
+    day_title: 'Day 1',
     lessons: [],
   }
 
@@ -228,17 +175,8 @@ export function ModuleLibrary() {
     const nextDayNum = curriculumDays.length + 1
     const newDay = {
       day: nextDayNum,
-      day_title: `Day ${nextDayNum}: In-Depth Practical Topics & Activities`,
-      lessons: [
-        {
-          sno: 1,
-          type: 'lesson',
-          title: `Day ${nextDayNum} Core Lecture: Advanced Implementation`,
-          duration: '45 mins',
-          format: 'Video Lecture',
-          description: `Key conceptual lecture and practical walk-through for day ${nextDayNum}.`,
-        },
-      ],
+      day_title: `Day ${nextDayNum}`,
+      lessons: [],
     }
     setCurriculumDays([...curriculumDays, newDay])
     setActiveDayNumber(nextDayNum)
@@ -406,22 +344,20 @@ export function ModuleLibrary() {
       ? Math.max(...currentItems.map((l) => Number(l.sno) || 0)) + 1
       : 1
 
-    const defaultQuestions = type === 'quiz' ? createDefaultQuizQuestions(`Day ${activeDay.day} Quiz`) : []
-
     setItemFormData({
       type,
       sno: nextSno,
       title: '',
-      duration: type === 'quiz' ? '20 mins' : type === 'test' ? '90 mins' : '45 mins',
+      duration: '',
       description: '',
       format: 'Video Lecture',
       doc_link: '',
       image_url: '',
-      questions_count: defaultQuestions.length || 5,
+      questions_count: 0,
       pass_score: '80%',
       total_marks: 100,
       passing_marks: 50,
-      quiz_questions: defaultQuestions,
+      quiz_questions: [],
     })
     setEditingItemSno(null)
     setShowItemForm(true)
@@ -429,25 +365,20 @@ export function ModuleLibrary() {
 
   // Open item form for editing an existing item
   const handleStartEditItem = (item) => {
-    let questions = item.quiz_questions
-    if (item.type === 'quiz' && (!questions || questions.length === 0)) {
-      questions = createDefaultQuizQuestions(item.title || `Day ${activeDay.day} Quiz`)
-    }
-
     setItemFormData({
       type: item.type || 'lesson',
       sno: item.sno || 1,
       title: item.title || '',
-      duration: item.duration || '45 mins',
+      duration: item.duration || '',
       description: item.description || '',
       format: item.format || 'Video Lecture',
       doc_link: item.doc_link || '',
       image_url: item.image_url || '',
-      questions_count: questions?.length || item.questions_count || 5,
+      questions_count: item.quiz_questions?.length || item.questions_count || 0,
       pass_score: item.pass_score || '80%',
       total_marks: item.total_marks || 100,
       passing_marks: item.passing_marks || 50,
-      quiz_questions: questions || [],
+      quiz_questions: item.quiz_questions || [],
     })
     setEditingItemSno(item.sno)
     setShowItemForm(true)
@@ -488,14 +419,14 @@ export function ModuleLibrary() {
 
     const qCount = itemFormData.type === 'quiz' && itemFormData.quiz_questions?.length
       ? itemFormData.quiz_questions.length
-      : (Number(itemFormData.questions_count) || 5)
+      : (Number(itemFormData.questions_count) || 0)
 
     const newItem = {
       sno: Number(itemFormData.sno) || 1,
       type: itemFormData.type,
       title: itemFormData.title.trim(),
-      duration: itemFormData.duration.trim() || '45 mins',
-      description: itemFormData.description.trim() || 'Instructional agenda and criteria.',
+      duration: itemFormData.duration.trim() || '30 mins',
+      description: itemFormData.description.trim(),
       format: itemFormData.format,
       doc_link: itemFormData.doc_link?.trim() || '',
       image_url: itemFormData.image_url || '',
