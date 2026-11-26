@@ -14,10 +14,7 @@ export function PerformanceBarChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Cohort Assessment vs Completion
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
             <span className="w-2.5 h-2.5 rounded-sm bg-light-primary"></span>
@@ -93,10 +90,7 @@ export function EnrollmentAreaChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-2">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Admissions vs Target (Jun - Nov)
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm text-on-success-container bg-success-container px-2 py-0.5 rounded-full font-semibold">
           +38.5% YoY
         </span>
@@ -154,10 +148,7 @@ export function FeeCollectionDonutChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Fee Ledger & Collection Ratio
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm text-light-primary font-semibold">$184.5K Total</span>
       </div>
 
@@ -246,10 +237,7 @@ export function DepartmentPieChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Enrollment by Academic Faculty
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm font-semibold text-light-primary">5 Departments</span>
       </div>
 

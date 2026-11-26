@@ -132,13 +132,10 @@ function Dashboard() {
         <main className="flex-1 p-6 lg:p-8 flex flex-col gap-6 max-w-[1440px] w-full mx-auto">
           {/* Page Header */}
           <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5">
               <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
-                Executive Analytics Dashboard
+                Dashboard
               </h1>
-              <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                Comprehensive institutional performance metrics, financial ledgers, and academic telemetry.
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -176,7 +173,7 @@ function Dashboard() {
             <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Total Enrolled Students
+                  Enrolled Students
                 </span>
                 <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">groups</span>
@@ -216,7 +213,7 @@ function Dashboard() {
             <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Published Courses
+                  Courses
                 </span>
                 <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">menu_book</span>
@@ -236,7 +233,7 @@ function Dashboard() {
             <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Running Batches
+                  Batches
                 </span>
                 <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">workspaces</span>
@@ -256,7 +253,7 @@ function Dashboard() {
             <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Classroom Utilization
+                  Room Utilization
                 </span>
                 <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">meeting_room</span>
@@ -281,17 +278,15 @@ function Dashboard() {
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             {/* Chart 1: Grouped Bar Chart */}
             <Card
-              title="1. Student Performance Analytics"
-              subtitle="Average assessment score vs. curriculum completion across active cohorts"
-              action={<span className="font-label text-label-sm text-light-primary font-semibold">Cohorts Fall 2026</span>}
+              title="Student Performance"
+              action={<span className="font-label text-label-sm text-light-primary font-semibold">Fall 2026</span>}
             >
               <PerformanceBarChart />
             </Card>
 
             {/* Chart 2: Curved Area Line Chart */}
             <Card
-              title="2. Monthly Admissions & Enrollment Trend"
-              subtitle="6-month timeline tracking actual student intake against institutional goals"
+              title="Admissions Trend"
               action={<span className="font-mono text-mono-sm text-on-success-container font-semibold">Target: 600/mo</span>}
             >
               <EnrollmentAreaChart />
@@ -302,8 +297,7 @@ function Dashboard() {
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {/* Chart 3: Donut / Pie Chart */}
             <Card
-              title="3. Fee Collection Breakdown"
-              subtitle="Real-time collection ratio & overdue installments"
+              title="Fee Collection"
               action={<span className="font-mono text-mono-sm text-success font-semibold">68% Reconciled</span>}
             >
               <FeeCollectionDonutChart />
@@ -311,8 +305,7 @@ function Dashboard() {
 
             {/* Chart 4: Departmental Share Multi-Slice Chart */}
             <Card
-              title="4. Faculty Enrollment Share"
-              subtitle="Student enrollment ratio across 5 academic departments"
+              title="Faculty Share"
               action={<span className="font-mono text-mono-sm text-light-primary font-semibold">2,840 Students</span>}
             >
               <DepartmentPieChart />
@@ -320,8 +313,7 @@ function Dashboard() {
 
             {/* Chart 5: Room Occupancy Heatmap Matrix */}
             <Card
-              title="5. Weekly Classroom Utilization"
-              subtitle="5-day matrix mapping physical and virtual lecture hall loads"
+              title="Room Occupancy"
               action={<span className="font-mono text-mono-sm text-light-primary font-semibold">20 Rooms</span>}
             >
               <ClassroomOccupancyHeatmap />
@@ -332,8 +324,7 @@ function Dashboard() {
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             {/* Chart 6: Horizontal Retention Funnel */}
             <Card
-              title="6. Academic Retention & Graduation Funnel"
-              subtitle="Cohort progression from admission to verified credential issuance"
+              title="Retention Funnel"
               action={<span className="font-mono text-mono-sm text-success font-semibold">5.7% Attrition</span>}
             >
               <CourseCompletionFunnel />
@@ -341,8 +332,7 @@ function Dashboard() {
 
             {/* Chart 7: Faculty Rating & Feedback Gauges */}
             <Card
-              title="7. Faculty Competency & Feedback"
-              subtitle="Evaluated across 2,340 verified student submissions this term"
+              title="Faculty Feedback"
               action={<span className="font-mono text-mono-sm text-light-primary font-semibold">★ 4.82 Avg</span>}
             >
               <TutorRatingBreakdown />
@@ -353,8 +343,7 @@ function Dashboard() {
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {/* Chart 8: Histogram Bell Curve */}
             <Card
-              title="8. Term Examination Grade Spread"
-              subtitle="Standard bell curve distribution of midterm assessments"
+              title="Grade Spread"
               action={<span className="font-mono text-mono-sm text-success font-semibold">95% Pass</span>}
             >
               <GradeHistogramChart />
@@ -362,8 +351,7 @@ function Dashboard() {
 
             {/* Chart 9: Hourly LMS Activity Wave Curve */}
             <Card
-              title="9. Concurrent LMS Activity Today"
-              subtitle="Hourly platform load & active student learning telemetry"
+              title="LMS Activity"
               action={<span className="font-mono text-mono-sm text-light-primary font-semibold">1,240 Peak</span>}
             >
               <PlatformEngagementLineChart />
@@ -371,8 +359,7 @@ function Dashboard() {
 
             {/* Chart 10: Departmental Operating Budget Stacked Bar */}
             <Card
-              title="10. Operating Budget Allocation"
-              subtitle="Fiscal expenditure tracking across academic resources"
+              title="Budget Allocation"
               action={<span className="font-mono text-mono-sm text-light-primary font-semibold">$215K Fiscal</span>}
             >
               <BudgetProgressChart />
@@ -390,11 +377,8 @@ function Dashboard() {
               <header className="px-6 py-4 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-4">
                 <div>
                   <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
-                    Today's Live Classes &amp; CI4 Courses
+                    Live Classes
                   </h2>
-                  <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    Real-time schedule connected to CodeIgniter 4 REST API
-                  </p>
                 </div>
                 <button
                   type="button"
@@ -465,7 +449,7 @@ function Dashboard() {
               <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col gap-4">
                 <header className="flex items-center justify-between gap-2">
                   <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
-                    Attendance Summary
+                    Attendance
                   </h2>
                   <span className="font-label text-label-md text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
                     92.4% Today
@@ -503,7 +487,7 @@ function Dashboard() {
               <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex-1 flex flex-col gap-3">
                 <header className="flex items-center justify-between gap-2">
                   <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
-                    Smart Notifications
+                    Notifications
                   </h2>
                   <span className="font-label text-label-sm text-light-primary font-semibold whitespace-nowrap">
                     4 Active
@@ -546,11 +530,8 @@ function Dashboard() {
             <div className="flex items-center justify-between pb-3 border-b border-light-outline-variant dark:border-dark-outline-variant mb-4">
               <div>
                 <h3 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface">
-                  Create New Course
+                  New Course
                 </h3>
-                <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                  Saves directly to CodeIgniter 4 backend
-                </p>
               </div>
               <button
                 type="button"

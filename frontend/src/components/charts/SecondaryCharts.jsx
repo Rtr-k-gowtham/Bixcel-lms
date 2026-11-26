@@ -21,12 +21,9 @@ export function ClassroomOccupancyHeatmap() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Room & Lab Utilization Heatmap
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm font-semibold text-on-success-container bg-success-container px-2 py-0.5 rounded-full">
-          86.5% Avg Occupancy
+          86.5% Avg
         </span>
       </div>
 
@@ -80,12 +77,9 @@ export function CourseCompletionFunnel() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Academic Retention & Graduation Funnel
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm font-semibold text-on-success-container bg-success-container px-2 py-0.5 rounded-full">
-          76.7% Completion Rate
+          76.7% Completion
         </span>
       </div>
 
@@ -131,12 +125,9 @@ export function TutorRatingBreakdown() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Faculty Performance & Student Feedback
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm font-semibold text-light-primary">
-          ★ 4.82 / 5.0 Avg
+          ★ 4.82 / 5.0
         </span>
       </div>
 
@@ -184,12 +175,9 @@ export function GradeHistogramChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Term Exam Grade Spread
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm font-semibold text-light-primary">
-          Normal Bell Curve
+          Bell Curve
         </span>
       </div>
 
@@ -246,12 +234,9 @@ export function PlatformEngagementLineChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-2">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Concurrent LMS Activity (Today)
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm text-on-success-container bg-success-container px-2 py-0.5 rounded-full font-semibold">
-          1,240 Peak Users
+          1,240 Peak
         </span>
       </div>
 
@@ -290,10 +275,7 @@ export function BudgetProgressChart() {
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
-      <div className="flex items-center justify-between text-label-sm">
-        <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          Academic Operating Budget Allocation
-        </span>
+      <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm font-semibold text-light-primary">$215K Allocated</span>
       </div>
 
