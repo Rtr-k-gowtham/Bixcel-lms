@@ -167,6 +167,28 @@ export const apiService = {
     const response = await apiClient.delete(`/students/${id}`)
     return response.data
   },
+
+  // Batch Management API
+  getBatches: async (params = {}) => {
+    const response = await apiClient.get('/batches', { params })
+    return response.data
+  },
+  getBatch: async (id) => {
+    const response = await apiClient.get(`/batches/${id}`)
+    return response.data
+  },
+  createBatch: async (batchData) => {
+    const response = await apiClient.post('/batches', batchData)
+    return response.data
+  },
+  updateBatch: async (id, batchData) => {
+    const response = await apiClient.put(`/batches/${id}`, batchData)
+    return response.data
+  },
+  deleteBatch: async (id) => {
+    const response = await apiClient.delete(`/batches/${id}`)
+    return response.data
+  },
 }
 
 export default apiService

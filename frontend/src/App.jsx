@@ -18,6 +18,7 @@ import { NotificationsScreen } from './components/notifications/NotificationsScr
 import { UserProfileScreen } from './components/profile/UserProfileScreen'
 import ModuleLibrary from './components/modules/ModuleLibrary'
 import StudentOnboarding from './components/students/StudentOnboarding'
+import BatchManagement from './components/batches/BatchManagement'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -193,7 +194,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {['students', 'onboarding'].includes(currentTab) ? (
+          {currentTab === 'batches' ? (
+            <BatchManagement />
+          ) : ['students', 'onboarding'].includes(currentTab) ? (
             <StudentOnboarding />
           ) : currentTab === 'modules' ? (
             <ModuleLibrary />

@@ -15,6 +15,7 @@ $routes->group('api', static function ($routes) {
     $routes->get('health', 'Api\HealthController::index');
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
     $routes->resource('modules', ['controller' => 'Api\ModuleController']);
+    $routes->resource('batches', ['controller' => 'Api\BatchController']);
     $routes->get('students/tracks', 'Api\StudentController::tracks');
     $routes->resource('students', ['controller' => 'Api\StudentController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);
