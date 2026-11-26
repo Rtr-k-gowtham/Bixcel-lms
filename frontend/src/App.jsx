@@ -20,6 +20,7 @@ import ModuleLibrary from './components/modules/ModuleLibrary'
 import StudentOnboarding from './components/students/StudentOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
+import FeesPayment from './components/fees/FeesPayment'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -132,6 +133,8 @@ function Dashboard() {
               ? 'Tutor Management & Allocation'
               : currentTab === 'batches'
               ? 'Batch Management'
+              : currentTab === 'fees'
+              ? 'Fees & Payment Collection'
               : currentTab === 'users'
               ? 'User Master'
               : currentTab === 'roles'
@@ -197,7 +200,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'tutors' ? (
+          {currentTab === 'fees' ? (
+            <FeesPayment />
+          ) : currentTab === 'tutors' ? (
             <TutorManagement />
           ) : currentTab === 'batches' ? (
             <BatchManagement />

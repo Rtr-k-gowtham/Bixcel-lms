@@ -215,6 +215,20 @@ export const apiService = {
     const response = await apiClient.post('/tutors/assign', assignmentData)
     return response.data
   },
+
+  // Fees & Payment Collection API
+  getFees: async (params = {}) => {
+    const response = await apiClient.get('/fees', { params })
+    return response.data
+  },
+  collectFeePayment: async (paymentData) => {
+    const response = await apiClient.post('/fees/collect', paymentData)
+    return response.data
+  },
+  getFeeReceipt: async (receiptNo) => {
+    const response = await apiClient.get(`/fees/receipt/${receiptNo}`)
+    return response.data
+  },
 }
 
 export default apiService
