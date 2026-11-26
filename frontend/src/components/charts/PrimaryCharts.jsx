@@ -27,20 +27,20 @@ export function PerformanceBarChart() {
         </div>
       </div>
 
-      <div className="grid grid-cols-6 gap-3 items-end h-36 pt-2 border-b border-light-outline-variant dark:border-dark-outline-variant pb-2">
+      <div className="grid grid-cols-6 gap-2 items-end h-24 pt-1 border-b border-light-outline-variant dark:border-dark-outline-variant pb-1.5">
         {data.map((item, idx) => (
           <div
             key={idx}
-            className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group"
+            className="flex flex-col items-center gap-1 h-full justify-end cursor-pointer group"
             onMouseEnter={() => setActiveIdx(idx)}
             onMouseLeave={() => setActiveIdx(null)}
           >
             {activeIdx === idx && (
-              <div className="absolute -top-7 px-2 py-0.5 rounded bg-sidebar text-on-sidebar text-[11px] font-mono shadow-md z-10 whitespace-nowrap">
-                Score: {item.score}% | Comp: {item.completion}%
+              <div className="absolute -top-7 px-1.5 py-0.5 rounded bg-sidebar text-on-sidebar text-[10px] font-mono shadow-md z-10 whitespace-nowrap">
+                {item.score}% | {item.completion}%
               </div>
             )}
-            <div className="w-full max-w-[34px] flex items-end gap-1 h-28 relative">
+            <div className="w-full max-w-[24px] flex items-end gap-0.5 h-18 relative">
               <div
                 className="flex-1 bg-light-primary rounded-t transition-all duration-state-change group-hover:brightness-110"
                 style={{ height: `${item.score}%` }}
@@ -50,7 +50,7 @@ export function PerformanceBarChart() {
                 style={{ height: `${item.completion}%` }}
               />
             </div>
-            <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               {item.cohort}
             </span>
           </div>
@@ -77,19 +77,19 @@ export function EnrollmentAreaChart() {
 
   // SVG dimensions
   const width = 360
-  const height = 130
+  const height = 95
   const max = 800
   const pts = points.map((p, i) => {
-    const x = 20 + i * ((width - 40) / (points.length - 1))
-    const y = height - 20 - (p.value / max) * (height - 35)
+    const x = 16 + i * ((width - 32) / (points.length - 1))
+    const y = height - 16 - (p.value / max) * (height - 28)
     return { x, y, ...p }
   })
 
   const pathD = pts.reduce((acc, pt, i) => (i === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`), '')
-  const areaD = `${pathD} L ${pts[pts.length - 1].x} ${height - 15} L ${pts[0].x} ${height - 15} Z`
+  const areaD = `${pathD} L ${pts[pts.length - 1].x} ${height - 12} L ${pts[0].x} ${height - 12} Z`
 
   return (
-    <div className="flex flex-col h-full justify-between gap-2">
+    <div className="flex flex-col h-full justify-between gap-1.5">
       <div className="flex items-center justify-end text-label-sm">
         <span className="font-mono text-label-sm text-on-success-container bg-success-container px-2 py-0.5 rounded-full font-semibold">
           +38.5% YoY
@@ -97,7 +97,7 @@ export function EnrollmentAreaChart() {
       </div>
 
       <div className="relative w-full overflow-hidden">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-32 overflow-visible">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-22 overflow-visible">
           <defs>
             <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#0037B0" stopOpacity="0.28" />
@@ -105,8 +105,8 @@ export function EnrollmentAreaChart() {
             </linearGradient>
           </defs>
           {/* Subtle grid lines */}
-          <line x1="20" y1="35" x2={width - 20} y2="35" stroke="currentColor" className="text-light-outline-variant dark:text-dark-outline-variant" strokeDasharray="3 3" />
-          <line x1="20" y1="75" x2={width - 20} y2="75" stroke="currentColor" className="text-light-outline-variant dark:text-dark-outline-variant" strokeDasharray="3 3" />
+          <line x1="16" y1="25" x2={width - 16} y2="25" stroke="currentColor" className="text-light-outline-variant dark:text-dark-outline-variant" strokeDasharray="3 3" />
+          <line x1="16" y1="55" x2={width - 16} y2="55" stroke="currentColor" className="text-light-outline-variant dark:text-dark-outline-variant" strokeDasharray="3 3" />
 
           {/* Area Fill */}
           <path d={areaD} fill="url(#areaGradient)" />
@@ -116,8 +116,8 @@ export function EnrollmentAreaChart() {
           {/* Data Points */}
           {pts.map((pt, i) => (
             <g key={i} className="cursor-pointer group">
-              <circle cx={pt.x} cy={pt.y} r="3.5" fill="#FFFFFF" stroke="#0037B0" strokeWidth="2" className="transition-all group-hover:r-5" />
-              <text x={pt.x} y={height - 2} textAnchor="middle" className="text-[11px] font-label fill-current text-light-on-surface-variant dark:text-dark-on-surface-variant">
+              <circle cx={pt.x} cy={pt.y} r="3" fill="#FFFFFF" stroke="#0037B0" strokeWidth="2" className="transition-all group-hover:r-4.5" />
+              <text x={pt.x} y={height - 1} textAnchor="middle" className="text-[10px] font-mono fill-current text-light-on-surface-variant dark:text-dark-on-surface-variant">
                 {pt.month}
               </text>
             </g>
@@ -125,8 +125,8 @@ export function EnrollmentAreaChart() {
         </svg>
       </div>
 
-      <div className="flex justify-between items-center text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant border-t border-light-outline-variant dark:border-dark-outline-variant pt-2">
-        <span>Current Month: <strong className="font-mono text-light-on-surface dark:text-dark-on-surface">720 Admitted</strong></span>
+      <div className="flex justify-between items-center text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant border-t border-light-outline-variant dark:border-dark-outline-variant pt-1.5">
+        <span>Current Month: <strong className="font-mono text-light-on-surface dark:text-dark-on-surface">720</strong></span>
         <span>Target: <strong className="font-mono text-light-on-surface dark:text-dark-on-surface">600</strong></span>
       </div>
     </div>
@@ -152,9 +152,9 @@ export function FeeCollectionDonutChart() {
         <span className="font-mono text-label-sm text-light-primary font-semibold">$184.5K Total</span>
       </div>
 
-      <div className="flex items-center justify-center gap-6 py-1">
+      <div className="flex items-center justify-center gap-4 py-0.5">
         {/* SVG Donut */}
-        <div className="relative w-28 h-28 shrink-0">
+        <div className="relative w-20 h-20 shrink-0">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
             {/* Background ring */}
             <circle cx="50" cy="50" r="40" fill="none" strokeWidth="12" className="stroke-light-surface-container-low dark:stroke-dark-surface-container" />
@@ -196,20 +196,20 @@ export function FeeCollectionDonutChart() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="font-headline text-headline-sm font-bold tabular-nums">68%</span>
-            <span className="text-[10px] font-label text-light-on-surface-variant uppercase">Collected</span>
+            <span className="font-headline text-[15px] font-bold tabular-nums">68%</span>
+            <span className="text-[9px] font-label text-light-on-surface-variant uppercase">Paid</span>
           </div>
         </div>
 
         {/* Legend */}
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-1.5 flex-1">
           {segments.map((seg, i) => (
-            <div key={i} className="flex items-center justify-between text-label-sm">
-              <span className="flex items-center gap-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }}></span>
+            <div key={i} className="flex items-center justify-between text-[11px]">
+              <span className="flex items-center gap-1.5 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }}></span>
                 {seg.label}
               </span>
-              <span className="font-mono text-mono-sm font-semibold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              <span className="font-mono font-semibold tabular-nums text-light-on-surface dark:text-dark-on-surface">
                 {seg.amount}
               </span>
             </div>
@@ -242,8 +242,8 @@ export function DepartmentPieChart() {
       </div>
 
       {/* Stacked Progress Bar Representation of Pie Share */}
-      <div className="space-y-3 py-1">
-        <div className="h-4 w-full rounded-full overflow-hidden flex bg-light-surface-container-low dark:bg-dark-surface-container">
+      <div className="space-y-2 py-0.5">
+        <div className="h-3 w-full rounded-full overflow-hidden flex bg-light-surface-container-low dark:bg-dark-surface-container">
           {depts.map((d, i) => (
             <div
               key={i}
@@ -254,14 +254,14 @@ export function DepartmentPieChart() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1 pt-0.5">
           {depts.map((d, i) => (
-            <div key={i} className="flex items-center justify-between text-label-sm">
+            <div key={i} className="flex items-center justify-between text-[11px]">
               <span className="flex items-center gap-1.5 text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: d.color }}></span>
                 <span className="truncate">{d.name}</span>
               </span>
-              <span className="font-mono text-mono-sm font-semibold tabular-nums ml-1">
+              <span className="font-mono font-semibold tabular-nums ml-1">
                 {d.share}%
               </span>
             </div>

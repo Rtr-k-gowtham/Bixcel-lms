@@ -11,10 +11,6 @@ import {
   DepartmentPieChart,
   ClassroomOccupancyHeatmap,
   CourseCompletionFunnel,
-  TutorRatingBreakdown,
-  GradeHistogramChart,
-  PlatformEngagementLineChart,
-  BudgetProgressChart,
 } from './components/charts'
 import { apiService } from './services/api'
 
@@ -167,202 +163,179 @@ function Dashboard() {
             </div>
           </section>
 
-          {/* 5 KPI Cards Grid */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-stretch">
+          {/* 6 Compact KPI Cards Grid */}
+          <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 items-stretch">
             {/* KPI 1 */}
-            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Enrolled Students
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
+                  Students
                 </span>
-                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">groups</span>
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px]">groups</span>
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              <div className="flex items-baseline justify-between gap-1">
+                <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
                   2,840
                 </span>
-                <span className="font-label text-label-sm text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded tabular-nums font-semibold">
                   +8.4%
                 </span>
               </div>
             </article>
 
             {/* KPI 2 */}
-            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Active Tutors
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
+                  Tutors
                 </span>
-                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">co_present</span>
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px]">co_present</span>
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              <div className="flex items-baseline justify-between gap-1">
+                <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
                   64
                 </span>
-                <span className="font-label text-label-sm text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
-                  +3 this term
+                <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded tabular-nums font-semibold">
+                  +3 Active
                 </span>
               </div>
             </article>
 
             {/* KPI 3 (Live Backend Synced) */}
-            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
                   Courses
                 </span>
-                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">menu_book</span>
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px]">menu_book</span>
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              <div className="flex items-baseline justify-between gap-1">
+                <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
                   {courses.length}
                 </span>
-                <span className="font-label text-label-sm text-on-pending-container bg-pending-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
-                  {health ? 'CI4 Synced' : 'Connecting'}
+                <span className="font-label text-[11px] text-on-pending-container bg-pending-container px-1.5 py-0.5 rounded tabular-nums font-semibold">
+                  {health ? 'CI4 Synced' : 'Syncing'}
                 </span>
               </div>
             </article>
 
             {/* KPI 4 */}
-            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
                   Batches
                 </span>
-                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">workspaces</span>
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px]">workspaces</span>
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              <div className="flex items-baseline justify-between gap-1">
+                <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
                   24
                 </span>
-                <span className="font-label text-label-sm text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full whitespace-nowrap font-semibold">
-                  On schedule
+                <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded font-semibold">
+                  On track
                 </span>
               </div>
             </article>
 
             {/* KPI 5 */}
-            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
-                  Room Utilization
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
+                  Occupancy
                 </span>
-                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">meeting_room</span>
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px]">meeting_room</span>
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              <div className="flex items-baseline justify-between gap-1">
+                <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
                   86.5%
                 </span>
-                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant tabular-nums whitespace-nowrap font-medium">
-                  18/20 rooms
+                <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant tabular-nums font-medium">
+                  18/20 rms
+                </span>
+              </div>
+            </article>
+
+            {/* KPI 6 */}
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
+                  Collection
+                </span>
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[16px]">account_balance_wallet</span>
+                </span>
+              </div>
+              <div className="flex items-baseline justify-between gap-1">
+                <span className="font-headline text-headline-sm tabular-nums font-bold text-light-on-surface dark:text-dark-on-surface">
+                  94.2%
+                </span>
+                <span className="font-label text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded font-semibold">
+                  Audited
                 </span>
               </div>
             </article>
           </section>
 
           {/* ========================================================================= */}
-          {/* 10 ENTERPRISE CHARTS & GRAPHS SECTION                                     */}
+          {/* 6 COMPACT ENTERPRISE CARDS (3x2 GRID LAYOUT)                             */}
           {/* ========================================================================= */}
-
-          {/* CHARTS ROW 1: Major Academic & Admissions Growth (2 Charts: 6 cols each) */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-            {/* Chart 1: Grouped Bar Chart */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+            {/* Card 1: Student Performance */}
             <Card
               title="Student Performance"
-              action={<span className="font-label text-label-sm text-light-primary font-semibold">Fall 2026</span>}
+              action={<span className="font-label text-[11px] text-light-primary font-semibold">Fall 2026</span>}
             >
               <PerformanceBarChart />
             </Card>
 
-            {/* Chart 2: Curved Area Line Chart */}
+            {/* Card 2: Admissions Trend */}
             <Card
               title="Admissions Trend"
-              action={<span className="font-mono text-mono-sm text-on-success-container font-semibold">Target: 600/mo</span>}
+              action={<span className="font-mono text-[11px] text-on-success-container font-semibold">Target: 600/mo</span>}
             >
               <EnrollmentAreaChart />
             </Card>
-          </section>
 
-          {/* CHARTS ROW 2: Finance, Distribution & Facilities (3 Charts: 4 cols each) */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-            {/* Chart 3: Donut / Pie Chart */}
+            {/* Card 3: Fee Collection */}
             <Card
               title="Fee Collection"
-              action={<span className="font-mono text-mono-sm text-success font-semibold">68% Reconciled</span>}
+              action={<span className="font-mono text-[11px] text-success font-semibold">68% Reconciled</span>}
             >
               <FeeCollectionDonutChart />
             </Card>
 
-            {/* Chart 4: Departmental Share Multi-Slice Chart */}
+            {/* Card 4: Faculty Share */}
             <Card
               title="Faculty Share"
-              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">2,840 Students</span>}
+              action={<span className="font-mono text-[11px] text-light-primary font-semibold">2,840 Students</span>}
             >
               <DepartmentPieChart />
             </Card>
 
-            {/* Chart 5: Room Occupancy Heatmap Matrix */}
+            {/* Card 5: Room Occupancy */}
             <Card
               title="Room Occupancy"
-              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">20 Rooms</span>}
+              action={<span className="font-mono text-[11px] text-light-primary font-semibold">20 Rooms</span>}
             >
               <ClassroomOccupancyHeatmap />
             </Card>
-          </section>
 
-          {/* CHARTS ROW 3: Student Retention & Faculty Rating (2 Charts: 6 cols each) */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-            {/* Chart 6: Horizontal Retention Funnel */}
+            {/* Card 6: Retention Funnel */}
             <Card
               title="Retention Funnel"
-              action={<span className="font-mono text-mono-sm text-success font-semibold">5.7% Attrition</span>}
+              action={<span className="font-mono text-[11px] text-success font-semibold">5.7% Attrition</span>}
             >
               <CourseCompletionFunnel />
-            </Card>
-
-            {/* Chart 7: Faculty Rating & Feedback Gauges */}
-            <Card
-              title="Faculty Feedback"
-              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">★ 4.82 Avg</span>}
-            >
-              <TutorRatingBreakdown />
-            </Card>
-          </section>
-
-          {/* CHARTS ROW 4: Grade Spread, Concurrent Activity & Budget (3 Charts: 4 cols each) */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-            {/* Chart 8: Histogram Bell Curve */}
-            <Card
-              title="Grade Spread"
-              action={<span className="font-mono text-mono-sm text-success font-semibold">95% Pass</span>}
-            >
-              <GradeHistogramChart />
-            </Card>
-
-            {/* Chart 9: Hourly LMS Activity Wave Curve */}
-            <Card
-              title="LMS Activity"
-              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">1,240 Peak</span>}
-            >
-              <PlatformEngagementLineChart />
-            </Card>
-
-            {/* Chart 10: Departmental Operating Budget Stacked Bar */}
-            <Card
-              title="Budget Allocation"
-              action={<span className="font-mono text-mono-sm text-light-primary font-semibold">$215K Fiscal</span>}
-            >
-              <BudgetProgressChart />
             </Card>
           </section>
 
@@ -371,19 +344,19 @@ function Dashboard() {
           {/* ========================================================================= */}
 
           {/* Today's Live Classes & CI4 Courses Row */}
-          <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          <section className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
             {/* Table (7 cols) */}
             <div className="xl:col-span-7 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm overflow-hidden flex flex-col">
-              <header className="px-6 py-4 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-4">
+              <header className="px-4 py-2.5 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                  <h2 className="font-title text-[15px] text-light-on-surface dark:text-dark-on-surface font-semibold">
                     Live Classes
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowModal(true)}
-                  className="font-label text-label-md text-light-primary hover:underline whitespace-nowrap shrink-0 font-semibold"
+                  className="font-label text-label-sm text-light-primary hover:underline whitespace-nowrap shrink-0 font-semibold"
                 >
                   + Add Course
                 </button>
@@ -393,26 +366,26 @@ function Dashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant">
-                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        <span className="font-label text-label-md whitespace-nowrap font-medium">Course / Title</span>
+                      <th scope="col" className="px-4 py-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-sm whitespace-nowrap font-medium">Course / Title</span>
                       </th>
-                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        <span className="font-label text-label-md whitespace-nowrap font-medium">Faculty Tutor</span>
+                      <th scope="col" className="px-4 py-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-sm whitespace-nowrap font-medium">Faculty Tutor</span>
                       </th>
-                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        <span className="font-label text-label-md whitespace-nowrap font-medium">Duration / Level</span>
+                      <th scope="col" className="px-4 py-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-sm whitespace-nowrap font-medium">Duration / Level</span>
                       </th>
-                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        <span className="font-label text-label-md whitespace-nowrap font-medium">Status</span>
+                      <th scope="col" className="px-4 py-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-sm whitespace-nowrap font-medium">Status</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
                     {courses.map((course, idx) => (
                       <tr key={course.id || idx} className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors">
-                        <td className="px-5 py-3.5 whitespace-nowrap">
+                        <td className="px-4 py-2.5 whitespace-nowrap">
                           <div className="flex flex-col">
-                            <span className="font-label text-label-lg text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-medium">
+                            <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-medium">
                               {course.title}
                             </span>
                             <span className="font-mono text-mono-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
@@ -420,18 +393,18 @@ function Dashboard() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 whitespace-nowrap">
+                        <td className="px-4 py-2.5 whitespace-nowrap">
                           <span className="font-body text-body-sm text-light-on-surface dark:text-dark-on-surface">
                             {course.instructor || 'Dr. Marcus Vance'}
                           </span>
                         </td>
-                        <td className="px-5 py-3.5 tabular-nums whitespace-nowrap">
+                        <td className="px-4 py-2.5 tabular-nums whitespace-nowrap">
                           <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
                             {course.duration || '6 Weeks'} • {course.level || 'Intermediate'}
                           </span>
                         </td>
-                        <td className="px-5 py-3.5 whitespace-nowrap">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success-container text-on-success-container whitespace-nowrap font-label text-label-md font-semibold">
+                        <td className="px-4 py-2.5 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success-container text-on-success-container whitespace-nowrap font-label text-label-sm font-semibold">
                             <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
                             <span>Active (CI4)</span>
                           </span>
@@ -444,39 +417,39 @@ function Dashboard() {
             </div>
 
             {/* Attendance & Smart Alerts (5 cols) */}
-            <div className="xl:col-span-5 flex flex-col gap-6">
+            <div className="xl:col-span-5 flex flex-col gap-4">
               {/* Attendance Card */}
-              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col gap-4">
+              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-sm flex flex-col gap-3">
                 <header className="flex items-center justify-between gap-2">
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                  <h2 className="font-title text-[15px] text-light-on-surface dark:text-dark-on-surface font-semibold">
                     Attendance
                   </h2>
-                  <span className="font-label text-label-md text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                  <span className="font-label text-label-sm text-on-success-container bg-success-container px-2 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
                     92.4% Today
                   </span>
                 </header>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
                     <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
                       Present
                     </span>
-                    <span className="font-title text-title-lg tabular-nums text-on-success-container font-semibold">
+                    <span className="font-title text-title-md tabular-nums text-on-success-container font-semibold">
                       1,412
                     </span>
                   </div>
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
                     <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
                       Late / Leave
                     </span>
-                    <span className="font-title text-title-lg tabular-nums text-on-pending-container font-semibold">
+                    <span className="font-title text-title-md tabular-nums text-on-pending-container font-semibold">
                       74
                     </span>
                   </div>
-                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                  <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-0.5">
                     <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
                       Absent
                     </span>
-                    <span className="font-title text-title-lg tabular-nums text-on-overdue-container font-semibold">
+                    <span className="font-title text-title-md tabular-nums text-on-overdue-container font-semibold">
                       42
                     </span>
                   </div>
@@ -484,9 +457,9 @@ function Dashboard() {
               </article>
 
               {/* Smart Notifications */}
-              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex-1 flex flex-col gap-3">
+              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-sm flex-1 flex flex-col gap-2.5">
                 <header className="flex items-center justify-between gap-2">
-                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                  <h2 className="font-title text-[15px] text-light-on-surface dark:text-dark-on-surface font-semibold">
                     Notifications
                   </h2>
                   <span className="font-label text-label-sm text-light-primary font-semibold whitespace-nowrap">
@@ -494,24 +467,24 @@ function Dashboard() {
                   </span>
                 </header>
                 <ul className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
-                  <li className="py-2.5 flex items-center gap-3">
+                  <li className="py-2 flex items-center gap-3">
                     <span className="w-2 h-2 rounded-full bg-overdue shrink-0"></span>
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
+                      <span className="font-label text-label-sm text-light-on-surface dark:text-dark-on-surface font-medium">
                         14 fee installments overdue in Batch B26-FS-A
                       </span>
-                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      <span className="font-label text-label-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
                         Finance • 18 mins ago
                       </span>
                     </div>
                   </li>
-                  <li className="py-2.5 flex items-center gap-3">
+                  <li className="py-2 flex items-center gap-3">
                     <span className="w-2 h-2 rounded-full bg-pending shrink-0"></span>
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
+                      <span className="font-label text-label-sm text-light-on-surface dark:text-dark-on-surface font-medium">
                         Room 204 scheduling conflict detected for Nov 28
                       </span>
-                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      <span className="font-label text-label-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
                         Timetable • 1 hour ago
                       </span>
                     </div>

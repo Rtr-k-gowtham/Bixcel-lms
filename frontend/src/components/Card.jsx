@@ -20,15 +20,15 @@ export function Card({
       {...props}
     >
       {(header || title) && (
-        <header className="px-5 py-3.5 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-4">
+        <header className="px-4 py-2.5 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-3">
           <div>
             {title && (
-              <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface">
+              <h2 className="font-title text-[14px] font-semibold text-light-on-surface dark:text-dark-on-surface">
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5">
+              <p className="font-body text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5">
                 {subtitle}
               </p>
             )}
@@ -38,10 +38,10 @@ export function Card({
         </header>
       )}
 
-      <div className={`flex-1 ${noPadding ? '' : 'p-5'}`}>{children}</div>
+      <div className={`flex-1 ${noPadding ? '' : 'p-3.5'}`}>{children}</div>
 
       {footer && (
-        <footer className="px-5 py-3 border-t border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container-lowest">
+        <footer className="px-4 py-2 border-t border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container-lowest">
           {footer}
         </footer>
       )}

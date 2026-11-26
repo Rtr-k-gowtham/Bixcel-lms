@@ -27,26 +27,26 @@ export function ClassroomOccupancyHeatmap() {
         </span>
       </div>
 
-      <div className="overflow-x-auto py-1">
-        <div className="min-w-[280px] space-y-1.5">
+      <div className="overflow-x-auto py-0.5">
+        <div className="min-w-[260px] space-y-1">
           {/* Header row */}
-          <div className="grid grid-cols-5 gap-1.5 text-center text-label-sm font-label text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <div className="grid grid-cols-5 gap-1 text-center text-[10px] font-label text-light-on-surface-variant dark:text-dark-on-surface-variant">
             <span className="text-left font-medium">Day</span>
             {slots.map((s, i) => (
-              <span key={i} className="font-mono text-[11px]">{s}</span>
+              <span key={i} className="font-mono">{s}</span>
             ))}
           </div>
 
           {/* Matrix rows */}
           {days.map((day, dIdx) => (
-            <div key={dIdx} className="grid grid-cols-5 gap-1.5 items-center text-center">
-              <span className="text-left font-label text-label-sm font-medium text-light-on-surface dark:text-dark-on-surface">
+            <div key={dIdx} className="grid grid-cols-5 gap-1 items-center text-center">
+              <span className="text-left font-label text-[11px] font-medium text-light-on-surface dark:text-dark-on-surface">
                 {day}
               </span>
               {matrix[dIdx].map((val, sIdx) => (
                 <div
                   key={sIdx}
-                  className={`py-1 rounded font-mono text-[11px] tabular-nums transition-transform hover:scale-105 cursor-pointer ${getColor(val)}`}
+                  className={`py-0.5 rounded font-mono text-[10px] tabular-nums transition-transform hover:scale-105 cursor-pointer ${getColor(val)}`}
                   title={`${day} @ ${slots[sIdx]}: ${val}% Room Utilization`}
                 >
                   {val}%
@@ -57,9 +57,9 @@ export function ClassroomOccupancyHeatmap() {
         </div>
       </div>
 
-      <div className="text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant border-t border-light-outline-variant dark:border-dark-outline-variant pt-2 flex justify-between items-center">
-        <span>Peak Usage Window</span>
-        <span className="font-semibold text-light-on-surface dark:text-dark-on-surface">Wednesday 09:00 AM (98%)</span>
+      <div className="text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant border-t border-light-outline-variant dark:border-dark-outline-variant pt-1.5 flex justify-between items-center">
+        <span>Peak Window</span>
+        <span className="font-semibold text-light-on-surface dark:text-dark-on-surface">Wed 09:00 AM (98%)</span>
       </div>
     </div>
   )
@@ -83,19 +83,19 @@ export function CourseCompletionFunnel() {
         </span>
       </div>
 
-      <div className="space-y-2 py-1">
+      <div className="space-y-1.5 py-0.5">
         {stages.map((stage, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            <div className="flex items-center justify-between text-label-sm">
+          <div key={i} className="flex flex-col gap-0.5">
+            <div className="flex items-center justify-between text-[11px]">
               <span className="font-medium text-light-on-surface dark:text-dark-on-surface truncate">
                 {stage.name}
               </span>
-              <div className="flex items-center gap-2 font-mono text-mono-sm tabular-nums">
+              <div className="flex items-center gap-1.5 font-mono text-[11px] tabular-nums">
                 <span className="text-light-on-surface dark:text-dark-on-surface font-semibold">{stage.count.toLocaleString()}</span>
-                <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant text-[11px]">({stage.percentage}%)</span>
+                <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant text-[10px]">({stage.percentage}%)</span>
               </div>
             </div>
-            <div className="h-2 w-full rounded-full bg-light-surface-container-low dark:bg-dark-surface-container overflow-hidden">
+            <div className="h-1.5 w-full rounded-full bg-light-surface-container-low dark:bg-dark-surface-container overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-surface-enter ${stage.color}`}
                 style={{ width: `${stage.percentage}%` }}
@@ -105,9 +105,9 @@ export function CourseCompletionFunnel() {
         ))}
       </div>
 
-      <div className="text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant border-t border-light-outline-variant dark:border-dark-outline-variant pt-2 flex justify-between">
+      <div className="text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant border-t border-light-outline-variant dark:border-dark-outline-variant pt-1.5 flex justify-between">
         <span>Attrition Rate</span>
-        <span className="font-semibold text-success">5.7% (Industry leading &lt;10%)</span>
+        <span className="font-semibold text-success">5.7% (Industry &lt;10%)</span>
       </div>
     </div>
   )
