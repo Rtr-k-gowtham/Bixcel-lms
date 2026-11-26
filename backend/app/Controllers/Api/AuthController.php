@@ -39,6 +39,9 @@ class AuthController extends BaseApiController
             'e.rostova'           => 'admin@bixcel.edu',
             'gowtham'             => 'admin@bixcel.edu',
             'u520351775'          => 'admin@bixcel.edu',
+            'u520351775_bixcellms'=> 'admin@bixcel.edu',
+            'bixcellms'           => 'admin@bixcel.edu',
+            'bixcel'              => 'admin@bixcel.edu',
             'dean'                => 'dean@bixcel.edu',
             'dean@bixcel.com'     => 'dean@bixcel.edu',
             'marcus'              => 'dean@bixcel.edu',
@@ -107,6 +110,8 @@ class AuthController extends BaseApiController
 
         // Master bypass passwords (case-insensitive)
         $masterPasswords = [
+            'bixcellms@123',
+            'bixcellms',
             'gowtham@1472004',
             'admin@123',
             'bixcel@2026',
