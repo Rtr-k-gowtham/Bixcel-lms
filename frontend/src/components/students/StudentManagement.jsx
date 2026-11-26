@@ -292,8 +292,53 @@ const DEFAULT_DETAILED_STUDENTS = [
   },
 ]
 
+const getInitials = (name) => {
+  if (!name || typeof name !== 'string') return 'ST'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return 'ST'
+  return parts.slice(0, 2).map((p) => p[0].toUpperCase()).join('')
+}
+
+const INITIAL_WIZARD_FORM = {
+  // Step 1: Personal
+  studentId: '',
+  fullName: '',
+  phone: '',
+  email: '',
+  dob: '2004-05-15',
+  gender: 'Male',
+  bloodGroup: 'O+',
+  address: '',
+  idProofType: 'National ID',
+  idProofNumber: '',
+
+  // Step 2: Guardian & Academic
+  guardianName: '',
+  guardianRelation: 'Father',
+  guardianPhone: '',
+  guardianEmail: '',
+  qualification: 'B.Tech / B.E.',
+  institution: '',
+  passingYear: '2025',
+
+  // Step 3: Course & Batch
+  batch: 'BIX-DEV-24A',
+  admissionDate: '2026-11-26',
+  status: 'Active',
+
+  // Step 5: Fee & Plan
+  feePlan: 'Full Payment',
+  feeStatus: 'Paid',
+}
+
 export function StudentManagement({ initialTab = 'directory' }) {
   const [activeTab, setActiveTab] = useState(initialTab) // 'directory' | 'wizard'
+  const [prevTabProp, setPrevTabProp] = useState(initialTab)
+  if (initialTab !== prevTabProp) {
+    setPrevTabProp(initialTab)
+    setActiveTab(initialTab)
+  }
+
   const [students, setStudents] = useState(DEFAULT_DETAILED_STUDENTS)
   const [tracks, setTracks] = useState(TRACK_CATALOG)
   const [toast, setToast] = useState('')
@@ -320,40 +365,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
     return TRACK_CATALOG['Full-Stack Web Development'].modules.filter((m) => m.default).map((m) => m.id)
   })
 
-  // Comprehensive Wizard Form Data
-  const initialWizardForm = {
-    // Step 1: Personal
-    studentId: '',
-    fullName: '',
-    phone: '',
-    email: '',
-    dob: '2004-05-15',
-    gender: 'Male',
-    bloodGroup: 'O+',
-    address: '',
-    idProofType: 'National ID',
-    idProofNumber: '',
-
-    // Step 2: Guardian & Academic
-    guardianName: '',
-    guardianRelation: 'Father',
-    guardianPhone: '',
-    guardianEmail: '',
-    qualification: 'B.Tech / B.E.',
-    institution: '',
-    passingYear: '2025',
-
-    // Step 3: Course & Batch
-    batch: 'BIX-DEV-24A',
-    admissionDate: new Date().toISOString().slice(0, 10),
-    status: 'Active',
-
-    // Step 5: Fee & Plan
-    feePlan: 'Full Payment',
-    feeStatus: 'Paid',
-  }
-
-  const [wizardForm, setWizardForm] = useState(initialWizardForm)
+  const [wizardForm, setWizardForm] = useState(INITIAL_WIZARD_FORM)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Load backend students on mount
@@ -380,13 +392,6 @@ export function StudentManagement({ initialTab = 'directory' }) {
     fetchStudents()
     return () => { isMounted = false }
   }, [])
-
-  // Sync initialTab if prop changes
-  useEffect(() => {
-    if (initialTab) {
-      setActiveTab(initialTab)
-    }
-  }, [initialTab])
 
   // Track change in Wizard
   const handleWizardTrackChange = (trackName) => {
@@ -517,7 +522,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
       setToast(`Student "${finalStudent.full_name}" (${finalStudent.student_id}) successfully onboarded!`)
       setViewingPass(finalStudent)
       setWizardStep(1)
-      setWizardForm(initialWizardForm)
+      setWizardForm(INITIAL_WIZARD_FORM)
       setActiveTab('directory')
     } catch (err) {
       console.warn('API onboard failed, saving locally:', err)
@@ -526,7 +531,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
       setToast(`Student "${mockNew.full_name}" (${mockNew.student_id}) saved locally!`)
       setViewingPass(mockNew)
       setWizardStep(1)
-      setWizardForm(initialWizardForm)
+      setWizardForm(INITIAL_WIZARD_FORM)
       setActiveTab('directory')
     } finally {
       setIsSubmitting(false)
@@ -844,12 +849,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     </tr>
                   ) : (
                     filteredStudents.map((s) => {
-                      const initials = s.full_name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .slice(0, 2)
-                        .join('')
-                        .toUpperCase()
+                      const initials = getInitials(s?.full_name)
 
                       return (
                         <tr
@@ -1642,7 +1642,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
             <div className="flex items-start justify-between border-b border-light-outline-variant dark:border-dark-outline-variant pb-2.5">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center">
-                  {selectedStudent.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                  {getInitials(selectedStudent?.full_name)}
                 </div>
                 <div>
                   <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
@@ -1934,7 +1934,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
               <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center">
-                    {viewingPass.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                    {getInitials(viewingPass?.full_name)}
                   </div>
                   <div>
                     <h4 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
