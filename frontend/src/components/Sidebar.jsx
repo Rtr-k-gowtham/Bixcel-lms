@@ -58,25 +58,22 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-sidebar text-on-sidebar">
       {/* Brand Header with Negative Logo */}
-      <div className="h-16 px-5 flex items-center justify-between border-b border-sidebar-surface shrink-0">
+      <div className="h-16 px-5 flex items-center border-b border-sidebar-surface shrink-0">
         <a
           href="#dashboard"
           onClick={(e) => {
             e.preventDefault()
             onSelectTab('dashboard')
           }}
-          className="flex items-center gap-2.5 overflow-hidden"
+          className="flex items-center w-full overflow-hidden"
           title="Bixcel Institute of Technologies"
         >
           <img
             src="/bixcel-logo-negative.png"
             alt="Bixcel Institute of Technologies"
-            className="h-8.5 max-h-9 w-auto object-contain"
+            className="h-10.5 max-h-11 w-auto object-contain"
           />
         </a>
-        <span className="font-label text-[10px] font-bold tracking-wider text-sidebar-muted uppercase bg-sidebar-surface px-1.5 py-0.5 rounded shrink-0">
-          LMS
-        </span>
       </div>
 
       {/* Main Navigation Menu */}
@@ -97,11 +94,10 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
                     onSelectTab(item.id)
                     if (onCloseMobile) onCloseMobile()
                   }}
-                  className={`flex items-center gap-3 px-3 py-1.5 rounded text-left transition-colors ${
-                    isActive
-                      ? 'bg-sidebar-active text-on-sidebar font-semibold'
-                      : 'text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-1.5 rounded text-left transition-colors ${isActive
+                    ? 'bg-sidebar-active text-on-sidebar font-semibold'
+                    : 'text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar'
+                    }`}
                 >
                   <span className="material-symbols-outlined text-[18px] shrink-0">
                     {item.icon}

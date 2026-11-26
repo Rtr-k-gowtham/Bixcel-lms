@@ -28,7 +28,7 @@ export function Header({
           <img
             src={theme === 'dark' ? '/bixcel-logo-negative.png' : '/bixcel-logo.png'}
             alt="Bixcel"
-            className="h-7 w-auto object-contain"
+            className="h-8.5 w-auto object-contain"
           />
         </div>
 
