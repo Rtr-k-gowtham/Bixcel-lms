@@ -1,0 +1,23 @@
+{
+  "name": "bixcel-lms",
+  "version": "1.0.0",
+  "description": "Full-Stack Learning Management System with React 19 and CodeIgniter 4 PHP",
+  "scripts": {
+    "dev": "concurrently -n \"CI4-BACKEND,REACT-FRONTEND\" -c \"magenta,cyan\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && php spark serve --port 8080",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "react",
+    "codeigniter4",
+    "php",
+    "lms",
+    "vite"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

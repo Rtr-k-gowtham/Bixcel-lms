@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+*/node_modules/
+vendor/
+backend/vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# Build outputs
+frontend/dist/
+dist/
+
+# CodeIgniter 4 writable storage & logs
+backend/writable/cache/*
+backend/writable/debugbar/*
+backend/writable/logs/*
+backend/writable/session/*
+backend/writable/uploads/*
+!backend/writable/cache/index.html
+!backend/writable/debugbar/index.html
+!backend/writable/logs/index.html
+!backend/writable/session/index.html
+!backend/writable/uploads/index.html
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
