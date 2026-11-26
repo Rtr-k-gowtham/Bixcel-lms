@@ -225,6 +225,18 @@ export const apiService = {
     const response = await apiClient.get('/fees', { params })
     return response.data
   },
+  getBalanceReport: async (params = {}) => {
+    const response = await apiClient.get('/fees/balance', { params })
+    return response.data
+  },
+  sendFeeReminder: async (payload) => {
+    const response = await apiClient.post('/fees/remind', payload)
+    return response.data
+  },
+  saveFeeCommitment: async (payload) => {
+    const response = await apiClient.post('/fees/commitment', payload)
+    return response.data
+  },
   collectFeePayment: async (paymentData) => {
     const response = await apiClient.post('/fees/collect', paymentData)
     return response.data

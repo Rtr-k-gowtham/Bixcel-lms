@@ -149,7 +149,7 @@ const DEFAULT_TRANSACTIONS = [
   },
 ]
 
-export function FeesPayment() {
+export function FeesPayment({ onNavigate }) {
   const [ledgers, setLedgers] = useState(DEFAULT_LEDGERS)
   const [transactions, setTransactions] = useState(DEFAULT_TRANSACTIONS)
   const [activeTab, setActiveTab] = useState('ledger') // 'ledger' | 'history'
@@ -357,6 +357,16 @@ export function FeesPayment() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {onNavigate && (
+            <button
+              type="button"
+              onClick={() => onNavigate('balance')}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded bg-amber-600 text-white hover:bg-amber-700 font-label text-label-md font-semibold shadow-xs transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+              <span>Aging &amp; Balance Dues</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => alert('Exporting fee collection report...')}

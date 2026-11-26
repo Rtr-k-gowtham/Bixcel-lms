@@ -61,6 +61,11 @@ class TestBackend extends BaseCommand
         $fCount = count($fData['data']['ledgers'] ?? []);
         CLI::write("[FeeController] index() returned {$fCount} fee ledgers. Status: " . ($fData['status'] ?? 'err'), 'cyan');
 
+        $balRes = $feeCtrl->balance();
+        $balData = json_decode($balRes->getBody(), true);
+        $balCount = count($balData['data']['ledgers'] ?? []);
+        CLI::write("[FeeController] balance() returned {$balCount} aging ledgers. Total Outstanding: ₹" . number_format($balData['meta']['total_outstanding_balance'] ?? 0), 'cyan');
+
         // 6. CalendarController
         $calCtrl = new CalendarController();
         $cRes = $calCtrl->index();

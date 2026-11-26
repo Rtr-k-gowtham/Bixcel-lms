@@ -42,6 +42,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
       group: 'Finance & Reports',
       items: [
         { id: 'fees', label: 'Fees & Payments', icon: 'payments' },
+        { id: 'balance', label: 'Fee Balance & Dues', icon: 'account_balance_wallet' },
         { id: 'analytics', label: 'Institutional Analytics', icon: 'analytics' },
       ],
     },

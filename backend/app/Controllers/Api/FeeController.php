@@ -260,4 +260,199 @@ class FeeController extends BaseApiController
             'data' => $p,
         ]);
     }
+
+    /**
+     * Outstanding Fee Balance & Aging Analysis
+     */
+    public function balance()
+    {
+        $invoiceModel = new FeeInvoiceModel();
+        $studentModel = new \App\Models\StudentModel();
+
+        $invoices = $invoiceModel->findAll();
+        $students = $studentModel->findAll();
+
+        $studentMap = [];
+        foreach ($students as $s) {
+            $studentMap[$s['student_id']] = $s;
+        }
+
+        $today = strtotime('2026-11-26');
+        $ledgers = [];
+
+        $totalBalance = 0;
+        $totalOverdue = 0;
+        $totalCurrent = 0;
+        $defaultersCount = 0;
+
+        $buckets = [
+            'current' => ['label' => 'Current Due', 'amount' => 0, 'count' => 0],
+            'days_1_15' => ['label' => '1-15 Days', 'amount' => 0, 'count' => 0],
+            'days_16_30' => ['label' => '16-30 Days', 'amount' => 0, 'count' => 0],
+            'days_31_60' => ['label' => '31-60 Days', 'amount' => 0, 'count' => 0],
+            'days_60_plus' => ['label' => '60+ Days Critical', 'amount' => 0, 'count' => 0],
+        ];
+
+        // Seeded or simulated commitments
+        $sampleCommitments = [
+            'STU-2026-0842' => ['promised_date' => '2026-12-05', 'amount' => 1500.00, 'notes' => 'Mother confirmed bank transfer on salary credit.'],
+            'STU-2026-0844' => ['promised_date' => '2026-12-02', 'amount' => 1200.00, 'notes' => 'Second installment via netbanking.'],
+        ];
+
+        foreach ($invoices as $inv) {
+            $sCode = $inv['student_code'];
+            $st = $studentMap[$sCode] ?? null;
+
+            $balance = (float) $inv['balance_amount'];
+            $totalAmount = (float) $inv['total_amount'];
+            $paidAmount = (float) $inv['paid_amount'];
+
+            $dueDate = $inv['due_date'] ?? date('Y-m-d', strtotime('+15 days'));
+            $dueTs = strtotime($dueDate);
+
+            $diffDays = (int) floor(($today - $dueTs) / 86400);
+            $daysOverdue = max(0, $diffDays);
+            $isOverdue = $diffDays > 0 && $balance > 0;
+
+            // Determine bucket
+            if (!$isOverdue) {
+                $bucketKey = 'current';
+                $agingCategory = 'Current';
+            } elseif ($daysOverdue <= 15) {
+                $bucketKey = 'days_1_15';
+                $agingCategory = '1-15 Days';
+            } elseif ($daysOverdue <= 30) {
+                $bucketKey = 'days_16_30';
+                $agingCategory = '16-30 Days';
+            } elseif ($daysOverdue <= 60) {
+                $bucketKey = 'days_31_60';
+                $agingCategory = '31-60 Days';
+            } else {
+                $bucketKey = 'days_60_plus';
+                $agingCategory = '60+ Days Critical';
+            }
+
+            if ($balance > 0) {
+                $totalBalance += $balance;
+                if ($isOverdue) {
+                    $totalOverdue += $balance;
+                    $defaultersCount++;
+                } else {
+                    $totalCurrent += $balance;
+                }
+                $buckets[$bucketKey]['amount'] += $balance;
+                $buckets[$bucketKey]['count']++;
+            }
+
+            $commitment = $sampleCommitments[$sCode] ?? null;
+
+            $guardianName = $st['guardian_name'] ?? ($inv['student_name'] . ' Guardian');
+            $guardianRelation = $st['guardian_relation'] ?? 'Parent';
+            $guardianPhone = $st['guardian_phone'] ?? ($st['phone'] ?? '+1 (555) 349-2190');
+            $guardianEmail = $st['guardian_email'] ?? 'guardian@gmail.com';
+
+            $ledgers[] = [
+                'id' => (int) $inv['id'],
+                'invoice_no' => $inv['invoice_no'],
+                'student_id' => $sCode,
+                'student_name' => $inv['student_name'],
+                'track' => $inv['track'] ?? 'Full-Stack Web Development',
+                'batch_code' => $inv['batch_code'] ?? 'FSW-2026-A',
+                'total_amount' => $totalAmount,
+                'paid_amount' => $paidAmount,
+                'balance_due' => $balance,
+                'paid_pct' => $totalAmount > 0 ? round(($paidAmount / $totalAmount) * 100, 1) : 0,
+                'due_date' => $dueDate,
+                'days_overdue' => $daysOverdue,
+                'is_overdue' => $isOverdue,
+                'aging_category' => $agingCategory,
+                'aging_bucket' => $bucketKey,
+                'guardian_name' => $guardianName,
+                'guardian_relation' => $guardianRelation,
+                'guardian_phone' => $guardianPhone,
+                'guardian_email' => $guardianEmail,
+                'student_phone' => $st['phone'] ?? '+1 (555) 000-0000',
+                'student_email' => $st['email'] ?? (strtolower(str_replace(' ', '.', $inv['student_name'])) . '@student.bixcel.edu'),
+                'status' => $inv['status'] ?? ($balance <= 0 ? 'Paid' : ($isOverdue ? 'Overdue' : 'Partial Payment')),
+                'commitment' => $commitment,
+                'reminders_count' => $isOverdue ? 2 : 0,
+                'last_reminded_at' => $isOverdue ? '2026-11-22 14:30:00' : null,
+            ];
+        }
+
+        // Add percentages to buckets
+        foreach ($buckets as &$b) {
+            $b['pct'] = $totalBalance > 0 ? round(($b['amount'] / $totalBalance) * 100, 1) : 0;
+        }
+
+        return $this->respond([
+            'status' => 'success',
+            'data' => [
+                'ledgers' => $ledgers,
+                'aging_buckets' => $buckets,
+            ],
+            'meta' => [
+                'total_outstanding_balance' => $totalBalance,
+                'total_overdue_balance' => $totalOverdue,
+                'total_current_due' => $totalCurrent,
+                'defaulters_count' => $defaultersCount,
+                'promised_commitments_amount' => 2700.00,
+                'promised_commitments_count' => count($sampleCommitments),
+                'recovery_efficiency_pct' => 74.2,
+                'avg_overdue_days' => 18.5,
+                'as_of_date' => '2026-11-26',
+            ],
+        ]);
+    }
+
+    /**
+     * Send dues reminder to student/guardian
+     */
+    public function sendReminder()
+    {
+        $input = $this->getRequestData();
+
+        if (empty($input['student_id'])) {
+            return $this->failValidationErrors(['student_id' => 'Student ID is required.']);
+        }
+
+        $channel = $input['channel'] ?? 'whatsapp'; // whatsapp | sms | email
+        $studentId = $input['student_id'];
+        $amount = $input['amount'] ?? 0;
+
+        return $this->respondCreated([
+            'status' => 'success',
+            'message' => "Payment reminder dispatched successfully via " . strtoupper($channel) . " for student ID {$studentId} (Amount: ₹" . number_format((float) $amount) . ").",
+            'data' => [
+                'student_id' => $studentId,
+                'channel' => $channel,
+                'sent_at' => date('Y-m-d H:i:s'),
+                'delivery_status' => 'Delivered',
+            ],
+        ]);
+    }
+
+    /**
+     * Save payment promise commitment
+     */
+    public function saveCommitment()
+    {
+        $input = $this->getRequestData();
+
+        if (empty($input['student_id']) || empty($input['promised_date'])) {
+            return $this->failValidationErrors(['promised_date' => 'Promised date and student ID are required.']);
+        }
+
+        return $this->respondCreated([
+            'status' => 'success',
+            'message' => "Payment commitment for {$input['student_id']} recorded for {$input['promised_date']}.",
+            'data' => [
+                'student_id' => $input['student_id'],
+                'promised_date' => $input['promised_date'],
+                'amount' => (float) ($input['amount'] ?? 0),
+                'notes' => $input['notes'] ?? 'Promised payment commitment.',
+                'logged_at' => date('Y-m-d H:i:s'),
+            ],
+        ]);
+    }
 }

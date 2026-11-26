@@ -18,6 +18,9 @@ $routes->group('api', static function ($routes) {
     $routes->resource('batches', ['controller' => 'Api\BatchController']);
     $routes->post('tutors/assign', 'Api\TutorController::assign');
     $routes->resource('tutors', ['controller' => 'Api\TutorController']);
+    $routes->get('fees/balance', 'Api\FeeController::balance');
+    $routes->post('fees/remind', 'Api\FeeController::sendReminder');
+    $routes->post('fees/commitment', 'Api\FeeController::saveCommitment');
     $routes->post('fees/collect', 'Api\FeeController::collect');
     $routes->get('fees/receipt/(:segment)', 'Api\FeeController::receipt/$1');
     $routes->resource('fees', ['controller' => 'Api\FeeController']);

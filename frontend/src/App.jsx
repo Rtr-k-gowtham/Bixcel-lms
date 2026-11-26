@@ -21,6 +21,7 @@ import StudentOnboarding from './components/students/StudentOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
+import FeeBalanceScreen from './components/fees/FeeBalanceScreen'
 import StudentCalendar from './components/calendar/StudentCalendar'
 import StudentProgressReport from './components/progress/StudentProgressReport'
 import { apiService } from './services/api'
@@ -143,6 +144,8 @@ function Dashboard() {
               ? 'Student Academic Progress Report'
               : currentTab === 'fees'
               ? 'Fees & Payment Collection'
+              : currentTab === 'balance'
+              ? 'Fee Balance & Accounts Receivable'
               : currentTab === 'users'
               ? 'User Master'
               : currentTab === 'roles'
@@ -207,10 +210,12 @@ function Dashboard() {
           {/* Conditional Screen Rendering */}
           {currentTab === 'progress' ? (
             <StudentProgressReport />
+          ) : currentTab === 'balance' ? (
+            <FeeBalanceScreen onNavigate={(tab) => setCurrentTab(tab)} />
           ) : ['calendar', 'timetable'].includes(currentTab) ? (
             <StudentCalendar />
           ) : currentTab === 'fees' ? (
-            <FeesPayment />
+            <FeesPayment onNavigate={(tab) => setCurrentTab(tab)} />
           ) : currentTab === 'tutors' ? (
             <TutorManagement />
           ) : currentTab === 'batches' ? (
