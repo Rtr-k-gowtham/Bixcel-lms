@@ -11,11 +11,20 @@ class AuditLogModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
     protected $allowedFields = [
-        'user_name',
+        'log_code',
+        'actor_name',
+        'actor_email',
+        'actor_role',
         'action',
-        'entity',
+        'action_type',
+        'module',
         'ip_address',
-        'details',
+        'user_agent',
+        'severity',
+        'status',
+        'summary',
+        'details_json',
+        'relative',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

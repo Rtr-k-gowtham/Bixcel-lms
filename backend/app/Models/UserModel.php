@@ -13,8 +13,18 @@ class UserModel extends Model
     protected $allowedFields = [
         'name',
         'email',
+        'emp_id',
         'role',
+        'role_code',
+        'department',
+        'phone',
         'status',
+        'avatar',
+        'last_login',
+        'bio',
+        'office',
+        'timezone',
+        'institution',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

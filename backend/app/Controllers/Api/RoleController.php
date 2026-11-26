@@ -2,175 +2,165 @@
 
 namespace App\Controllers\Api;
 
-use CodeIgniter\RESTful\ResourceController;
+use App\Libraries\DatabaseBootstrapper;
+use App\Models\RoleModel;
+use App\Models\UserModel;
 
-class RoleController extends ResourceController
+class RoleController extends BaseApiController
 {
     protected $format = 'json';
 
-    private static array $roles = [
-        [
-            'id'          => 1,
-            'name'        => 'Super Admin',
-            'code'        => 'ROLE_SUPER_ADMIN',
-            'users_count' => 2,
-            'scope'       => 'Full Enterprise Scope',
-            'is_system'   => true,
-            'description' => 'Unrestricted master access across all ERP foundations, academic telemetry, and financial ledgers.',
-            'status'      => 'Active',
-        ],
-        [
-            'id'          => 2,
-            'name'        => 'Admin',
-            'code'        => 'ROLE_ADMIN',
-            'users_count' => 4,
-            'scope'       => 'System & Operational Scope',
-            'is_system'   => true,
-            'description' => 'Configures courses, timetables, batch assignments, and standard platform operational settings.',
-            'status'      => 'Active',
-        ],
-        [
-            'id'          => 3,
-            'name'        => 'Academic Dean',
-            'code'        => 'ROLE_DEAN',
-            'users_count' => 3,
-            'scope'       => 'Departmental Governance',
-            'is_system'   => false,
-            'description' => 'Authorizes curriculum modifications, oversees faculty evaluations, and approves student certifications.',
-            'status'      => 'Active',
-        ],
-        [
-            'id'          => 4,
-            'name'        => 'Tutor / Faculty',
-            'code'        => 'ROLE_TUTOR',
-            'users_count' => 38,
-            'scope'       => 'Instructional Delivery',
-            'is_system'   => false,
-            'description' => 'Conducts lectures, marks student attendance, reviews assignments, and publishes examination scores.',
-            'status'      => 'Active',
-        ],
-        [
-            'id'          => 5,
-            'name'        => 'Admission Officer',
-            'code'        => 'ROLE_ADMISSIONS',
-            'users_count' => 6,
-            'scope'       => 'Student Intake Operations',
-            'is_system'   => false,
-            'description' => 'Processes enrollment applications, verifies academic credentials, and assigns students to active cohorts.',
-            'status'      => 'Active',
-        ],
-        [
-            'id'          => 6,
-            'name'        => 'Accountant',
-            'code'        => 'ROLE_FINANCE',
-            'users_count' => 5,
-            'scope'       => 'Bursar & Financial Ledgers',
-            'is_system'   => false,
-            'description' => 'Generates tuition invoices, tracks installment reconciliations, audits overdue balances, and prints receipts.',
-            'status'      => 'Active',
-        ],
-        [
-            'id'          => 7,
-            'name'        => 'Student / Learner',
-            'code'        => 'ROLE_STUDENT',
-            'users_count' => 2840,
-            'scope'       => 'Self-Service Academic Portal',
-            'is_system'   => true,
-            'description' => 'Accesses enrolled courses, attends live lectures, submits assignments, and reviews personal grade cards.',
-            'status'      => 'Active',
-        ],
-    ];
+    public function __construct()
+    {
+        DatabaseBootstrapper::ensureInitialized();
+        $this->request ??= \Config\Services::request();
+        $this->response ??= \Config\Services::response();
+    }
 
     public function index()
     {
+        $roleModel = new RoleModel();
+        $userModel = new UserModel();
+
+        $roles = $roleModel->orderBy('id', 'ASC')->findAll();
+
+        // Count users per role
+        $allUsers = $userModel->select('role, role_code')->findAll();
+        $counts = [];
+        foreach ($allUsers as $u) {
+            $code = $u['role_code'] ?? '';
+            $name = $u['role'] ?? '';
+            if ($code) $counts[$code] = ($counts[$code] ?? 0) + 1;
+            if ($name) $counts[$name] = ($counts[$name] ?? 0) + 1;
+        }
+
+        foreach ($roles as &$role) {
+            $role['id'] = (int) $role['id'];
+            $role['is_system'] = (bool) $role['is_system'];
+            $c = $counts[$role['code']] ?? ($counts[$role['name']] ?? 0);
+            $role['users_count'] = $c > 0 ? $c : (int)($role['users_count'] ?? 0);
+        }
+
         return $this->respond([
             'status' => 'success',
-            'count'  => count(self::$roles),
-            'data'   => self::$roles,
+            'count'  => count($roles),
+            'data'   => $roles,
         ]);
     }
 
     public function show($id = null)
     {
-        $id = (int)$id;
-        foreach (self::$roles as $role) {
-            if ($role['id'] === $id) {
-                return $this->respond([
-                    'status' => 'success',
-                    'data'   => $role,
-                ]);
-            }
+        $roleModel = new RoleModel();
+        $role = is_numeric($id) ? $roleModel->find((int)$id) : $roleModel->where('code', $id)->first();
+
+        if ($role) {
+            $role['id'] = (int) $role['id'];
+            $role['is_system'] = (bool) $role['is_system'];
+            return $this->respond([
+                'status' => 'success',
+                'data'   => $role,
+            ]);
         }
+
         return $this->failNotFound('Role not found');
     }
 
     public function create()
     {
-        $data = $this->request->getJSON(true) ?? $this->request->getPost();
+        $data = $this->getRequestData();
 
         if (empty($data['name']) || empty($data['code'])) {
             return $this->failValidationErrors('Role Name and Code are required');
         }
 
+        $roleModel = new RoleModel();
+
+        $code = strtoupper(trim((string)$data['code']));
+        if (!str_starts_with($code, 'ROLE_')) {
+            $code = 'ROLE_' . $code;
+        }
+
         $newRole = [
-            'id'          => count(self::$roles) + 1,
-            'name'        => $data['name'],
-            'code'        => strtoupper($data['code']),
-            'users_count' => 0,
-            'scope'       => $data['scope'] ?? 'Custom Scope',
-            'is_system'   => false,
-            'description' => $data['description'] ?? '',
-            'status'      => 'Active',
+            'name'             => trim((string)$data['name']),
+            'code'             => $code,
+            'scope'            => $data['scope'] ?? 'Custom Scope',
+            'is_system'        => 0,
+            'description'      => $data['description'] ?? '',
+            'status'           => $data['status'] ?? 'Active',
+            'permissions_json' => isset($data['permissions']) ? json_encode($data['permissions']) : null,
         ];
 
-        self::$roles[] = $newRole;
+        try {
+            $id = $roleModel->insert($newRole);
+            $created = $roleModel->find($id);
+            $created['id'] = (int)$created['id'];
+            $created['is_system'] = (bool)$created['is_system'];
+            $created['users_count'] = 0;
 
-        return $this->respondCreated([
-            'status'  => 'success',
-            'message' => 'Role created successfully',
-            'data'    => $newRole,
-        ]);
+            return $this->respondCreated([
+                'status'  => 'success',
+                'message' => 'Role created successfully',
+                'data'    => $created,
+            ]);
+        } catch (\Throwable $e) {
+            return $this->failServerError('Failed to create role: ' . $e->getMessage());
+        }
     }
 
     public function update($id = null)
     {
         $id = (int)$id;
-        $data = $this->request->getJSON(true) ?? $this->request->getRawInput();
+        $data = $this->getRequestData();
 
-        foreach (self::$roles as &$role) {
-            if ($role['id'] === $id) {
-                if (isset($data['name'])) $role['name'] = $data['name'];
-                if (isset($data['scope'])) $role['scope'] = $data['scope'];
-                if (isset($data['description'])) $role['description'] = $data['description'];
-                if (isset($data['status'])) $role['status'] = $data['status'];
+        $roleModel = new RoleModel();
+        $role = $roleModel->find($id);
 
-                return $this->respond([
-                    'status'  => 'success',
-                    'message' => 'Role updated successfully',
-                    'data'    => $role,
-                ]);
+        if (!$role) {
+            return $this->failNotFound('Role not found');
+        }
+
+        $updatable = ['name', 'scope', 'description', 'status', 'permissions_json'];
+        $payload = [];
+        foreach ($updatable as $field) {
+            if (isset($data[$field])) {
+                $payload[$field] = is_array($data[$field]) ? json_encode($data[$field]) : $data[$field];
             }
         }
 
-        return $this->failNotFound('Role not found');
+        if (!empty($payload)) {
+            $roleModel->update($id, $payload);
+        }
+
+        $updated = $roleModel->find($id);
+        $updated['id'] = (int)$updated['id'];
+        $updated['is_system'] = (bool)$updated['is_system'];
+
+        return $this->respond([
+            'status'  => 'success',
+            'message' => 'Role updated successfully',
+            'data'    => $updated,
+        ]);
     }
 
     public function delete($id = null)
     {
         $id = (int)$id;
-        foreach (self::$roles as $idx => $role) {
-            if ($role['id'] === $id) {
-                if ($role['is_system']) {
-                    return $this->fail('System protected roles cannot be deleted', 403);
-                }
-                array_splice(self::$roles, $idx, 1);
-                return $this->respondDeleted([
-                    'status'  => 'success',
-                    'message' => 'Role deleted successfully',
-                ]);
-            }
+        $roleModel = new RoleModel();
+        $role = $roleModel->find($id);
+
+        if (!$role) {
+            return $this->failNotFound('Role not found to delete');
         }
 
-        return $this->failNotFound('Role not found to delete');
+        if ($role['is_system']) {
+            return $this->fail('System protected roles cannot be deleted', 403);
+        }
+
+        $roleModel->delete($id);
+
+        return $this->respondDeleted([
+            'status'  => 'success',
+            'message' => 'Role deleted successfully',
+        ]);
     }
 }

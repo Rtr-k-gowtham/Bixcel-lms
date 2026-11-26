@@ -295,13 +295,40 @@ class CreateLmsTables extends Migration
         $this->forge->addKey('id', true);
         $this->forge->createTable('courses', true);
 
-        // 16. Users Table
+        // 16. Roles Table
+        $this->forge->addField([
+            'id' => ['type' => 'INTEGER', 'auto_increment' => true],
+            'name' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => false],
+            'code' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => false],
+            'description' => ['type' => 'TEXT', 'null' => true],
+            'scope' => ['type' => 'VARCHAR', 'constraint' => 100, 'default' => 'Operational Scope'],
+            'is_system' => ['type' => 'TINYINT', 'default' => 0],
+            'status' => ['type' => 'VARCHAR', 'constraint' => 30, 'default' => 'Active'],
+            'permissions_json' => ['type' => 'TEXT', 'null' => true],
+            'created_at' => ['type' => 'DATETIME', 'null' => true],
+            'updated_at' => ['type' => 'DATETIME', 'null' => true],
+        ]);
+        $this->forge->addKey('id', true);
+        $this->forge->addUniqueKey('name');
+        $this->forge->createTable('roles', true);
+
+        // 17. Users Table
         $this->forge->addField([
             'id' => ['type' => 'INTEGER', 'auto_increment' => true],
             'name' => ['type' => 'VARCHAR', 'constraint' => 150, 'null' => false],
             'email' => ['type' => 'VARCHAR', 'constraint' => 150, 'null' => false],
-            'role' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'Student'],
+            'emp_id' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
+            'role' => ['type' => 'VARCHAR', 'constraint' => 100, 'default' => 'Student'],
+            'role_code' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
+            'department' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
+            'phone' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
             'status' => ['type' => 'VARCHAR', 'constraint' => 30, 'default' => 'Active'],
+            'avatar' => ['type' => 'TEXT', 'null' => true],
+            'last_login' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
+            'bio' => ['type' => 'TEXT', 'null' => true],
+            'office' => ['type' => 'VARCHAR', 'constraint' => 150, 'null' => true],
+            'timezone' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
+            'institution' => ['type' => 'VARCHAR', 'constraint' => 200, 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
@@ -309,26 +336,42 @@ class CreateLmsTables extends Migration
         $this->forge->addUniqueKey('email');
         $this->forge->createTable('users', true);
 
-        // 17. Audit Logs Table
+        // 18. Audit Logs Table
         $this->forge->addField([
             'id' => ['type' => 'INTEGER', 'auto_increment' => true],
-            'user_name' => ['type' => 'VARCHAR', 'constraint' => 150, 'null' => false],
+            'log_code' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => false],
+            'actor_name' => ['type' => 'VARCHAR', 'constraint' => 150, 'null' => false],
+            'actor_email' => ['type' => 'VARCHAR', 'constraint' => 150, 'null' => true],
+            'actor_role' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
             'action' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => false],
-            'entity' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
+            'action_type' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
+            'module' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
             'ip_address' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
-            'details' => ['type' => 'TEXT', 'null' => true],
+            'user_agent' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
+            'severity' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'INFO'],
+            'status' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'Success'],
+            'summary' => ['type' => 'TEXT', 'null' => true],
+            'details_json' => ['type' => 'TEXT', 'null' => true],
+            'relative' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
         $this->forge->createTable('audit_logs', true);
 
-        // 18. Notifications Table
+        // 19. Notifications Table
         $this->forge->addField([
             'id' => ['type' => 'INTEGER', 'auto_increment' => true],
+            'notif_code' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => false],
             'title' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => false],
             'message' => ['type' => 'TEXT', 'null' => false],
             'type' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'info'],
+            'priority' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'medium'],
+            'category' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
             'is_read' => ['type' => 'TINYINT', 'default' => 0],
+            'action_label' => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
+            'action_link' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
+            'icon' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'notifications'],
+            'timestamp_label' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
@@ -341,6 +384,7 @@ class CreateLmsTables extends Migration
             'notifications',
             'audit_logs',
             'users',
+            'roles',
             'courses',
             'modules',
             'student_remarks',

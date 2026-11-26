@@ -2,11 +2,15 @@
 
 namespace App\Controllers\Api;
 
-use CodeIgniter\RESTful\ResourceController;
-
-class HealthController extends ResourceController
+class HealthController extends BaseApiController
 {
     protected $format = 'json';
+
+    public function __construct()
+    {
+        $this->request ??= \Config\Services::request();
+        $this->response ??= \Config\Services::response();
+    }
 
     public function index()
     {
