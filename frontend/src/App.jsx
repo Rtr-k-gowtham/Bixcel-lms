@@ -13,6 +13,9 @@ import {
   CourseCompletionFunnel,
 } from './components/charts'
 import { UserMaster, RoleMaster, PermissionMatrix } from './components/access'
+import { AuditLogs } from './components/audit/AuditLogs'
+import { NotificationsScreen } from './components/notifications/NotificationsScreen'
+import { UserProfileScreen } from './components/profile/UserProfileScreen'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -125,11 +128,18 @@ function Dashboard() {
               ? 'Role Master'
               : currentTab === 'permissions'
               ? 'Permission Matrix'
+              : currentTab === 'audit'
+              ? 'Audit Logs'
+              : currentTab === 'notifications'
+              ? 'Notifications & Alerts'
+              : currentTab === 'profile'
+              ? 'User Profile & Settings'
               : 'Dashboard'
           }
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           health={health}
           onRefresh={fetchData}
+          onNavigate={(tab) => setCurrentTab(tab)}
         />
 
         {/* Main Content Area */}
@@ -188,6 +198,12 @@ function Dashboard() {
             />
           ) : currentTab === 'permissions' ? (
             <PermissionMatrix initialRole={matrixPreselectedRole} />
+          ) : currentTab === 'audit' ? (
+            <AuditLogs />
+          ) : currentTab === 'notifications' ? (
+            <NotificationsScreen onNavigate={(tab) => setCurrentTab(tab)} />
+          ) : currentTab === 'profile' ? (
+            <UserProfileScreen />
           ) : (
             <>
               {/* Page Header */}

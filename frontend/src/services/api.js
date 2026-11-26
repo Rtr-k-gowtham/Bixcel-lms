@@ -81,6 +81,48 @@ export const apiService = {
     const response = await apiClient.post('/permissions', payload)
     return response.data
   },
+
+  // Audit Logs API
+  getAuditLogs: async () => {
+    const response = await apiClient.get('/audit-logs')
+    return response.data
+  },
+  getAuditLog: async (id) => {
+    const response = await apiClient.get(`/audit-logs/${id}`)
+    return response.data
+  },
+
+  // Notifications API
+  getNotifications: async () => {
+    const response = await apiClient.get('/notifications')
+    return response.data
+  },
+  markAllNotificationsRead: async () => {
+    const response = await apiClient.post('/notifications/read-all')
+    return response.data
+  },
+  markNotificationRead: async (id) => {
+    const response = await apiClient.put(`/notifications/${id}`)
+    return response.data
+  },
+  deleteNotification: async (id) => {
+    const response = await apiClient.delete(`/notifications/${id}`)
+    return response.data
+  },
+
+  // User Profile API
+  getProfile: async () => {
+    const response = await apiClient.get('/profile')
+    return response.data
+  },
+  updateProfile: async (profileData) => {
+    const response = await apiClient.put('/profile', profileData)
+    return response.data
+  },
+  revokeSession: async (sessionId) => {
+    const response = await apiClient.delete(`/profile/sessions/${sessionId}`)
+    return response.data
+  },
 }
 
 export default apiService

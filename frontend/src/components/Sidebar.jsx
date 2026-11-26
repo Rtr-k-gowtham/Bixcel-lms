@@ -57,6 +57,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
       items: [
         { id: 'notifications', label: 'Notifications', icon: 'notifications_active' },
         { id: 'audit', label: 'Audit Logs', icon: 'history' },
+        { id: 'profile', label: 'User Profile', icon: 'account_circle' },
         { id: 'settings', label: 'Institute Settings', icon: 'settings' },
       ],
     },

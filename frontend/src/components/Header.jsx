@@ -7,6 +7,7 @@ export function Header({
   onOpenMobileSidebar,
   health,
   onRefresh,
+  onNavigate,
 }) {
   const { theme, toggleTheme } = useTheme()
   const [profileOpen, setProfileOpen] = useState(false)
@@ -91,7 +92,9 @@ export function Header({
         {/* Notification Bell */}
         <button
           type="button"
+          onClick={() => onNavigate && onNavigate('notifications')}
           aria-label="4 unread notifications"
+          title="View Notifications"
           className="relative p-2 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors shrink-0"
         >
           <span className="material-symbols-outlined text-[20px]">notifications</span>
@@ -128,18 +131,28 @@ export function Header({
               <div className="px-4 py-2 border-b border-light-outline-variant dark:border-dark-outline-variant text-label-sm text-light-on-surface-variant">
                 Academic Year 2026-2027
               </div>
-              <a
-                href="#profile"
-                className="block px-4 py-2 font-body text-body-sm text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container"
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false)
+                  if (onNavigate) onNavigate('profile')
+                }}
+                className="w-full text-left px-4 py-2 font-body text-body-sm text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container flex items-center gap-2 font-medium"
               >
-                Switch to Tutor View
-              </a>
-              <a
-                href="#student"
-                className="block px-4 py-2 font-body text-body-sm text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container"
+                <span className="material-symbols-outlined text-[16px]">account_circle</span>
+                <span>My Profile &amp; Settings</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileOpen(false)
+                  if (onNavigate) onNavigate('notifications')
+                }}
+                className="w-full text-left px-4 py-2 font-body text-body-sm text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container flex items-center gap-2"
               >
-                Switch to Student View
-              </a>
+                <span className="material-symbols-outlined text-[16px]">notifications</span>
+                <span>System Notifications</span>
+              </button>
               <div className="my-1 border-t border-light-outline-variant dark:border-dark-outline-variant" />
               <button
                 type="button"
