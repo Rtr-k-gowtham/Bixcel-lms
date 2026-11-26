@@ -14,6 +14,7 @@ $routes->options('(:any)', static function () {
 $routes->group('api', static function ($routes) {
     $routes->get('health', 'Api\HealthController::index');
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
+    $routes->resource('modules', ['controller' => 'Api\ModuleController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);
     $routes->resource('roles', ['controller' => 'Api\RoleController']);
     $routes->get('permissions', 'Api\PermissionController::index');

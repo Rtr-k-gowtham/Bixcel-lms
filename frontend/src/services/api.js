@@ -36,6 +36,28 @@ export const apiService = {
     return response.data
   },
 
+  // Module Library API
+  getModules: async () => {
+    const response = await apiClient.get('/modules')
+    return response.data
+  },
+  getModule: async (id) => {
+    const response = await apiClient.get(`/modules/${id}`)
+    return response.data
+  },
+  createModule: async (moduleData) => {
+    const response = await apiClient.post('/modules', moduleData)
+    return response.data
+  },
+  updateModule: async (id, moduleData) => {
+    const response = await apiClient.put(`/modules/${id}`, moduleData)
+    return response.data
+  },
+  deleteModule: async (id) => {
+    const response = await apiClient.delete(`/modules/${id}`)
+    return response.data
+  },
+
   // Users API
   getUsers: async () => {
     const response = await apiClient.get('/users')

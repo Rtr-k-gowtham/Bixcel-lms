@@ -16,6 +16,7 @@ import { UserMaster, RoleMaster, PermissionMatrix } from './components/access'
 import { AuditLogs } from './components/audit/AuditLogs'
 import { NotificationsScreen } from './components/notifications/NotificationsScreen'
 import { UserProfileScreen } from './components/profile/UserProfileScreen'
+import ModuleLibrary from './components/modules/ModuleLibrary'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -120,6 +121,8 @@ function Dashboard() {
           breadcrumbCurrent={
             currentTab === 'courses'
               ? 'Course Management'
+              : currentTab === 'modules'
+              ? 'Module Library'
               : currentTab === 'batches'
               ? 'Batch Management'
               : currentTab === 'users'
@@ -187,7 +190,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'users' ? (
+          {currentTab === 'modules' ? (
+            <ModuleLibrary />
+          ) : currentTab === 'users' ? (
             <UserMaster />
           ) : currentTab === 'roles' ? (
             <RoleMaster

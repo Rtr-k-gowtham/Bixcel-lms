@@ -10,7 +10,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
       group: 'Academics',
       items: [
         { id: 'courses', label: 'Course Management', icon: 'menu_book' },
-        { id: 'modules', label: 'Reusable Module Library', icon: 'library_books' },
+        { id: 'modules', label: 'Module Library', icon: 'library_books' },
         { id: 'builder', label: 'Custom Course Builder', icon: 'view_quilt' },
         { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
         { id: 'lessons', label: 'Lesson Management', icon: 'article' },
