@@ -24,21 +24,37 @@ class ModuleController extends BaseApiController
 
         $modules = [];
         foreach ($dbModules as $mod) {
+            $curriculum = null;
+            if (!empty($mod['curriculum_lessons'])) {
+                $curriculum = is_string($mod['curriculum_lessons'])
+                    ? json_decode($mod['curriculum_lessons'], true)
+                    : $mod['curriculum_lessons'];
+            }
+            if (empty($curriculum) || !is_array($curriculum)) {
+                $curriculum = $this->generateDefaultCurriculum($mod['title'], (int) ($mod['duration_days'] ?? 7));
+            }
+
+            $totalLessons = 0;
+            foreach ($curriculum as $dayItem) {
+                $totalLessons += count($dayItem['lessons'] ?? []);
+            }
+
             $modules[] = [
-                'id'          => (int) $mod['id'],
-                'title'       => $mod['title'],
-                'code'        => $mod['code'],
-                'version'     => 'v2.0',
-                'category'    => $mod['category'] ?? 'Engineering',
-                'status'      => $mod['status'] ?? 'Published',
-                'days'        => (int) ($mod['duration_days'] ?? 10),
-                'lessons'     => (int) (($mod['duration_days'] ?? 10) * 2),
-                'tasks'       => 6,
-                'assignments' => 3,
-                'tests'       => 2,
-                'milestones'  => 1,
-                'updated_at'  => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
-                'description' => $mod['description'] ?? '',
+                'id'                 => (int) $mod['id'],
+                'title'              => $mod['title'],
+                'code'               => $mod['code'],
+                'version'            => 'v2.0',
+                'category'           => $mod['category'] ?? 'Engineering',
+                'status'             => $mod['status'] ?? 'Published',
+                'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 10),
+                'lessons'            => $totalLessons > 0 ? $totalLessons : (int) (($mod['duration_days'] ?? 10) * 2),
+                'curriculum_lessons' => $curriculum,
+                'tasks'              => 6,
+                'assignments'        => 3,
+                'tests'              => 2,
+                'milestones'         => 1,
+                'updated_at'         => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
+                'description'        => $mod['description'] ?? '',
             ];
         }
 
@@ -58,23 +74,39 @@ class ModuleController extends BaseApiController
             return $this->failNotFound('Module not found: ' . $id);
         }
 
+        $curriculum = null;
+        if (!empty($mod['curriculum_lessons'])) {
+            $curriculum = is_string($mod['curriculum_lessons'])
+                ? json_decode($mod['curriculum_lessons'], true)
+                : $mod['curriculum_lessons'];
+        }
+        if (empty($curriculum) || !is_array($curriculum)) {
+            $curriculum = $this->generateDefaultCurriculum($mod['title'], (int) ($mod['duration_days'] ?? 7));
+        }
+
+        $totalLessons = 0;
+        foreach ($curriculum as $dayItem) {
+            $totalLessons += count($dayItem['lessons'] ?? []);
+        }
+
         return $this->respond([
             'status' => 'success',
             'data'   => [
-                'id'          => (int) $mod['id'],
-                'title'       => $mod['title'],
-                'code'        => $mod['code'],
-                'version'     => 'v2.0',
-                'category'    => $mod['category'],
-                'status'      => $mod['status'],
-                'days'        => (int) $mod['duration_days'],
-                'lessons'     => (int) ($mod['duration_days'] * 2),
-                'tasks'       => 6,
-                'assignments' => 3,
-                'tests'       => 2,
-                'milestones'  => 1,
-                'updated_at'  => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
-                'description' => $mod['description'],
+                'id'                 => (int) $mod['id'],
+                'title'              => $mod['title'],
+                'code'               => $mod['code'],
+                'version'            => 'v2.0',
+                'category'           => $mod['category'],
+                'status'             => $mod['status'],
+                'days'               => count($curriculum) > 0 ? count($curriculum) : (int) $mod['duration_days'],
+                'lessons'            => $totalLessons > 0 ? $totalLessons : (int) ($mod['duration_days'] * 2),
+                'curriculum_lessons' => $curriculum,
+                'tasks'              => 6,
+                'assignments'        => 3,
+                'tests'              => 2,
+                'milestones'         => 1,
+                'updated_at'         => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
+                'description'        => $mod['description'],
             ],
         ]);
     }
@@ -91,34 +123,52 @@ class ModuleController extends BaseApiController
         $moduleModel = new ModuleModel();
         $code = strtoupper(trim((string) $data['code']));
 
+        $curriculum = null;
+        if (!empty($data['curriculum_lessons'])) {
+            $curriculum = is_string($data['curriculum_lessons'])
+                ? json_decode($data['curriculum_lessons'], true)
+                : $data['curriculum_lessons'];
+        }
+        if (empty($curriculum) || !is_array($curriculum)) {
+            $curriculum = $this->generateDefaultCurriculum((string) $data['title'], (int) ($data['days'] ?? 7));
+        }
+
+        $totalDays = count($curriculum);
+        $totalLessons = 0;
+        foreach ($curriculum as $dayItem) {
+            $totalLessons += count($dayItem['lessons'] ?? []);
+        }
+
         $id = $moduleModel->insert([
-            'code'          => $code,
-            'title'         => trim((string) $data['title']),
-            'category'      => $data['category'] ?? 'Engineering',
-            'duration_days' => (int) ($data['days'] ?? 10),
-            'credits'       => (int) ($data['credits'] ?? 3),
-            'level'         => $data['level'] ?? 'Intermediate',
-            'description'   => $data['description'] ?? '',
-            'status'        => $data['status'] ?? 'Active',
-            'created_at'    => $now,
-            'updated_at'    => $now,
+            'code'               => $code,
+            'title'              => trim((string) $data['title']),
+            'category'           => $data['category'] ?? 'Engineering',
+            'duration_days'      => $totalDays > 0 ? $totalDays : (int) ($data['days'] ?? 10),
+            'credits'            => (int) ($data['credits'] ?? 3),
+            'level'              => $data['level'] ?? 'Intermediate',
+            'description'        => $data['description'] ?? '',
+            'status'             => $data['status'] ?? 'Active',
+            'curriculum_lessons' => json_encode($curriculum),
+            'created_at'         => $now,
+            'updated_at'         => $now,
         ]);
 
         $newModule = [
-            'id'          => (int) $id,
-            'title'       => trim((string) $data['title']),
-            'code'        => $code,
-            'version'     => $data['version'] ?? 'v1.0',
-            'category'    => $data['category'] ?? 'General',
-            'status'      => $data['status'] ?? 'Draft',
-            'days'        => (int) ($data['days'] ?? 5),
-            'lessons'     => (int) ($data['lessons'] ?? 10),
-            'tasks'       => 4,
-            'assignments' => 2,
-            'tests'       => 1,
-            'milestones'  => 1,
-            'updated_at'  => date('Y-m-d'),
-            'description' => $data['description'] ?? '',
+            'id'                 => (int) $id,
+            'title'              => trim((string) $data['title']),
+            'code'               => $code,
+            'version'            => $data['version'] ?? 'v1.0',
+            'category'           => $data['category'] ?? 'General',
+            'status'             => $data['status'] ?? 'Draft',
+            'days'               => $totalDays > 0 ? $totalDays : (int) ($data['days'] ?? 5),
+            'lessons'            => $totalLessons > 0 ? $totalLessons : (int) ($data['lessons'] ?? 10),
+            'curriculum_lessons' => $curriculum,
+            'tasks'              => 4,
+            'assignments'        => 2,
+            'tests'              => 1,
+            'milestones'         => 1,
+            'updated_at'         => date('Y-m-d'),
+            'description'        => $data['description'] ?? '',
         ];
 
         return $this->respondCreated([
@@ -146,6 +196,15 @@ class ModuleController extends BaseApiController
         if (isset($data['days'])) $update['duration_days'] = (int) $data['days'];
         if (isset($data['description'])) $update['description'] = $data['description'];
         if (isset($data['status'])) $update['status'] = $data['status'];
+        if (isset($data['curriculum_lessons'])) {
+            $curriculum = is_string($data['curriculum_lessons'])
+                ? json_decode($data['curriculum_lessons'], true)
+                : $data['curriculum_lessons'];
+            $update['curriculum_lessons'] = json_encode($curriculum);
+            if (!empty($curriculum) && is_array($curriculum)) {
+                $update['duration_days'] = count($curriculum);
+            }
+        }
         $update['updated_at'] = date('Y-m-d H:i:s');
 
         $moduleModel->update($id, $update);
@@ -155,6 +214,97 @@ class ModuleController extends BaseApiController
             'message' => 'Module updated in database',
             'data'    => array_merge($mod, $update),
         ]);
+    }
+
+    private function generateDefaultCurriculum(string $title, int $days): array
+    {
+        $curriculum = [];
+        $days = max(1, min(60, $days));
+
+        $lessonTemplates = [
+            1 => [
+                'day_title' => 'Foundations & Architecture Overview',
+                'lessons' => [
+                    [
+                        'sno' => 1,
+                        'title' => 'Core Concepts & Domain Foundations',
+                        'description' => 'Introduction to core principles, terminology, design patterns, and environment configuration.',
+                        'duration' => '45 mins',
+                    ],
+                    [
+                        'sno' => 2,
+                        'title' => 'Workflow Tooling & Component Setup',
+                        'description' => 'Hands-on project scaffolding, repository structure, and linting rules setup.',
+                        'duration' => '60 mins',
+                    ],
+                ],
+            ],
+            2 => [
+                'day_title' => 'Deep Dive & Practical Implementation',
+                'lessons' => [
+                    [
+                        'sno' => 1,
+                        'title' => 'Practical Paradigms & Syntax Mastery',
+                        'description' => 'Exploration of functional mechanics, data structures, and edge-case error boundaries.',
+                        'duration' => '50 mins',
+                    ],
+                    [
+                        'sno' => 2,
+                        'title' => 'Guided Code-Along & Component Prototyping',
+                        'description' => 'Interactive coding session building robust and reusable modules.',
+                        'duration' => '60 mins',
+                    ],
+                ],
+            ],
+            3 => [
+                'day_title' => 'Integration & Asynchronous Data Flows',
+                'lessons' => [
+                    [
+                        'sno' => 1,
+                        'title' => 'State Synchronization & API Contracts',
+                        'description' => 'Consuming RESTful payloads, request lifecycle management, and optimistic UI updating.',
+                        'duration' => '55 mins',
+                    ],
+                    [
+                        'sno' => 2,
+                        'title' => 'Validation, Sanitation & Error Handling',
+                        'description' => 'Defensive validation strategies, user feedback toasts, and rollback hooks.',
+                        'duration' => '45 mins',
+                    ],
+                ],
+            ],
+        ];
+
+        for ($d = 1; $d <= $days; $d++) {
+            if (isset($lessonTemplates[$d])) {
+                $curriculum[] = [
+                    'day'       => $d,
+                    'day_title' => "Day {$d}: " . $lessonTemplates[$d]['day_title'],
+                    'lessons'   => $lessonTemplates[$d]['lessons'],
+                ];
+            } else {
+                $curriculum[] = [
+                    'day'       => $d,
+                    'day_title' => "Day {$d}: Advanced Application & Assessment",
+                    'lessons'   => [
+                        [
+                            'sno'         => 1,
+                            'title'       => "Lecture: Advanced Topics in {$title} (Part {$d})",
+                            'description' => "Detailed theoretical and structural exploration of topics for day {$d}.",
+                            'duration'    => '45 mins',
+                        ],
+                        [
+                            'sno'         => 2,
+                            'title'       => "Practical Lab: Hands-On Exercise {$d}",
+                            'description' => "Real-world engineering challenge applying lessons learned in day {$d}.",
+                            'duration'    => '60 mins',
+                        ],
+                    ],
+                ];
+            }
+        }
+
+        return $curriculum;
     }
 
     public function delete($id = null)

@@ -19,6 +19,7 @@ class ModuleModel extends Model
         'level',
         'description',
         'status',
+        'curriculum_lessons',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

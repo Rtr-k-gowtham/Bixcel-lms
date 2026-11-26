@@ -21,9 +21,7 @@ import StudentOnboarding from './components/students/StudentOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
-import FeeBalanceScreen from './components/fees/FeeBalanceScreen'
 import StudentCalendar from './components/calendar/StudentCalendar'
-import StudentProgressReport from './components/progress/StudentProgressReport'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -129,36 +127,32 @@ function Dashboard() {
             currentTab === 'courses'
               ? 'Course Management'
               : currentTab === 'modules'
-              ? 'Module Library'
-              : currentTab === 'students'
-              ? 'Student Management'
-              : currentTab === 'onboarding'
-              ? 'Student Onboarding'
-              : currentTab === 'tutors'
-              ? 'Tutor Management & Allocation'
-              : currentTab === 'batches'
-              ? 'Batch Management'
-              : ['calendar', 'timetable'].includes(currentTab)
-              ? 'Student Environment & Calendar'
-              : currentTab === 'progress'
-              ? 'Student Academic Progress Report'
-              : currentTab === 'fees'
-              ? 'Fees & Payment Collection'
-              : currentTab === 'balance'
-              ? 'Fee Balance & Accounts Receivable'
-              : currentTab === 'users'
-              ? 'User Master'
-              : currentTab === 'roles'
-              ? 'Role Master'
-              : currentTab === 'permissions'
-              ? 'Permission Matrix'
-              : currentTab === 'audit'
-              ? 'Audit Logs'
-              : currentTab === 'notifications'
-              ? 'Notifications & Alerts'
-              : currentTab === 'profile'
-              ? 'User Profile & Settings'
-              : 'Dashboard'
+                ? 'Module Library'
+                : currentTab === 'students'
+                  ? 'Student Management'
+                  : currentTab === 'onboarding'
+                    ? 'Student Onboarding'
+                    : currentTab === 'tutors'
+                      ? 'Tutor Management & Allocation'
+                      : currentTab === 'batches'
+                        ? 'Batch Management'
+                        : ['calendar', 'timetable'].includes(currentTab)
+                          ? 'Student Environment & Calendar'
+                          : currentTab === 'fees'
+                            ? 'Fees & Payment Collection'
+                            : currentTab === 'users'
+                              ? 'User Master'
+                              : currentTab === 'roles'
+                                ? 'Role Master'
+                                : currentTab === 'permissions'
+                                  ? 'Permission Matrix'
+                                  : currentTab === 'audit'
+                                    ? 'Audit Logs'
+                                    : currentTab === 'notifications'
+                                      ? 'Notifications & Alerts'
+                                      : currentTab === 'profile'
+                                        ? 'User Profile & Settings'
+                                        : 'Dashboard'
           }
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           health={health}
@@ -208,14 +202,10 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'progress' ? (
-            <StudentProgressReport />
-          ) : currentTab === 'balance' ? (
-            <FeeBalanceScreen onNavigate={(tab) => setCurrentTab(tab)} />
-          ) : ['calendar', 'timetable'].includes(currentTab) ? (
+          {['calendar', 'timetable'].includes(currentTab) ? (
             <StudentCalendar />
           ) : currentTab === 'fees' ? (
-            <FeesPayment onNavigate={(tab) => setCurrentTab(tab)} />
+            <FeesPayment />
           ) : currentTab === 'tutors' ? (
             <TutorManagement />
           ) : currentTab === 'batches' ? (

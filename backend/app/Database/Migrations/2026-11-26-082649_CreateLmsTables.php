@@ -274,6 +274,7 @@ class CreateLmsTables extends Migration
             'level' => ['type' => 'VARCHAR', 'constraint' => 50, 'default' => 'Intermediate'],
             'description' => ['type' => 'TEXT', 'null' => true],
             'status' => ['type' => 'VARCHAR', 'constraint' => 30, 'default' => 'Active'],
+            'curriculum_lessons' => ['type' => 'TEXT', 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);

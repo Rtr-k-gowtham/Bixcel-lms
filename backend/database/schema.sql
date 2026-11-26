@@ -206,6 +206,7 @@ CREATE TABLE `modules` (
   `level` VARCHAR(50) DEFAULT 'Intermediate',
   `description` TEXT NULL,
   `status` VARCHAR(30) DEFAULT 'Active',
+  `curriculum_lessons` TEXT NULL,
   `created_at` DATETIME NULL,
   `updated_at` DATETIME NULL,
   UNIQUE KEY `idx_modules_code` (`code`),
