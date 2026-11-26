@@ -21,6 +21,7 @@ import StudentOnboarding from './components/students/StudentOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
+import StudentCalendar from './components/calendar/StudentCalendar'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -135,6 +136,8 @@ function Dashboard() {
               ? 'Tutor Management & Allocation'
               : currentTab === 'batches'
               ? 'Batch Management'
+              : ['calendar', 'timetable'].includes(currentTab)
+              ? 'Student Environment & Calendar'
               : currentTab === 'fees'
               ? 'Fees & Payment Collection'
               : currentTab === 'users'
@@ -199,7 +202,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'fees' ? (
+          {['calendar', 'timetable'].includes(currentTab) ? (
+            <StudentCalendar />
+          ) : currentTab === 'fees' ? (
             <FeesPayment />
           ) : currentTab === 'tutors' ? (
             <TutorManagement />

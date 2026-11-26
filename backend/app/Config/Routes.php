@@ -21,6 +21,8 @@ $routes->group('api', static function ($routes) {
     $routes->post('fees/collect', 'Api\FeeController::collect');
     $routes->get('fees/receipt/(:segment)', 'Api\FeeController::receipt/$1');
     $routes->resource('fees', ['controller' => 'Api\FeeController']);
+    $routes->get('calendar/today', 'Api\CalendarController::today');
+    $routes->resource('calendar', ['controller' => 'Api\CalendarController']);
     $routes->get('students/tracks', 'Api\StudentController::tracks');
     $routes->resource('students', ['controller' => 'Api\StudentController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);

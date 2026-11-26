@@ -233,6 +233,28 @@ export const apiService = {
     const response = await apiClient.get(`/fees/receipt/${receiptNo}`)
     return response.data
   },
+
+  // Student Calendar & Environment API
+  getCalendarEvents: async (params = {}) => {
+    const response = await apiClient.get('/calendar', { params })
+    return response.data
+  },
+  getCalendarToday: async () => {
+    const response = await apiClient.get('/calendar/today')
+    return response.data
+  },
+  createCalendarEvent: async (eventData) => {
+    const response = await apiClient.post('/calendar', eventData)
+    return response.data
+  },
+  updateCalendarEvent: async (id, eventData) => {
+    const response = await apiClient.put(`/calendar/${id}`, eventData)
+    return response.data
+  },
+  deleteCalendarEvent: async (id) => {
+    const response = await apiClient.delete(`/calendar/${id}`)
+    return response.data
+  },
 }
 
 export default apiService
