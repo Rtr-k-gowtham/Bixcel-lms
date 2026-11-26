@@ -2,22 +2,18 @@ import { useState, useEffect } from 'react'
 import { ThemeProvider } from './context/ThemeContext'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
-import Card from './components/Card'
 import Badge from './components/Badge'
 import Button from './components/Button'
 import { apiService } from './services/api'
 
-function DashboardContent() {
+function Dashboard() {
   const [currentTab, setCurrentTab] = useState('dashboard')
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   // API State
   const [health, setHealth] = useState(null)
-  const [healthLoading, setHealthLoading] = useState(true)
-
   const [courses, setCourses] = useState([])
   const [coursesLoading, setCoursesLoading] = useState(true)
-  const [coursesError, setCoursesError] = useState(null)
 
   // Create Course Modal State
   const [showModal, setShowModal] = useState(false)
@@ -32,32 +28,28 @@ function DashboardContent() {
   })
 
   useEffect(() => {
-    fetchHealth()
-    fetchCourses()
+    fetchData()
   }, [])
 
-  const fetchHealth = async () => {
-    setHealthLoading(true)
-    try {
-      const data = await apiService.checkHealth()
-      setHealth(data)
-    } catch {
-      setHealth(null)
-    } finally {
-      setHealthLoading(false)
-    }
-  }
-
-  const fetchCourses = async () => {
+  const fetchData = async () => {
     setCoursesLoading(true)
-    setCoursesError(null)
     try {
-      const res = await apiService.getCourses()
-      if (res && res.data) {
-        setCourses(res.data)
+      const [healthData, coursesData] = await Promise.allSettled([
+        apiService.checkHealth(),
+        apiService.getCourses(),
+      ])
+
+      if (healthData.status === 'fulfilled') {
+        setHealth(healthData.value)
+      } else {
+        setHealth(null)
       }
-    } catch (err) {
-      setCoursesError(err.message || 'Unable to connect to CodeIgniter 4 backend')
+
+      if (coursesData.status === 'fulfilled' && coursesData.value?.data) {
+        setCourses(coursesData.value.data)
+      }
+    } catch {
+      // Handled silently
     } finally {
       setCoursesLoading(false)
     }
@@ -78,7 +70,7 @@ function DashboardContent() {
       const res = await apiService.createCourse(formData)
       if (res && res.data) {
         setCourses((prev) => [res.data, ...prev])
-        setFormSuccess('Course successfully created in CodeIgniter 4 backend.')
+        setFormSuccess('Course created and published in CodeIgniter 4 backend.')
         setFormData({
           title: '',
           instructor: '',
@@ -99,355 +91,476 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-light-background dark:bg-dark-background text-light-on-surface dark:text-dark-on-surface flex transition-colors duration-state-change">
+    <div className="min-h-screen flex bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface font-body antialiased transition-colors duration-state-change">
       {/* Persistent Deep Navy Sidebar */}
       <Sidebar
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={() => setMobileSidebarOpen(false)}
       />
 
-      {/* Main Workspace Area */}
-      <div
-        className={`flex-1 flex flex-col transition-all duration-surface-enter ${
-          sidebarCollapsed ? 'ml-20' : 'ml-sidebar-w'
-        }`}
-      >
-        {/* Header */}
+      {/* Main Workspace Column */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Navigation Header */}
         <Header
-          title={currentTab === 'courses' ? 'Course Catalog & Curriculum' : 'Executive Academic Dashboard'}
-          subtitle="Bixcel Enterprise Academic IMS + LMS System"
-          onRefresh={() => { fetchHealth(); fetchCourses(); }}
+          breadcrumbCurrent={
+            currentTab === 'courses'
+              ? 'Course Management'
+              : currentTab === 'batches'
+              ? 'Batch Management'
+              : 'Executive Overview'
+          }
+          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           health={health}
+          onRefresh={fetchData}
         />
 
-        {/* Main Content Body */}
-        <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
-          {/* Executive KPI Metrics Grid */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* KPI 1 */}
-            <Card className="!p-5">
-              <div className="flex items-center justify-between">
-                <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
-                  Total Active Students
-                </span>
-                <span className="w-8 h-8 rounded-full bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[18px]">group</span>
-                </span>
-              </div>
-              <div className="mt-3 flex items-baseline gap-2">
-                <span className="font-display text-display-lg-mobile md:text-display-lg font-bold tabular-nums">
-                  1,480
-                </span>
-                <Badge variant="verified" dot>+12.4%</Badge>
-              </div>
-              <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-                Across 24 active academic batches
+        {/* Main Content Area */}
+        <main className="flex-1 p-6 lg:p-8 flex flex-col gap-6 max-w-[1440px] w-full mx-auto">
+          {/* Page Header */}
+          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <h1 className="font-headline text-headline-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+                Executive Dashboard
+              </h1>
+              <p className="font-body text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                Overview of institute performance and academic operations.
               </p>
-            </Card>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              {/* Date pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface whitespace-nowrap">
+                <span className="material-symbols-outlined text-[18px] text-light-outline">calendar_today</span>
+                <span className="font-label text-label-md tabular-nums">Nov 26, 2026</span>
+              </div>
+
+              {/* Add Course Button */}
+              <button
+                type="button"
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary shadow-sm hover:bg-light-primary-container transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+              >
+                <span className="material-symbols-outlined text-[18px]">add</span>
+                <span>Create Course</span>
+              </button>
+
+              {/* Export Report Button */}
+              <button
+                type="button"
+                onClick={() => alert('Exporting executive report...')}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface shadow-sm hover:bg-light-surface-container-low transition-colors duration-state-change whitespace-nowrap font-label text-label-lg"
+              >
+                <span className="material-symbols-outlined text-[18px]">download</span>
+                <span>Export Report</span>
+              </button>
+            </div>
+          </section>
+
+          {/* 5 KPI Cards Grid */}
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-stretch">
+            {/* KPI 1 */}
+            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+                  Total Enrolled Students
+                </span>
+                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">groups</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+                  2,840
+                </span>
+                <span className="font-label text-label-sm text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                  +8.4%
+                </span>
+              </div>
+            </article>
 
             {/* KPI 2 */}
-            <Card className="!p-5">
-              <div className="flex items-center justify-between">
-                <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
-                  Active Courses
+            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+                  Active Tutors
                 </span>
-                <span className="w-8 h-8 rounded-full bg-success-container text-on-success-container flex items-center justify-center">
+                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">co_present</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+                  64
+                </span>
+                <span className="font-label text-label-sm text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                  +3 this term
+                </span>
+              </div>
+            </article>
+
+            {/* KPI 3 (Live Backend Synced) */}
+            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+                  Published Courses
+                </span>
+                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-[18px]">menu_book</span>
                 </span>
               </div>
-              <div className="mt-3 flex items-baseline gap-2">
-                <span className="font-display text-display-lg-mobile md:text-display-lg font-bold tabular-nums">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
                   {courses.length}
                 </span>
-                <Badge variant="primary">CI4 API</Badge>
-              </div>
-              <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-                Synced with backend REST API
-              </p>
-            </Card>
-
-            {/* KPI 3 */}
-            <Card className="!p-5">
-              <div className="flex items-center justify-between">
-                <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
-                  Attendance & Attendance Rate
-                </span>
-                <span className="w-8 h-8 rounded-full bg-pending-container text-on-pending-container flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
+                <span className="font-label text-label-sm text-on-pending-container bg-pending-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                  {health ? 'CI4 Synced' : 'Connecting'}
                 </span>
               </div>
-              <div className="mt-3 flex items-baseline gap-2">
-                <span className="font-display text-display-lg-mobile md:text-display-lg font-bold tabular-nums">
-                  94.2%
-                </span>
-                <Badge variant="verified">Optimal</Badge>
-              </div>
-              <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-                18 batches in session today
-              </p>
-            </Card>
+            </article>
 
             {/* KPI 4 */}
-            <Card className="!p-5">
-              <div className="flex items-center justify-between">
-                <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
-                  Fee Collection Ledger
+            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+                  Running Batches
                 </span>
-                <span className="w-8 h-8 rounded-full bg-light-surface-container dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">workspaces</span>
                 </span>
               </div>
-              <div className="mt-3 flex items-baseline gap-2">
-                <span className="font-display text-display-lg-mobile md:text-display-lg font-bold tabular-nums">
-                  $184.5K
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+                  24
                 </span>
-                <Badge variant="pending" dot>8 Pending</Badge>
+                <span className="font-label text-label-sm text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full whitespace-nowrap font-semibold">
+                  On schedule
+                </span>
               </div>
-              <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-                87% collected for Term 1
-              </p>
-            </Card>
+            </article>
+
+            {/* KPI 5 */}
+            <article className="h-full bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-5 shadow-sm flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-label text-label-md text-light-on-surface-variant dark:text-dark-on-surface-variant whitespace-nowrap">
+                  Classroom Utilization
+                </span>
+                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">meeting_room</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-headline text-headline-lg tabular-nums text-light-on-surface dark:text-dark-on-surface">
+                  86.5%
+                </span>
+                <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant tabular-nums whitespace-nowrap font-medium">
+                  18/20 rooms
+                </span>
+              </div>
+            </article>
           </section>
 
-          {/* Backend Connection Status Banner */}
-          <div className="bg-light-surface-bright dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-card">
-            <div className="flex items-center gap-3">
-              <span className={`w-3 h-3 rounded-full shrink-0 ${health ? 'bg-success animate-pulse' : 'bg-overdue'}`}></span>
-              <div>
-                <p className="text-label-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
-                  CodeIgniter 4 PHP Engine Status
-                </p>
-                <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                  {health
-                    ? `Connected to CI4 v${health.version} (${health.env} mode) • ${health.message}`
-                    : 'Backend server offline. Run `npm run dev` or `php spark serve` to start.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-mono-sm bg-light-surface-container-low dark:bg-dark-surface-container px-2.5 py-1 rounded text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                http://localhost:8080/api
-              </span>
-              <Button size="sm" variant="outline" icon="open_in_new" onClick={() => window.open('http://localhost:8080/api/health', '_blank')}>
-                API Health
-              </Button>
-            </div>
-          </div>
-
-          {/* Courses Catalog Section */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-headline text-headline-sm md:text-headline-md font-semibold text-light-on-surface dark:text-dark-on-surface">
-                  Curriculum & Course Offerings
-                </h3>
-                <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                  Active courses delivered by faculty, synced with CodeIgniter 4 database.
-                </p>
-              </div>
-              <Button icon="add" variant="primary" onClick={() => setShowModal(true)}>
-                Create New Course
-              </Button>
-            </div>
-
-            {coursesLoading ? (
-              <div className="text-center py-12 bg-light-surface-bright dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md">
-                <div className="inline-block w-8 h-8 border-3 border-light-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant mt-3">
-                  Fetching courses from CodeIgniter 4 backend...
-                </p>
-              </div>
-            ) : coursesError ? (
-              <div className="p-6 bg-overdue-container border border-overdue/20 rounded-md text-on-overdue-container flex items-center justify-between">
+          {/* Primary Analytics & Live Classes Row */}
+          <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+            {/* Student Performance Analytics Chart (7 cols) */}
+            <article className="xl:col-span-7 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col justify-between gap-5">
+              <header className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-semibold text-label-lg">Backend Connection Notice</p>
-                  <p className="text-body-sm mt-0.5">{coursesError}</p>
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                    Student Performance Analytics
+                  </h2>
+                  <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    Average assessment score vs. curriculum completion across active cohorts
+                  </p>
                 </div>
-                <Button size="sm" variant="outline" onClick={fetchCourses}>Retry</Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {courses.map((course) => (
-                  <Card
-                    key={course.id}
-                    title={course.title}
-                    header={
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge
-                          variant={
-                            course.level?.toLowerCase() === 'beginner'
-                              ? 'verified'
-                              : course.level?.toLowerCase() === 'advanced'
-                              ? 'overdue'
-                              : 'primary'
-                          }
-                        >
-                          {course.level || 'All Levels'}
-                        </Badge>
-                        <span className="font-mono text-mono-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                          ⏱ {course.duration || 'Flexible'}
-                        </span>
-                      </div>
-                    }
-                    footer={
-                      <div className="flex items-center justify-between text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
-                        <span className="flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-[16px]">school</span>
-                          {course.instructor || 'Faculty'}
-                        </span>
-                        <span className="tabular-nums font-semibold text-light-on-surface dark:text-dark-on-surface">
-                          👥 {course.enrolled || 0} Enrolled
-                        </span>
-                      </div>
-                    }
-                  >
-                    <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant line-clamp-3">
-                      {course.description || 'Comprehensive curriculum designed for institutional mastery and practical competence.'}
-                    </p>
-                  </Card>
+                <span className="font-label text-label-md text-light-on-primary-tint bg-light-primary-tint px-3 py-1 rounded-full shrink-0 whitespace-nowrap font-medium">
+                  Fall 2026
+                </span>
+              </header>
+
+              <div className="grid grid-cols-6 gap-4 items-end h-44 pt-4 border-b border-light-outline-variant dark:border-dark-outline-variant pb-3">
+                {[
+                  { cohort: 'CS-401', score: 82, completion: 74 },
+                  { cohort: 'DS-204', score: 88, completion: 91 },
+                  { cohort: 'CA-302', score: 76, completion: 68 },
+                  { cohort: 'UX-110', score: 92, completion: 86 },
+                  { cohort: 'SE-215', score: 79, completion: 81 },
+                  { cohort: 'AI-501', score: 85, completion: 79 },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end">
+                    <div className="w-full max-w-[40px] flex items-end gap-1 h-32">
+                      <div
+                        className="flex-1 bg-light-primary rounded-t"
+                        style={{ height: `${item.score}%` }}
+                        title={`Academic Score: ${item.score}%`}
+                      />
+                      <div
+                        className="flex-1 bg-light-secondary-container dark:bg-dark-secondary-container rounded-t"
+                        style={{ height: `${item.completion}%` }}
+                        title={`Curriculum Completion: ${item.completion}%`}
+                      />
+                    </div>
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+                      {item.cohort}
+                    </span>
+                  </div>
                 ))}
               </div>
-            )}
+
+              <footer className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-5">
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-sm bg-light-primary"></span>
+                    <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Academic Score (83.7% avg)
+                    </span>
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-sm bg-light-secondary-container"></span>
+                    <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Curriculum Completion (79.8% avg)
+                    </span>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => alert('Opening full cohort analytics view...')}
+                  className="font-label text-label-md text-light-primary hover:underline whitespace-nowrap font-semibold"
+                >
+                  View Analytics →
+                </button>
+              </footer>
+            </article>
+
+            {/* Attendance Summary & Smart Notifications (5 cols) */}
+            <div className="xl:col-span-5 flex flex-col gap-6">
+              {/* Attendance Card */}
+              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col gap-4">
+                <header className="flex items-center justify-between gap-2">
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                    Attendance Summary
+                  </h2>
+                  <span className="font-label text-label-md text-on-success-container bg-success-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap font-semibold">
+                    92.4% Today
+                  </span>
+                </header>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Present
+                    </span>
+                    <span className="font-title text-title-lg tabular-nums text-on-success-container font-semibold">
+                      1,412
+                    </span>
+                  </div>
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Late / Leave
+                    </span>
+                    <span className="font-title text-title-lg tabular-nums text-on-pending-container font-semibold">
+                      74
+                    </span>
+                  </div>
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-1">
+                    <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                      Absent
+                    </span>
+                    <span className="font-title text-title-lg tabular-nums text-on-overdue-container font-semibold">
+                      42
+                    </span>
+                  </div>
+                </div>
+              </article>
+
+              {/* Smart Notifications */}
+              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex-1 flex flex-col gap-3">
+                <header className="flex items-center justify-between gap-2">
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                    Smart Notifications
+                  </h2>
+                  <span className="font-label text-label-sm text-light-primary font-semibold whitespace-nowrap">
+                    4 Active
+                  </span>
+                </header>
+                <ul className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
+                  <li className="py-2.5 flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-overdue shrink-0"></span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
+                        14 fee installments overdue in Batch B26-FS-A
+                      </span>
+                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        Finance • 18 mins ago
+                      </span>
+                    </div>
+                  </li>
+                  <li className="py-2.5 flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full bg-pending shrink-0"></span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-medium">
+                        Room 204 scheduling conflict detected for Nov 28
+                      </span>
+                      <span className="font-label text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        Timetable • 1 hour ago
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+              </article>
+            </div>
           </section>
 
-          {/* Academic Batch Management & Timetable Preview Section */}
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Batch Table Card (2 Cols) */}
-            <Card
-              title="Recent Academic Batches"
-              subtitle="Current operational cohorts across departments"
-              className="lg:col-span-2"
-              action={
-                <Button size="sm" variant="outline" icon="visibility">
-                  View All Batches
-                </Button>
-              }
-              noPadding
-            >
+          {/* Today's Live Classes & CI4 Course Catalog Row */}
+          <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            {/* Today's Live Classes Table (7 cols) */}
+            <div className="xl:col-span-7 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm overflow-hidden flex flex-col">
+              <header className="px-6 py-4 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface font-semibold">
+                    Today's Live Classes &amp; CI4 Courses
+                  </h2>
+                  <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    Real-time schedule connected to CodeIgniter 4 REST API
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="font-label text-label-md text-light-primary hover:underline whitespace-nowrap shrink-0 font-semibold"
+                >
+                  + Add Course
+                </button>
+              </header>
+
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-body-sm">
+                <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-label-sm text-light-on-surface-variant dark:text-dark-on-surface-variant font-semibold">
-                      <th className="py-3 px-4">Batch Code</th>
-                      <th className="py-3 px-4">Department / Program</th>
-                      <th className="py-3 px-4">Lead Tutor</th>
-                      <th className="py-3 px-4">Strength</th>
-                      <th className="py-3 px-4">Status</th>
+                    <tr className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant">
+                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-md whitespace-nowrap font-medium">Course / Title</span>
+                      </th>
+                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-md whitespace-nowrap font-medium">Faculty Tutor</span>
+                      </th>
+                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-md whitespace-nowrap font-medium">Duration / Level</span>
+                      </th>
+                      <th scope="col" className="px-5 py-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        <span className="font-label text-label-md whitespace-nowrap font-medium">Status</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
-                    <tr className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container-low transition-colors">
-                      <td className="py-3 px-4 font-mono text-mono-sm font-semibold text-light-primary dark:text-dark-primary">
-                        BTC-2026-CS1
-                      </td>
-                      <td className="py-3 px-4 font-medium">Computer Science & AI</td>
-                      <td className="py-3 px-4">Prof. K. Gowtham</td>
-                      <td className="py-3 px-4 tabular-nums">48 / 50</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="verified" dot>In Progress</Badge>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container-low transition-colors">
-                      <td className="py-3 px-4 font-mono text-mono-sm font-semibold text-light-primary dark:text-dark-primary">
-                        BTC-2026-WD2
-                      </td>
-                      <td className="py-3 px-4 font-medium">Web & Cloud Systems</td>
-                      <td className="py-3 px-4">Sophia Chen</td>
-                      <td className="py-3 px-4 tabular-nums">42 / 45</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="verified" dot>In Progress</Badge>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container-low transition-colors">
-                      <td className="py-3 px-4 font-mono text-mono-sm font-semibold text-light-primary dark:text-dark-primary">
-                        BTC-2026-DS3
-                      </td>
-                      <td className="py-3 px-4 font-medium">Data Engineering & Analytics</td>
-                      <td className="py-3 px-4">David Miller</td>
-                      <td className="py-3 px-4 tabular-nums">36 / 40</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="pending" dot>Enrollment</Badge>
-                      </td>
-                    </tr>
+                    {courses.map((course, idx) => (
+                      <tr key={course.id || idx} className="hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors">
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <div className="flex flex-col">
+                            <span className="font-label text-label-lg text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-medium">
+                              {course.title}
+                            </span>
+                            <span className="font-mono text-mono-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                              CRS-{100 + Number(course.id || idx + 1)}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <span className="font-body text-body-sm text-light-on-surface dark:text-dark-on-surface">
+                            {course.instructor || 'Dr. Marcus Vance'}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 tabular-nums whitespace-nowrap">
+                          <span className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                            {course.duration || '6 Weeks'} • {course.level || 'Intermediate'}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-success-container text-on-success-container whitespace-nowrap font-label text-label-md font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
+                            <span>Active (CI4)</span>
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-            </Card>
+            </div>
 
-            {/* Quick Today's Timetable Card (1 Col) */}
-            <Card
-              title="Today's Timetable"
-              subtitle="Live schedule & lecture occupancy"
-              action={
-                <span className="font-mono text-mono-sm text-light-primary dark:text-dark-primary font-semibold">
-                  ROOM 302
-                </span>
-              }
-            >
-              <div className="space-y-4">
-                <div className="p-3 rounded-DEFAULT bg-light-surface-container-low dark:bg-dark-surface-container border-l-4 border-light-primary">
-                  <div className="flex justify-between items-center text-label-sm">
-                    <span className="font-mono text-mono-sm font-semibold text-light-primary dark:text-dark-primary">
-                      09:00 AM - 11:00 AM
-                    </span>
-                    <Badge variant="verified">Live Now</Badge>
-                  </div>
-                  <p className="font-semibold text-title-md mt-1">Full-Stack Architectures</p>
-                  <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    Tutor: Alex Morgan • Hall A-102
-                  </p>
-                </div>
+            {/* Pending Grading & Upcoming Exams (5 cols) */}
+            <div className="xl:col-span-5 flex flex-col gap-6">
+              <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-6 shadow-sm flex flex-col gap-4">
+                <header className="flex items-center justify-between gap-2">
+                  <h2 className="font-title text-title-lg text-light-on-surface dark:text-dark-on-surface whitespace-nowrap font-semibold">
+                    Pending Grading &amp; Exams
+                  </h2>
+                  <span className="font-label text-label-md text-on-pending-container bg-pending-container px-2.5 py-0.5 rounded-full tabular-nums whitespace-nowrap shrink-0 font-semibold">
+                    38 Pending
+                  </span>
+                </header>
 
-                <div className="p-3 rounded-DEFAULT bg-light-surface-container-low dark:bg-dark-surface-container border-l-4 border-light-outline-variant">
-                  <div className="flex justify-between items-center text-label-sm">
-                    <span className="font-mono text-mono-sm font-medium text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                      01:30 PM - 03:30 PM
-                    </span>
-                    <Badge variant="neutral">Upcoming</Badge>
+                <div className="space-y-3">
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex items-center justify-between">
+                    <div>
+                      <p className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-semibold">
+                        CS-401 Mid-Term Evaluation
+                      </p>
+                      <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        Batch B26-FS-A • 48 Submissions
+                      </p>
+                    </div>
+                    <Badge variant="pending" dot>Due in 2 days</Badge>
                   </div>
-                  <p className="font-semibold text-title-md mt-1">REST API Engineering (CI4)</p>
-                  <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    Tutor: David Miller • Lab 4
-                  </p>
+
+                  <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container flex items-center justify-between">
+                    <div>
+                      <p className="font-label text-label-md text-light-on-surface dark:text-dark-on-surface font-semibold">
+                        DS-204 Neural Network Project
+                      </p>
+                      <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        Batch B26-DS-B • 42 Submissions
+                      </p>
+                    </div>
+                    <Badge variant="verified">Graded</Badge>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </article>
+            </div>
           </section>
         </main>
       </div>
 
-      {/* Create New Course Modal */}
+      {/* Create Course Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-light-surface-bright dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-lg shadow-modal w-full max-w-lg p-6 animate-in fade-in zoom-in-95 duration-surface-enter">
-            <div className="flex items-center justify-between pb-4 border-b border-light-outline-variant dark:border-dark-outline-variant mb-4">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-modal w-full max-w-md p-5 animate-in fade-in zoom-in-95 duration-state-change">
+            <div className="flex items-center justify-between pb-3 border-b border-light-outline-variant dark:border-dark-outline-variant mb-4">
               <div>
-                <h3 className="font-headline text-headline-sm font-bold text-light-on-surface dark:text-dark-on-surface">
+                <h3 className="font-title text-title-lg font-bold text-light-on-surface dark:text-dark-on-surface">
                   Create New Course
                 </h3>
                 <p className="font-body text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                  Adds new curriculum directly to the CodeIgniter 4 backend
+                  Saves directly to CodeIgniter 4 backend
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowModal(false)}
-                className="text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-light-on-surface dark:hover:text-dark-on-surface p-1 rounded"
+                className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded"
               >
-                <span className="material-symbols-outlined text-[20px]">close</span>
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
 
             {formSuccess && (
-              <div className="mb-4 p-3 rounded-DEFAULT bg-success-container text-on-success-container text-body-sm border border-success/20">
+              <div className="mb-3 p-2.5 rounded bg-success-container text-on-success-container text-body-sm font-medium">
                 ✓ {formSuccess}
               </div>
             )}
 
-            <form onSubmit={handleCreateCourse} className="space-y-4">
+            <form onSubmit={handleCreateCourse} className="space-y-3">
               <div>
-                <label className="block text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                <label className="block font-label text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                   Course Title *
                 </label>
                 <input
@@ -455,35 +568,35 @@ function DashboardContent() {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="e.g. Enterprise Cloud Architecture"
-                  className="w-full px-3 py-2 text-body-md rounded-DEFAULT border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-bright dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-light-primary"
+                  placeholder="e.g. Full-Stack Web Engineering"
+                  className="w-full px-3 py-1.5 font-body text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Instructor / Faculty
+                  <label className="block font-label text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Faculty Tutor
                   </label>
                   <input
                     type="text"
                     name="instructor"
                     value={formData.instructor}
                     onChange={handleInputChange}
-                    placeholder="e.g. Dr. K. Gowtham"
-                    className="w-full px-3 py-2 text-body-md rounded-DEFAULT border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-bright dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-light-primary"
+                    placeholder="e.g. Dr. Marcus Vance"
+                    className="w-full px-3 py-1.5 font-body text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  <label className="block font-label text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                     Level
                   </label>
                   <select
                     name="level"
                     value={formData.level}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 text-body-md rounded-DEFAULT border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-bright dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-light-primary"
+                    className="w-full px-3 py-1.5 font-body text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   >
                     <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
@@ -493,40 +606,49 @@ function DashboardContent() {
               </div>
 
               <div>
-                <label className="block text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                  Duration
+                <label className="block font-label text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Duration &amp; Schedule
                 </label>
                 <input
                   type="text"
                   name="duration"
                   value={formData.duration}
                   onChange={handleInputChange}
-                  placeholder="e.g. 8 Weeks (6 hrs/week)"
-                  className="w-full px-3 py-2 text-body-md rounded-DEFAULT border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-bright dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-light-primary"
+                  placeholder="e.g. Lab 304 • 09:00 AM"
+                  className="w-full px-3 py-1.5 font-body text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                <label className="block font-label text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                   Description
                 </label>
                 <textarea
                   name="description"
-                  rows="3"
+                  rows="2"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Course objectives, curriculum summary..."
-                  className="w-full px-3 py-2 text-body-md rounded-DEFAULT border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-bright dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-light-primary"
+                  placeholder="Curriculum summary..."
+                  className="w-full px-3 py-1.5 font-body text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
                 ></textarea>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant">
-                <Button variant="outline" onClick={() => setShowModal(false)} disabled={submitting}>
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  disabled={submitting}
+                  className="px-3 py-1.5 font-label text-label-md rounded border border-light-outline-variant text-light-on-surface hover:bg-light-surface-container-low"
+                >
                   Cancel
-                </Button>
-                <Button type="submit" variant="primary" disabled={submitting}>
-                  {submitting ? 'Submitting to CI4...' : 'Publish Course'}
-                </Button>
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-1.5 font-label text-label-md rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container shadow-sm font-semibold"
+                >
+                  {submitting ? 'Publishing...' : 'Publish Course'}
+                </button>
               </div>
             </form>
           </div>
@@ -539,7 +661,7 @@ function DashboardContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <DashboardContent />
+      <Dashboard />
     </ThemeProvider>
   )
 }

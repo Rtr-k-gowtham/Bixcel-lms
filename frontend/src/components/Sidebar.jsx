@@ -1,138 +1,133 @@
 import React from 'react'
 
-export function Sidebar({ currentTab, onSelectTab, collapsed, onToggleCollapse }) {
-  const navItems = [
-    { id: 'dashboard', label: 'Executive Dashboard', icon: 'dashboard', badge: null },
-    { id: 'courses', label: 'Course Catalog', icon: 'auto_stories', badge: 'Active' },
-    { id: 'batches', label: 'Batch Management', icon: 'groups', badge: null },
-    { id: 'timetable', label: 'Timetable & Classrooms', icon: 'calendar_month', badge: null },
-    { id: 'enrollment', label: 'Student Admissions', icon: 'person_add', badge: null },
-    { id: 'tutors', label: 'Tutor Assignment', icon: 'school', badge: null },
-    { id: 'fees', label: 'Fee Collection Ledger', icon: 'payments', badge: null },
+export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) {
+  const sections = [
+    {
+      group: null,
+      items: [{ id: 'dashboard', label: 'Dashboard', icon: 'dashboard', active: true }],
+    },
+    {
+      group: 'Academics',
+      items: [
+        { id: 'courses', label: 'Course Management', icon: 'menu_book' },
+        { id: 'modules', label: 'Reusable Module Library', icon: 'library_books' },
+        { id: 'builder', label: 'Custom Course Builder', icon: 'view_quilt' },
+        { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
+        { id: 'lessons', label: 'Lesson Management', icon: 'article' },
+      ],
+    },
+    {
+      group: 'People',
+      items: [
+        { id: 'students', label: 'Student Management', icon: 'groups' },
+        { id: 'tutors', label: 'Tutor Management', icon: 'co_present' },
+      ],
+    },
+    {
+      group: 'Operations',
+      items: [
+        { id: 'batches', label: 'Batch Management', icon: 'workspaces' },
+        { id: 'timetable', label: 'Timetable & Scheduling', icon: 'schedule' },
+        { id: 'attendance', label: 'Attendance Management', icon: 'how_to_reg' },
+        { id: 'assignments', label: 'Assignment Management', icon: 'assignment' },
+        { id: 'exams', label: 'Examination Management', icon: 'quiz' },
+        { id: 'milestones', label: 'Competency Milestones', icon: 'flag' },
+        { id: 'calendar', label: 'Student Calendar', icon: 'calendar_month' },
+        { id: 'progress', label: 'Academic Progress', icon: 'monitoring' },
+        { id: 'feedback', label: 'Tutor Rating & Feedback', icon: 'star' },
+      ],
+    },
+    {
+      group: 'Finance & Reports',
+      items: [
+        { id: 'fees', label: 'Fees & Payments', icon: 'payments' },
+        { id: 'analytics', label: 'Institutional Analytics', icon: 'analytics' },
+      ],
+    },
+    {
+      group: 'Settings',
+      items: [
+        { id: 'users', label: 'Users & Permissions', icon: 'manage_accounts' },
+        { id: 'notifications', label: 'Notifications', icon: 'notifications_active' },
+        { id: 'audit', label: 'Audit Logs', icon: 'history' },
+        { id: 'settings', label: 'Institute Settings', icon: 'settings' },
+      ],
+    },
   ]
 
-  const adminItems = [
-    { id: 'users', label: 'User Master Directory', icon: 'manage_accounts' },
-    { id: 'settings', label: 'System Configuration', icon: 'settings' },
-  ]
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-sidebar text-on-sidebar">
+      {/* Brand Header */}
+      <div className="h-16 px-5 flex items-center gap-3 border-b border-sidebar-surface shrink-0">
+        <div className="w-8 h-8 rounded bg-sidebar-active flex items-center justify-center shrink-0">
+          <span className="material-symbols-outlined text-on-sidebar text-[18px]">school</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-title text-title-md text-on-sidebar leading-tight">Bixcel</span>
+          <span className="font-label text-label-sm text-sidebar-muted">IMS + LMS</span>
+        </div>
+      </div>
+
+      {/* Main Navigation Menu */}
+      <nav className="flex-1 px-3 py-4 flex flex-col gap-5 overflow-y-auto" aria-label="Main Navigation">
+        {sections.map((section, sIdx) => (
+          <div key={sIdx} className="flex flex-col gap-1">
+            {section.group && (
+              <span className="px-3 font-label text-label-sm text-sidebar-muted uppercase tracking-wider">
+                {section.group}
+              </span>
+            )}
+            {section.items.map((item) => {
+              const isActive = currentTab === item.id || (currentTab === 'dashboard' && item.id === 'dashboard')
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    onSelectTab(item.id)
+                    if (onCloseMobile) onCloseMobile()
+                  }}
+                  className={`flex items-center gap-3 px-3 py-1.5 rounded text-left transition-colors ${
+                    isActive
+                      ? 'bg-sidebar-active text-on-sidebar font-semibold'
+                      : 'text-sidebar-muted hover:bg-sidebar-surface hover:text-on-sidebar'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[18px] shrink-0">
+                    {item.icon}
+                  </span>
+                  <span className="font-body text-body-sm truncate">{item.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        ))}
+      </nav>
+    </div>
+  )
 
   return (
-    <aside
-      className={`fixed top-0 left-0 bottom-0 z-30 bg-sidebar text-on-sidebar flex flex-col transition-all duration-surface-enter ${
-        collapsed ? 'w-20' : 'w-sidebar-w'
-      }`}
-    >
-      {/* Brand Header */}
-      <div className="h-header-h px-5 flex items-center justify-between border-b border-sidebar-surface">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-10 h-10 rounded-DEFAULT bg-sidebar-active flex items-center justify-center font-bold text-lg text-white shadow-md shrink-0">
-            B
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside
+        id="appSidebar"
+        className="hidden lg:flex lg:w-[260px] lg:shrink-0 bg-sidebar text-on-sidebar flex-col border-r border-sidebar-surface min-h-screen sticky top-0 h-screen"
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="fixed inset-0 bg-sidebar/70 backdrop-blur-sm"
+            onClick={onCloseMobile}
+          />
+          <div className="fixed inset-y-0 left-0 w-[260px] max-w-full z-10 shadow-xl">
+            {sidebarContent}
           </div>
-          {!collapsed && (
-            <div className="truncate">
-              <h1 className="font-display font-bold text-title-md leading-tight tracking-tight text-white">
-                Bixcel IMS
-              </h1>
-              <p className="text-label-sm text-sidebar-muted font-medium">Academic Portal</p>
-            </div>
-          )}
         </div>
-        <button
-          onClick={onToggleCollapse}
-          className="text-sidebar-muted hover:text-white p-1 rounded hover:bg-sidebar-surface transition-colors"
-          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          <span className="material-symbols-outlined text-[20px]">
-            {collapsed ? 'chevron_right' : 'menu_open'}
-          </span>
-        </button>
-      </div>
-
-      {/* Navigation List */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-        <div>
-          {!collapsed && (
-            <p className="px-3 mb-2 text-label-sm font-semibold tracking-wider text-sidebar-muted uppercase">
-              Academic Operations
-            </p>
-          )}
-          <nav className="space-y-1">
-            {navItems.map((item) => {
-              const active = currentTab === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onSelectTab(item.id)}
-                  title={collapsed ? item.label : undefined}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-label-lg transition-all duration-state-change text-left ${
-                    active
-                      ? 'bg-sidebar-active text-white font-semibold shadow-sm'
-                      : 'text-sidebar-muted hover:text-white hover:bg-sidebar-surface'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[20px] shrink-0">
-                    {item.icon}
-                  </span>
-                  {!collapsed && (
-                    <span className="flex-1 truncate">{item.label}</span>
-                  )}
-                  {!collapsed && item.badge && (
-                    <span className="bg-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </nav>
-        </div>
-
-        <div>
-          {!collapsed && (
-            <p className="px-3 mb-2 text-label-sm font-semibold tracking-wider text-sidebar-muted uppercase">
-              Administration
-            </p>
-          )}
-          <nav className="space-y-1">
-            {adminItems.map((item) => {
-              const active = currentTab === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onSelectTab(item.id)}
-                  title={collapsed ? item.label : undefined}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-label-lg transition-all duration-state-change text-left ${
-                    active
-                      ? 'bg-sidebar-active text-white font-semibold shadow-sm'
-                      : 'text-sidebar-muted hover:text-white hover:bg-sidebar-surface'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[20px] shrink-0">
-                    {item.icon}
-                  </span>
-                  {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
-                </button>
-              )
-            })}
-          </nav>
-        </div>
-      </div>
-
-      {/* User Shell Profile */}
-      <div className="p-3 border-t border-sidebar-surface bg-sidebar">
-        <div className="flex items-center gap-3 p-2 rounded-DEFAULT hover:bg-sidebar-surface transition-colors cursor-pointer">
-          <div className="w-9 h-9 rounded-full bg-light-primary text-white flex items-center justify-center font-semibold text-sm shrink-0">
-            SA
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-label-md font-semibold text-white truncate">Super Admin</p>
-              <p className="text-label-sm text-sidebar-muted truncate">admin@bixcel.edu</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </aside>
+      )}
+    </>
   )
 }
 
