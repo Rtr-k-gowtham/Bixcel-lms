@@ -1045,7 +1045,7 @@ export function ModuleLibrary() {
 
                       {/* Clean Title Only (No UI/UX tag, no description snippet) */}
                       <td className="py-2.5 px-3 align-top">
-                        <span className="font-title text-[13.5px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                        <span className="font-body text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
                           {m.title}
                         </span>
                       </td>
@@ -1189,7 +1189,7 @@ export function ModuleLibrary() {
                     {formData.code || 'MOD-NEW'}
                   </span>
                   <span className="text-light-outline text-[12px]">•</span>
-                  <h2 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface truncate">
+                  <h2 className="font-title text-xs font-semibold text-light-on-surface dark:text-dark-on-surface truncate">
                     {formData.title ? formData.title : 'New Module Curriculum Studio'}
                   </h2>
                 </div>
@@ -1418,7 +1418,7 @@ export function ModuleLibrary() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <div className="sm:col-span-6">
-                      <label className="block text-[11px] font-bold text-light-on-surface dark:text-dark-on-surface mb-1">
+                      <label className="block text-[11px] font-medium text-light-on-surface-variant mb-1">
                         Module Title *
                       </label>
                       <input
@@ -1427,7 +1427,7 @@ export function ModuleLibrary() {
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="e.g. Advanced UI/UX Design Systems & Component Tokens"
-                        className="w-full px-2.5 py-1.5 text-xs font-semibold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        className="w-full px-2.5 py-1.5 text-xs font-medium rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                       />
                     </div>
 
@@ -2524,7 +2524,7 @@ export function ModuleLibrary() {
                 <span className="font-mono text-mono-xs text-light-primary font-bold">
                   {inspectModule.code} • {inspectModule.version}
                 </span>
-                <h3 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                <h3 className="font-title text-[13px] font-semibold text-light-on-surface dark:text-dark-on-surface">
                   {inspectModule.title}
                 </h3>
               </div>
