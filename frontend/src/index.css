@@ -1,17 +1,98 @@
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: light;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Persistent Sidebar Shell */
+    --color-sidebar: #0F172A;
+    --color-on-sidebar: #FFFFFF;
+    --color-sidebar-muted: #94A3B8;
+    --color-sidebar-surface: #1E293B;
+    --color-sidebar-active: #1D4ED8;
+
+    /* Semantic Status */
+    --color-success: #059669;
+    --color-on-success: #1C1C1C;
+    --color-success-container: #D1FAE5;
+    --color-on-success-container: #065F46;
+
+    --color-pending: #B45309;
+    --color-on-pending: #FFFFFF;
+    --color-pending-container: #FEF3C7;
+    --color-on-pending-container: #92400E;
+
+    --color-overdue: #BE123C;
+    --color-on-overdue: #FFFFFF;
+    --color-overdue-container: #FFE4E6;
+    --color-on-overdue-container: #9F1239;
+
+    /* Light Theme Surface & Text */
+    --color-primary: #0037B0;
+    --color-on-primary: #FFFFFF;
+    --color-primary-container: #1D4ED8;
+    --color-on-primary-container: #FFFFFF;
+    --color-primary-tint: #EFEFFF;
+    --color-on-primary-tint: #002682;
+
+    --color-background: #F8FAFC;
+    --color-on-background: #1A1B23;
+    --color-surface: #F8FAFC;
+    --color-surface-dim: #E2E8F0;
+    --color-surface-bright: #FFFFFF;
+    --color-surface-container-low: #F1F5F9;
+    --color-surface-container: #E2E8F0;
+    --color-surface-container-high: #CBD5E1;
+    --color-on-surface: #0F172A;
+    --color-on-surface-variant: #475569;
+    --color-outline: #64748B;
+    --color-outline-variant: #E2E8F0;
+  }
+
+  .dark {
+    --color-primary: #B7C4FF;
+    --color-on-primary: #002682;
+    --color-primary-container: #1D4ED8;
+    --color-on-primary-container: #FFFFFF;
+    --color-primary-tint: #1D2C63;
+    --color-on-primary-tint: #DCE1FF;
+
+    --color-background: #0B0F19;
+    --color-on-background: #F1F5F9;
+    --color-surface: #0B0F19;
+    --color-surface-dim: #0B0F19;
+    --color-surface-bright: #1E293B;
+    --color-surface-container-low: #1E293B;
+    --color-surface-container: #334155;
+    --color-surface-container-high: #475569;
+    --color-on-surface: #F8FAFC;
+    --color-on-surface-variant: #CBD5E1;
+    --color-outline: #94A3B8;
+    --color-outline-variant: #334155;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+/* Tabular numbers for clean numeric column alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+/* Custom scrollbars matching design system */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
 }
