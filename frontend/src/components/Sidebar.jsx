@@ -57,15 +57,26 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-sidebar text-on-sidebar">
-      {/* Brand Header */}
-      <div className="h-16 px-5 flex items-center gap-3 border-b border-sidebar-surface shrink-0">
-        <div className="w-8 h-8 rounded bg-sidebar-active flex items-center justify-center shrink-0">
-          <span className="material-symbols-outlined text-on-sidebar text-[18px]">school</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-title text-title-md text-on-sidebar leading-tight">Bixcel</span>
-          <span className="font-label text-label-sm text-sidebar-muted">IMS + LMS</span>
-        </div>
+      {/* Brand Header with Negative Logo */}
+      <div className="h-16 px-5 flex items-center justify-between border-b border-sidebar-surface shrink-0">
+        <a
+          href="#dashboard"
+          onClick={(e) => {
+            e.preventDefault()
+            onSelectTab('dashboard')
+          }}
+          className="flex items-center gap-2.5 overflow-hidden"
+          title="Bixcel Institute of Technologies"
+        >
+          <img
+            src="/bixcel-logo-negative.png"
+            alt="Bixcel Institute of Technologies"
+            className="h-8.5 max-h-9 w-auto object-contain"
+          />
+        </a>
+        <span className="font-label text-[10px] font-bold tracking-wider text-sidebar-muted uppercase bg-sidebar-surface px-1.5 py-0.5 rounded shrink-0">
+          LMS
+        </span>
       </div>
 
       {/* Main Navigation Menu */}

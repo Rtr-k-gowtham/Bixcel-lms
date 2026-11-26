@@ -25,10 +25,11 @@ export function Header({
         </button>
 
         <div className="flex items-center gap-2 lg:hidden">
-          <div className="w-7 h-7 rounded bg-light-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-light-on-primary text-[16px]">school</span>
-          </div>
-          <span className="font-title text-title-md text-light-on-surface dark:text-dark-on-surface">Bixcel</span>
+          <img
+            src={theme === 'dark' ? '/bixcel-logo-negative.png' : '/bixcel-logo.png'}
+            alt="Bixcel"
+            className="h-7 w-auto object-contain"
+          />
         </div>
 
         <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-2 text-light-on-surface-variant whitespace-nowrap">
