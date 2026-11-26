@@ -255,6 +255,20 @@ export const apiService = {
     const response = await apiClient.delete(`/calendar/${id}`)
     return response.data
   },
+
+  // Student Academic Progress Report API
+  getProgressList: async (params = {}) => {
+    const response = await apiClient.get('/progress', { params })
+    return response.data
+  },
+  getStudentProgress: async (id) => {
+    const response = await apiClient.get(`/progress/${id}`)
+    return response.data
+  },
+  saveAdvisorRemark: async (remarkData) => {
+    const response = await apiClient.post('/progress/remark', remarkData)
+    return response.data
+  },
 }
 
 export default apiService

@@ -22,6 +22,7 @@ import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
 import StudentCalendar from './components/calendar/StudentCalendar'
+import StudentProgressReport from './components/progress/StudentProgressReport'
 import { apiService } from './services/api'
 
 function Dashboard() {
@@ -138,6 +139,8 @@ function Dashboard() {
               ? 'Batch Management'
               : ['calendar', 'timetable'].includes(currentTab)
               ? 'Student Environment & Calendar'
+              : currentTab === 'progress'
+              ? 'Student Academic Progress Report'
               : currentTab === 'fees'
               ? 'Fees & Payment Collection'
               : currentTab === 'users'
@@ -202,7 +205,9 @@ function Dashboard() {
           )}
 
           {/* Conditional Screen Rendering */}
-          {['calendar', 'timetable'].includes(currentTab) ? (
+          {currentTab === 'progress' ? (
+            <StudentProgressReport />
+          ) : ['calendar', 'timetable'].includes(currentTab) ? (
             <StudentCalendar />
           ) : currentTab === 'fees' ? (
             <FeesPayment />

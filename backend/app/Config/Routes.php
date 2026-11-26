@@ -23,6 +23,8 @@ $routes->group('api', static function ($routes) {
     $routes->resource('fees', ['controller' => 'Api\FeeController']);
     $routes->get('calendar/today', 'Api\CalendarController::today');
     $routes->resource('calendar', ['controller' => 'Api\CalendarController']);
+    $routes->post('progress/remark', 'Api\ProgressController::remark');
+    $routes->resource('progress', ['controller' => 'Api\ProgressController']);
     $routes->get('students/tracks', 'Api\StudentController::tracks');
     $routes->resource('students', ['controller' => 'Api\StudentController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);
