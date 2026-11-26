@@ -2,104 +2,20 @@
 
 namespace App\Controllers\Api;
 
+use App\Libraries\DatabaseBootstrapper;
+use App\Models\TutorModel;
 use CodeIgniter\RESTful\ResourceController;
 
-class TutorController extends ResourceController
+class TutorController extends BaseApiController
 {
     protected $format = 'json';
 
-    private static array $tutors = [
-        [
-            'id' => 1,
-            'staff_id' => 'TUT-101',
-            'name' => 'Sofia Alvarez',
-            'role' => 'Lead Product Designer',
-            'expertise' => 'UI/UX Design, Figma, Design Systems',
-            'courses' => 'UI/UX Product Design, Design Systems',
-            'availability' => 'Available',
-            'hours' => 12,
-            'max_hours' => 24,
-            'rating' => 4.9,
-            'email' => 'sofia.alvarez@bixcel.edu',
-            'phone' => '+1 (555) 234-8901',
-            'assigned_batches' => ['BIX-UX-26D', 'BIX-UX-26A'],
-        ],
-        [
-            'id' => 2,
-            'staff_id' => 'TUT-104',
-            'name' => 'Marcus Vance',
-            'role' => 'Senior Brand & Visual Tutor',
-            'expertise' => 'Graphic Design, Typography, Branding',
-            'courses' => 'Graphic Design Master Course',
-            'availability' => 'Partial',
-            'hours' => 18,
-            'max_hours' => 24,
-            'rating' => 4.8,
-            'email' => 'marcus.vance@bixcel.edu',
-            'phone' => '+1 (555) 345-9012',
-            'assigned_batches' => ['BIX-GD-26A', 'BIX-GD-26B'],
-        ],
-        [
-            'id' => 3,
-            'staff_id' => 'TUT-109',
-            'name' => 'Priya Nair',
-            'role' => 'Creative Studio Mentor',
-            'expertise' => 'Photoshop, UI Prototyping, Accessibility',
-            'courses' => 'Graphic Design, UI/UX Product Design',
-            'availability' => 'Available',
-            'hours' => 10,
-            'max_hours' => 24,
-            'rating' => 4.7,
-            'email' => 'priya.nair@bixcel.edu',
-            'phone' => '+1 (555) 456-0123',
-            'assigned_batches' => ['BIX-GD-26A', 'BIX-UX-26D'],
-        ],
-        [
-            'id' => 4,
-            'staff_id' => 'TUT-112',
-            'name' => 'Dr. Aris Thorne',
-            'role' => 'Principal Engineering Tutor',
-            'expertise' => 'Full-Stack Web, Data Science, Cloud',
-            'courses' => 'Full-Stack Web, Data Science',
-            'availability' => 'Full',
-            'hours' => 24,
-            'max_hours' => 24,
-            'rating' => 4.95,
-            'email' => 'aris.thorne@bixcel.edu',
-            'phone' => '+1 (555) 567-1234',
-            'assigned_batches' => ['BIX-FS-26C', 'BIX-DS-26E'],
-        ],
-        [
-            'id' => 5,
-            'staff_id' => 'TUT-115',
-            'name' => 'Tariq Al-Mansoor',
-            'role' => 'Cloud Solutions Architect',
-            'expertise' => 'AWS, Terraform, Kubernetes, DevOps',
-            'courses' => 'Cloud & DevOps Engineering',
-            'availability' => 'Available',
-            'hours' => 14,
-            'max_hours' => 24,
-            'rating' => 4.85,
-            'email' => 'tariq.mansoor@bixcel.edu',
-            'phone' => '+1 (555) 678-2345',
-            'assigned_batches' => ['BIX-CLD-26F'],
-        ],
-        [
-            'id' => 6,
-            'staff_id' => 'TUT-118',
-            'name' => 'Elena Rostova',
-            'role' => 'Cybersecurity & Cryptography Specialist',
-            'expertise' => 'Network Defense, SOC Operations, Ethical Hacking',
-            'courses' => 'Cybersecurity Operations',
-            'availability' => 'Partial',
-            'hours' => 16,
-            'max_hours' => 24,
-            'rating' => 4.9,
-            'email' => 'elena.rostova@bixcel.edu',
-            'phone' => '+1 (555) 789-3456',
-            'assigned_batches' => ['BIX-SEC-09F'],
-        ],
-    ];
+    public function __construct()
+    {
+        DatabaseBootstrapper::ensureInitialized();
+        $this->request ??= \Config\Services::request();
+        $this->response ??= \Config\Services::response();
+    }
 
     /**
      * List tutors
@@ -109,7 +25,29 @@ class TutorController extends ResourceController
         $search = $this->request->getGet('search');
         $avail = $this->request->getGet('availability');
 
-        $filtered = self::$tutors;
+        $tutorModel = new TutorModel();
+        $dbTutors = $tutorModel->findAll();
+
+        $tutors = [];
+        foreach ($dbTutors as $t) {
+            $tutors[] = [
+                'id' => (int) $t['id'],
+                'staff_id' => $t['tutor_id'],
+                'name' => $t['full_name'],
+                'role' => $t['specialization'] ?? 'Faculty Tutor',
+                'expertise' => $t['specialization'] ?? 'Curriculum Instruction',
+                'courses' => $t['assigned_track'] ?? 'General Engineering',
+                'availability' => $t['status'] === 'Active' ? 'Available' : 'Partial',
+                'hours' => 14,
+                'max_hours' => 24,
+                'rating' => (float) ($t['rating'] ?? 4.9),
+                'email' => $t['email'] ?? '',
+                'phone' => $t['phone'] ?? '',
+                'assigned_batches' => ['BIX-2026-A'],
+            ];
+        }
+
+        $filtered = $tutors;
 
         if (!empty($search)) {
             $q = strtolower(trim((string) $search));
@@ -122,22 +60,20 @@ class TutorController extends ResourceController
         }
 
         if (!empty($avail) && $avail !== 'all') {
-            $filtered = array_values(array_filter($filtered, static function ($t) use ($avail) {
-                return $t['availability'] === $avail;
-            }));
+            $filtered = array_values(array_filter($filtered, static fn($t) => $t['availability'] === $avail));
         }
 
-        $totalHours = array_sum(array_column(self::$tutors, 'hours'));
-        $avgRating = count(self::$tutors) > 0 ? round(array_sum(array_column(self::$tutors, 'rating')) / count(self::$tutors), 2) : 5.0;
+        $totalHours = array_sum(array_column($tutors, 'hours'));
+        $avgRating = count($tutors) > 0 ? round(array_sum(array_column($tutors, 'rating')) / count($tutors), 2) : 5.0;
 
         return $this->respond([
             'status' => 'success',
             'data' => $filtered,
             'meta' => [
-                'total_tutors' => count(self::$tutors),
-                'available_count' => count(array_filter(self::$tutors, static fn($t) => $t['availability'] === 'Available')),
-                'partial_count' => count(array_filter(self::$tutors, static fn($t) => $t['availability'] === 'Partial')),
-                'full_capacity_count' => count(array_filter(self::$tutors, static fn($t) => $t['availability'] === 'Full')),
+                'total_tutors' => count($tutors),
+                'available_count' => count(array_filter($tutors, static fn($t) => $t['availability'] === 'Available')),
+                'partial_count' => count(array_filter($tutors, static fn($t) => $t['availability'] === 'Partial')),
+                'full_capacity_count' => count(array_filter($tutors, static fn($t) => $t['availability'] === 'Full')),
                 'total_weekly_hours' => $totalHours,
                 'avg_faculty_rating' => $avgRating,
                 'max_workload_cap' => 24,
@@ -150,17 +86,28 @@ class TutorController extends ResourceController
      */
     public function show($id = null)
     {
-        $tutor = null;
-        foreach (self::$tutors as $t) {
-            if ($t['id'] == $id || $t['staff_id'] === $id) {
-                $tutor = $t;
-                break;
-            }
-        }
+        $tutorModel = new TutorModel();
+        $t = $tutorModel->where('id', $id)->orWhere('tutor_id', $id)->first();
 
-        if (!$tutor) {
+        if (!$t) {
             return $this->failNotFound('Tutor record not found.');
         }
+
+        $tutor = [
+            'id' => (int) $t['id'],
+            'staff_id' => $t['tutor_id'],
+            'name' => $t['full_name'],
+            'role' => $t['specialization'] ?? 'Faculty Tutor',
+            'expertise' => $t['specialization'] ?? 'Curriculum Instruction',
+            'courses' => $t['assigned_track'] ?? 'General Engineering',
+            'availability' => $t['status'] === 'Active' ? 'Available' : 'Partial',
+            'hours' => 14,
+            'max_hours' => 24,
+            'rating' => (float) ($t['rating'] ?? 4.9),
+            'email' => $t['email'],
+            'phone' => $t['phone'],
+            'assigned_batches' => ['BIX-2026-A'],
+        ];
 
         return $this->respond([
             'status' => 'success',
@@ -173,94 +120,100 @@ class TutorController extends ResourceController
      */
     public function create()
     {
-        $input = $this->request->getJSON(true) ?? $this->request->getPost();
+        $input = $this->getRequestData();
 
         if (empty($input['name'])) {
             return $this->failValidationErrors(['name' => 'Tutor Full Name is required.']);
         }
 
-        $nextNum = 120 + count(self::$tutors);
-        $staffId = !empty($input['staff_id']) ? trim((string) $input['staff_id']) : "TUT-{$nextNum}";
+        $tutorModel = new TutorModel();
+        $count = $tutorModel->countAllResults();
+        $staffId = !empty($input['staff_id']) ? trim((string) $input['staff_id']) : 'TUT-' . (120 + $count);
 
-        $newTutor = [
-            'id' => count(self::$tutors) + 1,
-            'staff_id' => $staffId,
-            'name' => trim((string) $input['name']),
-            'role' => !empty($input['role']) ? trim((string) $input['role']) : 'Subject Matter Instructor',
-            'expertise' => !empty($input['expertise']) ? trim((string) $input['expertise']) : 'General Curriculum',
-            'courses' => !empty($input['courses']) ? trim((string) $input['courses']) : 'General Academics',
-            'availability' => $input['availability'] ?? 'Available',
-            'hours' => (int) ($input['hours'] ?? 8),
-            'max_hours' => 24,
-            'rating' => 5.0,
+        $now = date('Y-m-d H:i:s');
+        $tutorData = [
+            'tutor_id' => $staffId,
+            'full_name' => trim((string) $input['name']),
             'email' => !empty($input['email']) ? trim((string) $input['email']) : strtolower(str_replace(' ', '.', trim((string) $input['name']))) . '@bixcel.edu',
             'phone' => !empty($input['phone']) ? trim((string) $input['phone']) : '+1 (555) 000-0000',
-            'assigned_batches' => $input['assigned_batches'] ?? [],
+            'specialization' => $input['expertise'] ?? ($input['role'] ?? 'Specialist'),
+            'assigned_track' => $input['courses'] ?? 'Engineering',
+            'status' => 'Active',
+            'rating' => (float) ($input['rating'] ?? 4.9),
+            'total_hours' => (int) ($input['hours'] ?? 12),
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
 
-        array_unshift(self::$tutors, $newTutor);
+        $id = $tutorModel->insert($tutorData);
+
+        $responseData = [
+            'id' => (int) $id,
+            'staff_id' => $staffId,
+            'name' => $tutorData['full_name'],
+            'role' => $tutorData['specialization'],
+            'expertise' => $tutorData['specialization'],
+            'courses' => $tutorData['assigned_track'],
+            'availability' => 'Available',
+            'hours' => $tutorData['total_hours'],
+            'max_hours' => 24,
+            'rating' => $tutorData['rating'],
+            'email' => $tutorData['email'],
+            'phone' => $tutorData['phone'],
+            'assigned_batches' => [],
+        ];
 
         return $this->respondCreated([
             'status' => 'success',
-            'message' => "Certified tutor {$newTutor['name']} onboarded successfully with ID {$staffId}.",
-            'data' => $newTutor,
+            'message' => "Tutor {$responseData['name']} ({$staffId}) onboarded successfully in database.",
+            'data' => $responseData,
         ]);
     }
 
     /**
-     * Update tutor
+     * Update tutor details
      */
     public function update($id = null)
     {
-        $input = $this->request->getJSON(true) ?? $this->request->getRawInput();
+        $input = $this->getRequestData();
 
-        $foundIdx = null;
-        foreach (self::$tutors as $idx => $t) {
-            if ($t['id'] == $id || $t['staff_id'] === $id) {
-                $foundIdx = $idx;
-                break;
-            }
+        $tutorModel = new TutorModel();
+        $tutor = $tutorModel->where('id', $id)->orWhere('tutor_id', $id)->first();
+
+        if (!$tutor) {
+            return $this->failNotFound('Tutor record not found.');
         }
 
-        if ($foundIdx === null) {
-            return $this->failNotFound('Tutor not found.');
-        }
+        $update = [];
+        if (isset($input['name'])) $update['full_name'] = trim((string) $input['name']);
+        if (isset($input['email'])) $update['email'] = trim((string) $input['email']);
+        if (isset($input['phone'])) $update['phone'] = trim((string) $input['phone']);
+        if (isset($input['role'])) $update['specialization'] = trim((string) $input['role']);
+        if (isset($input['expertise'])) $update['specialization'] = trim((string) $input['expertise']);
+        if (isset($input['courses'])) $update['assigned_track'] = trim((string) $input['courses']);
+        if (isset($input['rating'])) $update['rating'] = (float) $input['rating'];
+        $update['updated_at'] = date('Y-m-d H:i:s');
 
-        $tutor = &self::$tutors[$foundIdx];
-        if (isset($input['name'])) $tutor['name'] = trim((string) $input['name']);
-        if (isset($input['role'])) $tutor['role'] = trim((string) $input['role']);
-        if (isset($input['expertise'])) $tutor['expertise'] = trim((string) $input['expertise']);
-        if (isset($input['courses'])) $tutor['courses'] = trim((string) $input['courses']);
-        if (isset($input['availability'])) $tutor['availability'] = $input['availability'];
-        if (isset($input['hours'])) $tutor['hours'] = (int) $input['hours'];
-        if (isset($input['email'])) $tutor['email'] = trim((string) $input['email']);
-        if (isset($input['phone'])) $tutor['phone'] = trim((string) $input['phone']);
-        if (isset($input['assigned_batches'])) $tutor['assigned_batches'] = (array) $input['assigned_batches'];
+        $tutorModel->update($tutor['id'], $update);
 
+        $merged = array_merge($tutor, $update);
         return $this->respond([
             'status' => 'success',
-            'message' => "Tutor {$tutor['name']} updated successfully.",
-            'data' => $tutor,
-        ]);
-    }
-
-    /**
-     * Assign tutor to batch
-     */
-    public function assign()
-    {
-        $input = $this->request->getJSON(true) ?? $this->request->getPost();
-        $batchCode = $input['batch_code'] ?? 'BIX-UX-26D';
-        $primaryId = $input['primary_id'] ?? null;
-        $additionalIds = (array) ($input['additional_ids'] ?? []);
-
-        return $this->respond([
-            'status' => 'success',
-            'message' => "Tutor allocation for batch {$batchCode} updated successfully.",
+            'message' => "Tutor {$merged['full_name']} updated successfully.",
             'data' => [
-                'batch_code' => $batchCode,
-                'primary_tutor_id' => $primaryId,
-                'additional_tutor_ids' => $additionalIds,
+                'id' => (int) $merged['id'],
+                'staff_id' => $merged['tutor_id'],
+                'name' => $merged['full_name'],
+                'role' => $merged['specialization'],
+                'expertise' => $merged['specialization'],
+                'courses' => $merged['assigned_track'],
+                'availability' => 'Available',
+                'hours' => 14,
+                'max_hours' => 24,
+                'rating' => (float) $merged['rating'],
+                'email' => $merged['email'],
+                'phone' => $merged['phone'],
+                'assigned_batches' => ['BIX-2026-A'],
             ],
         ]);
     }
@@ -270,22 +223,18 @@ class TutorController extends ResourceController
      */
     public function delete($id = null)
     {
-        $found = false;
-        foreach (self::$tutors as $idx => $t) {
-            if ($t['id'] == $id || $t['staff_id'] === $id) {
-                array_splice(self::$tutors, $idx, 1);
-                $found = true;
-                break;
-            }
+        $tutorModel = new TutorModel();
+        $tutor = $tutorModel->where('id', $id)->orWhere('tutor_id', $id)->first();
+
+        if (!$tutor) {
+            return $this->failNotFound('Tutor record not found.');
         }
 
-        if (!$found) {
-            return $this->failNotFound('Tutor not found.');
-        }
+        $tutorModel->delete($tutor['id']);
 
         return $this->respondDeleted([
             'status' => 'success',
-            'message' => 'Tutor record archived successfully.',
+            'message' => 'Tutor record archived successfully from database.',
         ]);
     }
 }

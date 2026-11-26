@@ -2,11 +2,20 @@
 
 namespace App\Controllers\Api;
 
+use App\Libraries\DatabaseBootstrapper;
+use App\Models\BatchModel;
 use CodeIgniter\RESTful\ResourceController;
 
-class BatchController extends ResourceController
+class BatchController extends BaseApiController
 {
     protected $format = 'json';
+
+    public function __construct()
+    {
+        DatabaseBootstrapper::ensureInitialized();
+        $this->request ??= \Config\Services::request();
+        $this->response ??= \Config\Services::response();
+    }
 
     private static array $classrooms = [
         ['name' => 'Design Room 302', 'capacity' => 28, 'campus' => 'North Wing'],
@@ -15,99 +24,6 @@ class BatchController extends ResourceController
         ['name' => 'Lab 102', 'capacity' => 25, 'campus' => 'Main Engineering Block'],
         ['name' => 'Analytics Hub 105', 'capacity' => 20, 'campus' => 'Data Science Center'],
         ['name' => 'Cybersecurity Lab 401', 'capacity' => 24, 'campus' => 'Security Operations'],
-    ];
-
-    private static array $batches = [
-        [
-            'id' => 1,
-            'code' => 'BIX-GD-26A',
-            'name' => 'Graphic Design Morning',
-            'course' => 'Graphic Design Master Course',
-            'start' => '2026-11-02',
-            'end' => '2027-01-15',
-            'enrolled' => 26,
-            'capacity' => 30,
-            'primary_tutor' => 'Marcus Vance',
-            'co_tutor' => 'Priya Nair',
-            'room' => 'Studio Lab 204',
-            'status' => 'Active',
-            'created_at' => '2026-10-15 09:30:00',
-        ],
-        [
-            'id' => 2,
-            'code' => 'BIX-FS-26C',
-            'name' => 'Full-Stack Cohort C',
-            'course' => 'Full-Stack Web Engineering',
-            'start' => '2026-11-10',
-            'end' => '2027-03-24',
-            'enrolled' => 28,
-            'capacity' => 28,
-            'primary_tutor' => 'Dr. Aris Thorne',
-            'co_tutor' => 'Liam Chen',
-            'room' => 'Lab 101',
-            'status' => 'Active',
-            'created_at' => '2026-10-20 11:15:00',
-        ],
-        [
-            'id' => 3,
-            'code' => 'BIX-UX-26D',
-            'name' => 'UI/UX Product Evening',
-            'course' => 'UI/UX Product Design',
-            'start' => '2026-12-01',
-            'end' => '2027-02-18',
-            'enrolled' => 19,
-            'capacity' => 25,
-            'primary_tutor' => 'Sofia Alvarez',
-            'co_tutor' => 'Unassigned',
-            'room' => 'Design Room 302',
-            'status' => 'Enrolling',
-            'created_at' => '2026-11-01 14:00:00',
-        ],
-        [
-            'id' => 4,
-            'code' => 'BIX-DS-26E',
-            'name' => 'Data Science Weekend',
-            'course' => 'Data Science & Analytics',
-            'start' => '2026-12-07',
-            'end' => '2027-04-04',
-            'enrolled' => 14,
-            'capacity' => 30,
-            'primary_tutor' => 'Dr. Aris Thorne',
-            'co_tutor' => 'Maya Lin',
-            'room' => 'Analytics Hub 105',
-            'status' => 'Upcoming',
-            'created_at' => '2026-11-05 16:45:00',
-        ],
-        [
-            'id' => 5,
-            'code' => 'BIX-GD-26B',
-            'name' => 'Graphic Design Afternoon',
-            'course' => 'Graphic Design Master Course',
-            'start' => '2026-08-18',
-            'end' => '2026-10-30',
-            'enrolled' => 24,
-            'capacity' => 24,
-            'primary_tutor' => 'Priya Nair',
-            'co_tutor' => 'Marcus Vance',
-            'room' => 'Studio Lab 204',
-            'status' => 'Completed',
-            'created_at' => '2026-07-20 10:00:00',
-        ],
-        [
-            'id' => 6,
-            'code' => 'BIX-CLD-26F',
-            'name' => 'Cloud & DevOps Accelerated',
-            'course' => 'Cloud & DevOps Engineering',
-            'start' => '2026-12-15',
-            'end' => '2027-03-30',
-            'enrolled' => 12,
-            'capacity' => 25,
-            'primary_tutor' => 'Tariq Al-Mansoor',
-            'co_tutor' => 'Chen Wei',
-            'room' => 'Lab 102',
-            'status' => 'Enrolling',
-            'created_at' => '2026-11-12 13:20:00',
-        ],
     ];
 
     /**
@@ -119,7 +35,29 @@ class BatchController extends ResourceController
         $course = $this->request->getGet('course');
         $status = $this->request->getGet('status');
 
-        $filtered = self::$batches;
+        $batchModel = new BatchModel();
+        $dbBatches = $batchModel->findAll();
+
+        $batches = [];
+        foreach ($dbBatches as $b) {
+            $batches[] = [
+                'id' => (int) $b['id'],
+                'code' => $b['batch_code'],
+                'name' => $b['track'] . ' (' . $b['batch_code'] . ')',
+                'course' => $b['track'],
+                'start' => $b['start_date'] ?? date('Y-m-d'),
+                'end' => $b['end_date'] ?? date('Y-m-d', strtotime('+3 months')),
+                'enrolled' => (int) ($b['enrolled_count'] ?? 0),
+                'capacity' => (int) ($b['capacity'] ?? 30),
+                'primary_tutor' => $b['tutor_name'] ?? 'Unassigned',
+                'co_tutor' => 'Unassigned',
+                'room' => $b['classroom'] ?? 'Lab 101',
+                'status' => $b['status'] ?? 'Active',
+                'created_at' => $b['created_at'],
+            ];
+        }
+
+        $filtered = $batches;
 
         if (!empty($search)) {
             $q = strtolower(trim((string) $search));
@@ -133,21 +71,17 @@ class BatchController extends ResourceController
         }
 
         if (!empty($course) && $course !== 'all') {
-            $filtered = array_values(array_filter($filtered, static function ($b) use ($course) {
-                return $b['course'] === $course;
-            }));
+            $filtered = array_values(array_filter($filtered, static fn($b) => $b['course'] === $course));
         }
 
         if (!empty($status) && $status !== 'all') {
-            $filtered = array_values(array_filter($filtered, static function ($b) use ($status) {
-                return $b['status'] === $status;
-            }));
+            $filtered = array_values(array_filter($filtered, static fn($b) => $b['status'] === $status));
         }
 
-        $totalBatches = count(self::$batches);
-        $activeBatches = count(array_filter(self::$batches, static fn($b) => $b['status'] === 'Active'));
-        $totalEnrolled = array_sum(array_column(self::$batches, 'enrolled'));
-        $totalCapacity = array_sum(array_column(self::$batches, 'capacity'));
+        $totalBatches = count($batches);
+        $activeBatches = count(array_filter($batches, static fn($b) => $b['status'] === 'Active'));
+        $totalEnrolled = array_sum(array_column($batches, 'enrolled'));
+        $totalCapacity = array_sum(array_column($batches, 'capacity'));
         $seatUtilization = $totalCapacity > 0 ? round(($totalEnrolled / $totalCapacity) * 100, 1) : 0;
 
         return $this->respond([
@@ -156,8 +90,8 @@ class BatchController extends ResourceController
             'meta' => [
                 'total_batches' => $totalBatches,
                 'active_batches' => $activeBatches,
-                'enrolling_batches' => count(array_filter(self::$batches, static fn($b) => $b['status'] === 'Enrolling')),
-                'upcoming_batches' => count(array_filter(self::$batches, static fn($b) => $b['status'] === 'Upcoming')),
+                'enrolling_batches' => count(array_filter($batches, static fn($b) => $b['status'] === 'Enrolling')),
+                'upcoming_batches' => count(array_filter($batches, static fn($b) => $b['status'] === 'Upcoming')),
                 'total_enrolled' => $totalEnrolled,
                 'total_capacity' => $totalCapacity,
                 'remaining_seats' => max(0, $totalCapacity - $totalEnrolled),
@@ -173,17 +107,28 @@ class BatchController extends ResourceController
      */
     public function show($id = null)
     {
-        $batch = null;
-        foreach (self::$batches as $b) {
-            if ($b['id'] == $id || $b['code'] === $id) {
-                $batch = $b;
-                break;
-            }
-        }
+        $batchModel = new BatchModel();
+        $b = $batchModel->where('id', $id)->orWhere('batch_code', $id)->first();
 
-        if (!$batch) {
+        if (!$b) {
             return $this->failNotFound('Batch not found.');
         }
+
+        $batch = [
+            'id' => (int) $b['id'],
+            'code' => $b['batch_code'],
+            'name' => $b['track'] . ' (' . $b['batch_code'] . ')',
+            'course' => $b['track'],
+            'start' => $b['start_date'],
+            'end' => $b['end_date'],
+            'enrolled' => (int) $b['enrolled_count'],
+            'capacity' => (int) $b['capacity'],
+            'primary_tutor' => $b['tutor_name'],
+            'co_tutor' => 'Unassigned',
+            'room' => $b['classroom'],
+            'status' => $b['status'],
+            'created_at' => $b['created_at'],
+        ];
 
         return $this->respond([
             'status' => 'success',
@@ -196,41 +141,51 @@ class BatchController extends ResourceController
      */
     public function create()
     {
-        $input = $this->request->getJSON(true) ?? $this->request->getPost();
+        $input = $this->getRequestData();
 
-        if (empty($input['name'])) {
-            return $this->failValidationErrors(['name' => 'Batch Name is required.']);
-        }
+        $courseName = !empty($input['course']) ? trim((string) $input['course']) : (!empty($input['name']) ? trim((string) $input['name']) : 'Web Development');
+        $code = !empty($input['code']) ? trim((string) $input['code']) : 'BIX-' . strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $courseName), 0, 3)) . '-' . rand(10, 99);
 
-        if (empty($input['course'])) {
-            return $this->failValidationErrors(['course' => 'Course selection is required.']);
-        }
-
-        $newId = count(self::$batches) + 1;
-        $code = !empty($input['code']) ? trim((string) $input['code']) : 'BIX-BAT-26' . chr(64 + $newId);
-
-        $newBatch = [
-            'id' => $newId,
-            'code' => $code,
-            'name' => trim((string) $input['name']),
-            'course' => trim((string) $input['course']),
-            'start' => !empty($input['start']) ? $input['start'] : date('Y-m-d'),
-            'end' => !empty($input['end']) ? $input['end'] : date('Y-m-d', strtotime('+3 months')),
-            'enrolled' => (int) ($input['enrolled'] ?? 0),
+        $now = date('Y-m-d H:i:s');
+        $batchData = [
+            'batch_code' => $code,
+            'track' => $courseName,
+            'tutor_id' => 'TUT-' . rand(101, 109),
+            'tutor_name' => !empty($input['primary_tutor']) ? trim((string) $input['primary_tutor']) : 'Unassigned',
+            'start_date' => !empty($input['start']) ? $input['start'] : date('Y-m-d'),
+            'end_date' => !empty($input['end']) ? $input['end'] : date('Y-m-d', strtotime('+3 months')),
+            'timing' => '09:00 AM - 01:00 PM',
+            'classroom' => !empty($input['room']) ? trim((string) $input['room']) : 'Lab 101',
             'capacity' => (int) ($input['capacity'] ?? 25),
-            'primary_tutor' => !empty($input['primary_tutor']) ? trim((string) $input['primary_tutor']) : 'Unassigned',
-            'co_tutor' => !empty($input['co_tutor']) ? trim((string) $input['co_tutor']) : 'Unassigned',
-            'room' => !empty($input['room']) ? trim((string) $input['room']) : 'Design Room 302',
-            'status' => $input['status'] ?? 'Enrolling',
-            'created_at' => date('Y-m-d H:i:s'),
+            'enrolled_count' => (int) ($input['enrolled'] ?? 0),
+            'status' => $input['status'] ?? 'Active',
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
 
-        array_unshift(self::$batches, $newBatch);
+        $batchModel = new BatchModel();
+        $id = $batchModel->insert($batchData);
+
+        $responseData = [
+            'id' => (int) $id,
+            'code' => $code,
+            'name' => $courseName . ' (' . $code . ')',
+            'course' => $courseName,
+            'start' => $batchData['start_date'],
+            'end' => $batchData['end_date'],
+            'enrolled' => $batchData['enrolled_count'],
+            'capacity' => $batchData['capacity'],
+            'primary_tutor' => $batchData['tutor_name'],
+            'co_tutor' => 'Unassigned',
+            'room' => $batchData['classroom'],
+            'status' => $batchData['status'],
+            'created_at' => $now,
+        ];
 
         return $this->respondCreated([
             'status' => 'success',
-            'message' => "Batch {$newBatch['name']} ({$code}) created successfully.",
-            'data' => $newBatch,
+            'message' => "Batch {$responseData['name']} created successfully in database.",
+            'data' => $responseData,
         ]);
     }
 
@@ -239,36 +194,46 @@ class BatchController extends ResourceController
      */
     public function update($id = null)
     {
-        $input = $this->request->getJSON(true) ?? $this->request->getRawInput();
+        $input = $this->getRequestData();
 
-        $foundIdx = null;
-        foreach (self::$batches as $idx => $b) {
-            if ($b['id'] == $id || $b['code'] === $id) {
-                $foundIdx = $idx;
-                break;
-            }
-        }
+        $batchModel = new BatchModel();
+        $batch = $batchModel->where('id', $id)->orWhere('batch_code', $id)->first();
 
-        if ($foundIdx === null) {
+        if (!$batch) {
             return $this->failNotFound('Batch not found.');
         }
 
-        $batch = &self::$batches[$foundIdx];
-        if (isset($input['name'])) $batch['name'] = trim((string) $input['name']);
-        if (isset($input['course'])) $batch['course'] = trim((string) $input['course']);
-        if (isset($input['start'])) $batch['start'] = $input['start'];
-        if (isset($input['end'])) $batch['end'] = $input['end'];
-        if (isset($input['capacity'])) $batch['capacity'] = (int) $input['capacity'];
-        if (isset($input['enrolled'])) $batch['enrolled'] = (int) $input['enrolled'];
-        if (isset($input['primary_tutor'])) $batch['primary_tutor'] = trim((string) $input['primary_tutor']);
-        if (isset($input['co_tutor'])) $batch['co_tutor'] = trim((string) $input['co_tutor']);
-        if (isset($input['room'])) $batch['room'] = trim((string) $input['room']);
-        if (isset($input['status'])) $batch['status'] = $input['status'];
+        $update = [];
+        if (isset($input['course'])) $update['track'] = trim((string) $input['course']);
+        if (isset($input['primary_tutor'])) $update['tutor_name'] = trim((string) $input['primary_tutor']);
+        if (isset($input['start'])) $update['start_date'] = $input['start'];
+        if (isset($input['end'])) $update['end_date'] = $input['end'];
+        if (isset($input['capacity'])) $update['capacity'] = (int) $input['capacity'];
+        if (isset($input['enrolled'])) $update['enrolled_count'] = (int) $input['enrolled'];
+        if (isset($input['room'])) $update['classroom'] = trim((string) $input['room']);
+        if (isset($input['status'])) $update['status'] = $input['status'];
+        $update['updated_at'] = date('Y-m-d H:i:s');
 
+        $batchModel->update($batch['id'], $update);
+
+        $merged = array_merge($batch, $update);
         return $this->respond([
             'status' => 'success',
-            'message' => "Batch {$batch['name']} updated successfully.",
-            'data' => $batch,
+            'message' => "Batch updated successfully.",
+            'data' => [
+                'id' => (int) $merged['id'],
+                'code' => $merged['batch_code'],
+                'name' => $merged['track'] . ' (' . $merged['batch_code'] . ')',
+                'course' => $merged['track'],
+                'start' => $merged['start_date'],
+                'end' => $merged['end_date'],
+                'enrolled' => (int) $merged['enrolled_count'],
+                'capacity' => (int) $merged['capacity'],
+                'primary_tutor' => $merged['tutor_name'],
+                'co_tutor' => 'Unassigned',
+                'room' => $merged['classroom'],
+                'status' => $merged['status'],
+            ],
         ]);
     }
 
@@ -277,22 +242,18 @@ class BatchController extends ResourceController
      */
     public function delete($id = null)
     {
-        $found = false;
-        foreach (self::$batches as $idx => $b) {
-            if ($b['id'] == $id || $b['code'] === $id) {
-                array_splice(self::$batches, $idx, 1);
-                $found = true;
-                break;
-            }
-        }
+        $batchModel = new BatchModel();
+        $batch = $batchModel->where('id', $id)->orWhere('batch_code', $id)->first();
 
-        if (!$found) {
+        if (!$batch) {
             return $this->failNotFound('Batch not found.');
         }
 
+        $batchModel->delete($batch['id']);
+
         return $this->respondDeleted([
             'status' => 'success',
-            'message' => 'Batch removed successfully.',
+            'message' => 'Batch removed successfully from database.',
         ]);
     }
 }

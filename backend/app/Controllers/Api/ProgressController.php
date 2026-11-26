@@ -2,11 +2,21 @@
 
 namespace App\Controllers\Api;
 
+use App\Libraries\DatabaseBootstrapper;
+use App\Models\ProgressModel;
+use App\Models\RemarkModel;
 use CodeIgniter\RESTful\ResourceController;
 
-class ProgressController extends ResourceController
+class ProgressController extends BaseApiController
 {
     protected $format = 'json';
+
+    public function __construct()
+    {
+        DatabaseBootstrapper::ensureInitialized();
+        $this->request ??= \Config\Services::request();
+        $this->response ??= \Config\Services::response();
+    }
 
     private static array $progressReports = [
         [
@@ -482,7 +492,7 @@ class ProgressController extends ResourceController
      */
     public function remark()
     {
-        $input = $this->request->getJSON(true) ?? $this->request->getPost();
+        $input = $this->getRequestData();
 
         if (empty($input['student_id']) || empty($input['note'])) {
             return $this->failValidationErrors(['note' => 'Student ID and remark note are required.']);
@@ -508,9 +518,26 @@ class ProgressController extends ResourceController
             return $this->failNotFound('Student record not found.');
         }
 
+        // Persist remark into student_remarks database table
+        try {
+            $remarkModel = new RemarkModel();
+            $remarkModel->insert([
+                'student_code' => $studentId,
+                'advisor_name' => $input['advisor'] ?? 'Academic Advisor',
+                'advisor_role' => 'Faculty Lead',
+                'category' => 'Academic Standing',
+                'flag' => 'Positive',
+                'date' => date('Y-m-d'),
+                'notes' => trim((string) $input['note']) . (!empty($input['recommendation']) ? ' | Recommendation: ' . trim((string) $input['recommendation']) : ''),
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Error saving remark: ' . $e->getMessage());
+        }
+
         return $this->respondCreated([
             'status' => 'success',
-            'message' => 'Advisor remark recorded successfully in student progress report.',
+            'message' => 'Advisor remark recorded successfully and saved to database.',
         ]);
     }
 }

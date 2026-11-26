@@ -2,161 +2,21 @@
 
 namespace App\Controllers\Api;
 
+use App\Libraries\DatabaseBootstrapper;
+use App\Models\FeeInvoiceModel;
+use App\Models\FeePaymentModel;
 use CodeIgniter\RESTful\ResourceController;
 
-class FeeController extends ResourceController
+class FeeController extends BaseApiController
 {
     protected $format = 'json';
 
-    private static array $ledgers = [
-        [
-            'id' => 1,
-            'student_id' => 'STU-2026-001',
-            'student_name' => 'Arjun Kumar',
-            'course' => 'Graphic Design Master Course',
-            'batch' => 'GD-2026-M1',
-            'total_fee' => 25000,
-            'paid_amount' => 15000,
-            'balance_due' => 10000,
-            'due_date' => '2026-11-25',
-            'status' => 'Partial Payment',
-            'email' => 'arjun.kumar@student.bixcel.edu',
-            'phone' => '+91 98765 43210',
-        ],
-        [
-            'id' => 2,
-            'student_id' => 'STU-2026-002',
-            'student_name' => 'Priya Sharma',
-            'course' => 'UI/UX Product Design',
-            'batch' => 'UX-2026-M1',
-            'total_fee' => 30000,
-            'paid_amount' => 30000,
-            'balance_due' => 0,
-            'due_date' => '2026-11-20',
-            'status' => 'Paid',
-            'email' => 'priya.sharma@student.bixcel.edu',
-            'phone' => '+91 98765 43211',
-        ],
-        [
-            'id' => 3,
-            'student_id' => 'STU-2026-003',
-            'student_name' => 'Rahul Kumar',
-            'course' => 'Full-Stack Web Engineering',
-            'batch' => 'FS-2026-M1',
-            'total_fee' => 45000,
-            'paid_amount' => 10000,
-            'balance_due' => 35000,
-            'due_date' => '2026-11-15',
-            'status' => 'Overdue',
-            'email' => 'rahul.kumar@student.bixcel.edu',
-            'phone' => '+91 98765 43212',
-        ],
-        [
-            'id' => 4,
-            'student_id' => 'STU-2026-004',
-            'student_name' => 'Divya S',
-            'course' => 'Graphic Design Master Course',
-            'batch' => 'GD-2026-M1',
-            'total_fee' => 25000,
-            'paid_amount' => 0,
-            'balance_due' => 25000,
-            'due_date' => '2026-11-30',
-            'status' => 'Unpaid',
-            'email' => 'divya.s@student.bixcel.edu',
-            'phone' => '+91 98765 43213',
-        ],
-        [
-            'id' => 5,
-            'student_id' => 'STU-2026-005',
-            'student_name' => 'Marcus Vance',
-            'course' => 'Digital Marketing Specialization',
-            'batch' => 'BIX-MKT-26B',
-            'total_fee' => 35000,
-            'paid_amount' => 35000,
-            'balance_due' => 0,
-            'due_date' => '2026-11-10',
-            'status' => 'Paid',
-            'email' => 'marcus.v@student.bixcel.edu',
-            'phone' => '+91 98765 43214',
-        ],
-        [
-            'id' => 6,
-            'student_id' => 'STU-2026-006',
-            'student_name' => 'Sophia Martinez',
-            'course' => 'Data Science & Analytics',
-            'batch' => 'BIX-DS-18C',
-            'total_fee' => 40000,
-            'paid_amount' => 20000,
-            'balance_due' => 20000,
-            'due_date' => '2026-12-05',
-            'status' => 'Partial Payment',
-            'email' => 'sophia.m@student.bixcel.edu',
-            'phone' => '+91 98765 43215',
-        ],
-    ];
-
-    private static array $transactions = [
-        [
-            'id' => 1,
-            'txn_id' => 'TXN-2026-8841',
-            'receipt_no' => 'RCP-2026-0449',
-            'student_id' => 'STU-2026-002',
-            'student_name' => 'Priya Sharma',
-            'course' => 'UI/UX Product Design',
-            'batch' => 'UX-2026-M1',
-            'payment_date' => '2026-11-20 11:42:00',
-            'method' => 'Bank Transfer',
-            'amount' => 30000,
-            'status' => 'Success',
-            'notes' => 'Full tuition fee payment verified via NEFT.',
-            'collected_by' => 'Elena Rostova',
-        ],
-        [
-            'id' => 2,
-            'txn_id' => 'TXN-2026-8839',
-            'receipt_no' => 'RCP-2026-0448',
-            'student_id' => 'STU-2026-001',
-            'student_name' => 'Arjun Kumar',
-            'course' => 'Graphic Design Master Course',
-            'batch' => 'GD-2026-M1',
-            'payment_date' => '2026-11-18 14:15:00',
-            'method' => 'UPI',
-            'amount' => 15000,
-            'status' => 'Success',
-            'notes' => 'First installment via GPay.',
-            'collected_by' => 'Elena Rostova',
-        ],
-        [
-            'id' => 3,
-            'txn_id' => 'TXN-2026-8835',
-            'receipt_no' => 'RCP-2026-0447',
-            'student_id' => 'STU-2026-005',
-            'student_name' => 'Marcus Vance',
-            'course' => 'Digital Marketing Specialization',
-            'batch' => 'BIX-MKT-26B',
-            'payment_date' => '2026-11-10 10:20:00',
-            'method' => 'Card',
-            'amount' => 35000,
-            'status' => 'Success',
-            'notes' => 'Complete enrollment fee payment.',
-            'collected_by' => 'Finance Office',
-        ],
-        [
-            'id' => 4,
-            'txn_id' => 'TXN-2026-8830',
-            'receipt_no' => 'RCP-2026-0446',
-            'student_id' => 'STU-2026-006',
-            'student_name' => 'Sophia Martinez',
-            'course' => 'Data Science & Analytics',
-            'batch' => 'BIX-DS-18C',
-            'payment_date' => '2026-11-05 16:30:00',
-            'method' => 'UPI',
-            'amount' => 20000,
-            'status' => 'Success',
-            'notes' => 'Module chunk payment installment 1.',
-            'collected_by' => 'Finance Office',
-        ],
-    ];
+    public function __construct()
+    {
+        DatabaseBootstrapper::ensureInitialized();
+        $this->request ??= \Config\Services::request();
+        $this->response ??= \Config\Services::response();
+    }
 
     /**
      * List all fee records, transactions and overview KPIs
@@ -167,7 +27,50 @@ class FeeController extends ResourceController
         $course = $this->request->getGet('course');
         $status = $this->request->getGet('status');
 
-        $filtered = self::$ledgers;
+        $invoiceModel = new FeeInvoiceModel();
+        $paymentModel = new FeePaymentModel();
+
+        $invoices = $invoiceModel->findAll();
+        $payments = $paymentModel->orderBy('id', 'DESC')->findAll();
+
+        $ledgers = [];
+        foreach ($invoices as $inv) {
+            $ledgers[] = [
+                'id' => (int) $inv['id'],
+                'student_id' => $inv['student_code'],
+                'student_name' => $inv['student_name'],
+                'course' => $inv['track'] ?? 'Full-Stack Web Development',
+                'batch' => $inv['batch_code'] ?? 'BIX-2026-A',
+                'total_fee' => (float) $inv['total_amount'],
+                'paid_amount' => (float) $inv['paid_amount'],
+                'balance_due' => (float) $inv['balance_amount'],
+                'due_date' => $inv['due_date'] ?? date('Y-m-d', strtotime('+30 days')),
+                'status' => $inv['status'] ?? 'Pending',
+                'email' => strtolower(str_replace(' ', '.', $inv['student_name'])) . '@student.bixcel.edu',
+                'phone' => '+1 (555) 000-0000',
+            ];
+        }
+
+        $transactions = [];
+        foreach ($payments as $p) {
+            $transactions[] = [
+                'id' => (int) $p['id'],
+                'txn_id' => $p['transaction_ref'] ?? ('TXN-2026-' . (8800 + (int) $p['id'])),
+                'receipt_no' => $p['receipt_no'],
+                'student_id' => 'STU-2026-' . str_pad((string) ($p['student_id'] ?? 1), 3, '0', STR_PAD_LEFT),
+                'student_name' => $p['student_name'] ?? 'Student',
+                'course' => 'Enrolled Curriculum Track',
+                'batch' => 'BIX-2026-A',
+                'payment_date' => $p['payment_date'] ?? date('Y-m-d H:i:s'),
+                'method' => $p['payment_method'] ?? 'Bank Transfer',
+                'amount' => (float) $p['amount'],
+                'status' => 'Success',
+                'notes' => $p['notes'] ?? 'Fee collection receipt.',
+                'collected_by' => 'Finance Office',
+            ];
+        }
+
+        $filtered = $ledgers;
 
         if (!empty($search)) {
             $q = strtolower(trim((string) $search));
@@ -180,38 +83,34 @@ class FeeController extends ResourceController
         }
 
         if (!empty($course) && $course !== 'all') {
-            $filtered = array_values(array_filter($filtered, static function ($l) use ($course) {
-                return str_contains($l['course'], $course);
-            }));
+            $filtered = array_values(array_filter($filtered, static fn($l) => str_contains(strtolower($l['course']), strtolower($course))));
         }
 
         if (!empty($status) && $status !== 'all') {
-            $filtered = array_values(array_filter($filtered, static function ($l) use ($status) {
-                return $l['status'] === $status;
-            }));
+            $filtered = array_values(array_filter($filtered, static fn($l) => $l['status'] === $status));
         }
 
-        $totalFee = array_sum(array_column(self::$ledgers, 'total_fee'));
-        $collected = array_sum(array_column(self::$ledgers, 'paid_amount'));
-        $pending = array_sum(array_column(self::$ledgers, 'balance_due'));
+        $totalFee = array_sum(array_column($ledgers, 'total_fee'));
+        $collected = array_sum(array_column($ledgers, 'paid_amount'));
+        $pending = array_sum(array_column($ledgers, 'balance_due'));
         $overdue = array_sum(array_map(
             static fn($l) => $l['status'] === 'Overdue' ? $l['balance_due'] : 0,
-            self::$ledgers
+            $ledgers
         ));
 
         return $this->respond([
             'status' => 'success',
             'data' => [
                 'ledgers' => $filtered,
-                'transactions' => self::$transactions,
+                'transactions' => $transactions,
             ],
             'meta' => [
                 'total_fees' => $totalFee ?: 2500000,
                 'collected_amount' => $collected ?: 1850000,
                 'pending_amount' => $pending ?: 450000,
-                'overdue_amount' => $overdue ?: 200000,
-                'collection_percentage' => '74%',
-                'total_transactions' => 450 + count(self::$transactions),
+                'overdue_amount' => $overdue ?: 0,
+                'collection_percentage' => $totalFee > 0 ? round(($collected / $totalFee) * 100, 1) . '%' : '100%',
+                'total_transactions' => count($transactions),
             ],
             'monthly_trend' => [
                 ['month' => 'Jun', 'collected' => 2.4, 'pending' => 0.6],
@@ -229,17 +128,27 @@ class FeeController extends ResourceController
      */
     public function show($id = null)
     {
-        $ledger = null;
-        foreach (self::$ledgers as $l) {
-            if ($l['id'] == $id || $l['student_id'] === $id) {
-                $ledger = $l;
-                break;
-            }
-        }
+        $invoiceModel = new FeeInvoiceModel();
+        $inv = $invoiceModel->where('id', $id)->orWhere('student_code', $id)->orWhere('invoice_no', $id)->first();
 
-        if (!$ledger) {
+        if (!$inv) {
             return $this->failNotFound('Student fee ledger not found.');
         }
+
+        $ledger = [
+            'id' => (int) $inv['id'],
+            'student_id' => $inv['student_code'],
+            'student_name' => $inv['student_name'],
+            'course' => $inv['track'],
+            'batch' => $inv['batch_code'],
+            'total_fee' => (float) $inv['total_amount'],
+            'paid_amount' => (float) $inv['paid_amount'],
+            'balance_due' => (float) $inv['balance_amount'],
+            'due_date' => $inv['due_date'],
+            'status' => $inv['status'],
+            'email' => strtolower(str_replace(' ', '.', $inv['student_name'])) . '@student.bixcel.edu',
+            'phone' => '+1 (555) 000-0000',
+        ];
 
         return $this->respond([
             'status' => 'success',
@@ -248,11 +157,11 @@ class FeeController extends ResourceController
     }
 
     /**
-     * Collect payment from student
+     * Collect payment from student and persist to database
      */
     public function collect()
     {
-        $input = $this->request->getJSON(true) ?? $this->request->getPost();
+        $input = $this->getRequestData();
 
         if (empty($input['student_id'])) {
             return $this->failValidationErrors(['student_id' => 'Student ID is required.']);
@@ -263,56 +172,72 @@ class FeeController extends ResourceController
             return $this->failValidationErrors(['amount' => 'Payment amount must be greater than zero.']);
         }
 
-        // Find student ledger
-        $targetIdx = null;
-        foreach (self::$ledgers as $idx => $l) {
-            if ($l['student_id'] === $input['student_id'] || $l['id'] == $input['student_id']) {
-                $targetIdx = $idx;
-                break;
-            }
+        $invoiceModel = new FeeInvoiceModel();
+        $inv = $invoiceModel->where('student_code', $input['student_id'])->orWhere('id', $input['student_id'])->first();
+
+        if (!$inv) {
+            return $this->failNotFound('Student fee ledger not found.');
         }
 
-        if ($targetIdx === null) {
-            return $this->failNotFound('Student record not found.');
-        }
+        $newPaid = (float) $inv['paid_amount'] + $amount;
+        $newBalance = max(0, (float) $inv['total_amount'] - $newPaid);
+        $newStatus = $newBalance <= 0 ? 'Paid' : 'Partial Payment';
 
-        $ledger = &self::$ledgers[$targetIdx];
-        $ledger['paid_amount'] += $amount;
-        $ledger['balance_due'] = max(0, $ledger['total_fee'] - $ledger['paid_amount']);
+        $invoiceModel->update($inv['id'], [
+            'paid_amount' => $newPaid,
+            'balance_amount' => $newBalance,
+            'status' => $newStatus,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
 
-        if ($ledger['balance_due'] <= 0) {
-            $ledger['status'] = 'Paid';
-        } else {
-            $ledger['status'] = 'Partial Payment';
-        }
-
-        $nextNum = 450 + count(self::$transactions);
-        $receiptNo = 'RCP-2026-0' . $nextNum;
+        $paymentModel = new FeePaymentModel();
+        $totalPayments = $paymentModel->countAllResults();
+        $receiptNo = 'RCP-2026-0' . (450 + $totalPayments + 1);
         $txnId = 'TXN-2026-' . rand(8850, 9999);
+        $now = date('Y-m-d H:i:s');
+
+        $paymentId = $paymentModel->insert([
+            'receipt_no' => $receiptNo,
+            'invoice_id' => $inv['id'],
+            'student_id' => $inv['student_id'],
+            'student_name' => $inv['student_name'],
+            'amount' => $amount,
+            'payment_method' => $input['method'] ?? 'Bank Transfer',
+            'transaction_ref' => $txnId,
+            'notes' => $input['notes'] ?? 'Fee collection receipt.',
+            'payment_date' => date('Y-m-d'),
+            'created_at' => $now,
+        ]);
 
         $newTxn = [
-            'id' => count(self::$transactions) + 1,
+            'id' => (int) $paymentId,
             'txn_id' => $txnId,
             'receipt_no' => $receiptNo,
-            'student_id' => $ledger['student_id'],
-            'student_name' => $ledger['student_name'],
-            'course' => $ledger['course'],
-            'batch' => $ledger['batch'],
-            'payment_date' => date('Y-m-d H:i:s'),
-            'method' => $input['method'] ?? 'UPI',
+            'student_id' => $inv['student_code'],
+            'student_name' => $inv['student_name'],
+            'course' => $inv['track'],
+            'batch' => $inv['batch_code'],
+            'payment_date' => $now,
+            'method' => $input['method'] ?? 'Bank Transfer',
             'amount' => $amount,
             'status' => 'Success',
             'notes' => $input['notes'] ?? 'Fee collection receipt.',
-            'collected_by' => 'Elena Rostova',
+            'collected_by' => 'Finance Office',
         ];
-
-        array_unshift(self::$transactions, $newTxn);
 
         return $this->respondCreated([
             'status' => 'success',
-            'message' => "Payment of ₹" . number_format($amount) . " collected successfully for {$ledger['student_name']}.",
+            'message' => "Payment of ₹" . number_format($amount) . " collected and recorded in database for {$inv['student_name']}.",
             'data' => [
-                'ledger' => $ledger,
+                'ledger' => [
+                    'id' => (int) $inv['id'],
+                    'student_id' => $inv['student_code'],
+                    'student_name' => $inv['student_name'],
+                    'total_fee' => (float) $inv['total_amount'],
+                    'paid_amount' => $newPaid,
+                    'balance_due' => $newBalance,
+                    'status' => $newStatus,
+                ],
                 'transaction' => $newTxn,
             ],
         ]);
@@ -323,21 +248,16 @@ class FeeController extends ResourceController
      */
     public function receipt($receiptNo = null)
     {
-        $txn = null;
-        foreach (self::$transactions as $t) {
-            if ($t['receipt_no'] === $receiptNo || $t['txn_id'] === $receiptNo) {
-                $txn = $t;
-                break;
-            }
-        }
+        $paymentModel = new FeePaymentModel();
+        $p = $paymentModel->where('receipt_no', $receiptNo)->orWhere('transaction_ref', $receiptNo)->first();
 
-        if (!$txn) {
+        if (!$p) {
             return $this->failNotFound('Receipt not found.');
         }
 
         return $this->respond([
             'status' => 'success',
-            'data' => $txn,
+            'data' => $p,
         ]);
     }
 }
