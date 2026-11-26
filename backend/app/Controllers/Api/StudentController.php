@@ -89,8 +89,23 @@ class StudentController extends ResourceController
             'student_id' => 'STU-2026-0842',
             'full_name' => 'Marcus Vance',
             'guardian_name' => 'Eleanor Vance',
+            'guardian_relation' => 'Mother',
+            'guardian_phone' => '+1 (555) 349-2190',
+            'guardian_email' => 'eleanor.vance@gmail.com',
             'phone' => '+1 (555) 349-2194',
             'email' => 'marcus.vance@student.bixcel.edu',
+            'dob' => '2004-03-12',
+            'gender' => 'Male',
+            'blood_group' => 'O+',
+            'address' => '742 Evergreen Terrace, Springfield, OR',
+            'qualification' => 'B.Sc Marketing',
+            'institution' => 'Oregon State University',
+            'passing_year' => '2025',
+            'id_proof_type' => 'National ID',
+            'id_proof_number' => 'NID-9482014',
+            'fee_plan' => 'Full Payment',
+            'fee_status' => 'Paid',
+            'attendance_pct' => 96,
             'status' => 'Active',
             'course_mode' => 'custom',
             'track' => 'Digital Marketing',
@@ -110,8 +125,23 @@ class StudentController extends ResourceController
             'student_id' => 'STU-2026-0841',
             'full_name' => 'Alena Rostova',
             'guardian_name' => 'Mikhail Rostov',
+            'guardian_relation' => 'Father',
+            'guardian_phone' => '+1 (555) 781-4400',
+            'guardian_email' => 'm.rostov@gmail.com',
             'phone' => '+1 (555) 781-4402',
             'email' => 'alena.rostova@student.bixcel.edu',
+            'dob' => '2003-08-22',
+            'gender' => 'Female',
+            'blood_group' => 'A+',
+            'address' => '42 Pine Crest Ave, Seattle, WA',
+            'qualification' => 'B.Des Industrial Design',
+            'institution' => 'University of Washington',
+            'passing_year' => '2024',
+            'id_proof_type' => 'Passport',
+            'id_proof_number' => 'PASS-US-892104',
+            'fee_plan' => '3-Installment EMI',
+            'fee_status' => 'Paid',
+            'attendance_pct' => 98,
             'status' => 'Active',
             'course_mode' => 'standard',
             'track' => 'UI/UX Product Design',
@@ -129,8 +159,23 @@ class StudentController extends ResourceController
             'student_id' => 'STU-2026-0840',
             'full_name' => 'Kevin Chen',
             'guardian_name' => 'David Chen',
+            'guardian_relation' => 'Father',
+            'guardian_phone' => '+1 (555) 912-3340',
+            'guardian_email' => 'david.chen@gmail.com',
             'phone' => '+1 (555) 912-3341',
             'email' => 'kevin.chen@student.bixcel.edu',
+            'dob' => '2002-11-05',
+            'gender' => 'Male',
+            'blood_group' => 'B+',
+            'address' => '108 Silicon Valley Blvd, San Jose, CA',
+            'qualification' => 'B.Tech Computer Science',
+            'institution' => 'San Jose State University',
+            'passing_year' => '2024',
+            'id_proof_type' => 'Driver License',
+            'id_proof_number' => 'DL-CA-4029108',
+            'fee_plan' => '2-Installment',
+            'fee_status' => 'Paid',
+            'attendance_pct' => 94,
             'status' => 'Active',
             'course_mode' => 'custom',
             'track' => 'Full-Stack Web Development',
@@ -150,8 +195,23 @@ class StudentController extends ResourceController
             'student_id' => 'STU-2026-0839',
             'full_name' => 'Sophia Martinez',
             'guardian_name' => 'Carlos Martinez',
+            'guardian_relation' => 'Father',
+            'guardian_phone' => '+1 (555) 203-8870',
+            'guardian_email' => 'carlos.m@gmail.com',
             'phone' => '+1 (555) 203-8877',
             'email' => 'sophia.m@student.bixcel.edu',
+            'dob' => '2004-06-18',
+            'gender' => 'Female',
+            'blood_group' => 'AB+',
+            'address' => '312 Ocean Dr, Miami, FL',
+            'qualification' => 'B.Sc Statistics & Math',
+            'institution' => 'University of Miami',
+            'passing_year' => '2026',
+            'id_proof_type' => 'National ID',
+            'id_proof_number' => 'NID-8109283',
+            'fee_plan' => 'Full Payment',
+            'fee_status' => 'Partial',
+            'attendance_pct' => 84,
             'status' => 'On Leave',
             'course_mode' => 'standard',
             'track' => 'Data Science & Analytics',
@@ -169,8 +229,23 @@ class StudentController extends ResourceController
             'student_id' => 'STU-2026-0838',
             'full_name' => 'Tariq Al-Mansoor',
             'guardian_name' => 'Rashid Al-Mansoor',
+            'guardian_relation' => 'Father',
+            'guardian_phone' => '+1 (555) 604-5100',
+            'guardian_email' => 'rashid.m@gmail.com',
             'phone' => '+1 (555) 604-5120',
             'email' => 'tariq.mansoor@student.bixcel.edu',
+            'dob' => '2001-09-30',
+            'gender' => 'Male',
+            'blood_group' => 'O-',
+            'address' => '89 Innovation Way, Austin, TX',
+            'qualification' => 'B.Tech Information Technology',
+            'institution' => 'UT Austin',
+            'passing_year' => '2023',
+            'id_proof_type' => 'Passport',
+            'id_proof_number' => 'PASS-TX-902341',
+            'fee_plan' => 'Full Payment',
+            'fee_status' => 'Paid',
+            'attendance_pct' => 97,
             'status' => 'Active',
             'course_mode' => 'custom',
             'track' => 'Cloud & DevOps Engineering',
@@ -190,8 +265,23 @@ class StudentController extends ResourceController
             'student_id' => 'STU-2026-0837',
             'full_name' => 'Priya Sharma',
             'guardian_name' => 'Rajesh Sharma',
+            'guardian_relation' => 'Father',
+            'guardian_phone' => '+1 (555) 472-9900',
+            'guardian_email' => 'rajesh.sharma@gmail.com',
             'phone' => '+1 (555) 472-9901',
             'email' => 'priya.sharma@student.bixcel.edu',
+            'dob' => '2003-01-15',
+            'gender' => 'Female',
+            'blood_group' => 'B+',
+            'address' => '55 Tech Park Road, Boston, MA',
+            'qualification' => 'B.Sc Computer Science',
+            'institution' => 'Boston University',
+            'passing_year' => '2025',
+            'id_proof_type' => 'National ID',
+            'id_proof_number' => 'NID-7729104',
+            'fee_plan' => '3-Installment EMI',
+            'fee_status' => 'Paid',
+            'attendance_pct' => 95,
             'status' => 'Active',
             'course_mode' => 'custom',
             'track' => 'Cybersecurity Operations',
@@ -328,11 +418,26 @@ class StudentController extends ResourceController
         $now = date('Y-m-d H:i:s');
         $newStudent = [
             'id' => count(self::$students) + 1,
-            'student_id' => $generatedId,
+            'student_id' => !empty($input['student_id']) ? trim((string) $input['student_id']) : $generatedId,
             'full_name' => trim((string) $input['full_name']),
             'guardian_name' => trim((string) $input['guardian_name']),
+            'guardian_relation' => $input['guardian_relation'] ?? 'Guardian',
+            'guardian_phone' => !empty($input['guardian_phone']) ? trim((string) $input['guardian_phone']) : trim((string) $input['phone']),
+            'guardian_email' => $input['guardian_email'] ?? '',
             'phone' => trim((string) $input['phone']),
             'email' => !empty($input['email']) ? trim((string) $input['email']) : strtolower(str_replace(' ', '.', trim((string) $input['full_name']))) . '@student.bixcel.edu',
+            'dob' => $input['dob'] ?? '2004-01-01',
+            'gender' => $input['gender'] ?? 'Not Specified',
+            'blood_group' => $input['blood_group'] ?? 'O+',
+            'address' => $input['address'] ?? '',
+            'qualification' => $input['qualification'] ?? 'High School',
+            'institution' => $input['institution'] ?? '',
+            'passing_year' => $input['passing_year'] ?? '2025',
+            'id_proof_type' => $input['id_proof_type'] ?? 'National ID',
+            'id_proof_number' => $input['id_proof_number'] ?? 'NID-' . rand(1000000, 9999999),
+            'fee_plan' => $input['fee_plan'] ?? 'Full Payment',
+            'fee_status' => $input['fee_status'] ?? 'Paid',
+            'attendance_pct' => (int) ($input['attendance_pct'] ?? 100),
             'status' => $input['status'] ?? 'Active',
             'course_mode' => $input['course_mode'] ?? 'custom',
             'track' => $input['track'] ?? 'Digital Marketing',
@@ -352,8 +457,42 @@ class StudentController extends ResourceController
 
         return $this->respondCreated([
             'status' => 'success',
-            'message' => "Student {$newStudent['full_name']} onboarded successfully with registration ID {$generatedId}.",
+            'message' => "Student {$newStudent['full_name']} onboarded successfully with registration ID {$newStudent['student_id']}.",
             'data' => $newStudent,
+        ]);
+    }
+
+    /**
+     * Update student details
+     */
+    public function update($id = null)
+    {
+        $input = $this->request->getJSON(true) ?? $this->request->getRawInput();
+
+        $studentIdx = null;
+        foreach (self::$students as $idx => $s) {
+            if ($s['id'] == $id || $s['student_id'] === $id) {
+                $studentIdx = $idx;
+                break;
+            }
+        }
+
+        if ($studentIdx === null) {
+            return $this->failNotFound('Student record not found.');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $current = self::$students[$studentIdx];
+
+        $updated = array_merge($current, array_filter((array) $input, static fn($v) => $v !== null));
+        $updated['updated_at'] = $now;
+
+        self::$students[$studentIdx] = $updated;
+
+        return $this->respond([
+            'status' => 'success',
+            'message' => "Student {$updated['full_name']} details updated successfully.",
+            'data' => $updated,
         ]);
     }
 
