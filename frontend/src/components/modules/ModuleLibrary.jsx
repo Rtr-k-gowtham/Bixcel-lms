@@ -1240,27 +1240,34 @@ export function ModuleLibrary() {
           {/* Studio Split-Pane Body: Left Days Sidebar + Right Workspace Canvas */}
           <div className="flex-1 flex overflow-hidden">
             {/* ================================================================= */}
-            {/* LEFT COLUMN: CURRICULUM DAYS SIDEBAR                             */}
+            {/* LEFT COLUMN: CURRICULUM DAYS SIDEBAR (MODERN ENTERPRISE UI)      */}
             {/* ================================================================= */}
-            <aside className="w-64 sm:w-72 lg:w-80 shrink-0 border-r border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/20 flex flex-col h-full overflow-hidden">
+            <aside className="w-72 sm:w-80 lg:w-84 shrink-0 border-r border-light-outline-variant/80 dark:border-dark-outline-variant/80 bg-light-surface-container-low/30 dark:bg-dark-surface-container/20 flex flex-col h-full overflow-hidden">
               {/* Sidebar Header with Add Day Button */}
-              <div className="p-3.5 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 flex items-center justify-between shrink-0 bg-light-surface-container-lowest/80 dark:bg-dark-surface-bright/50">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px] text-light-primary">calendar_view_day</span>
-                    <span className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface uppercase tracking-wider">
-                      Curriculum Days
-                    </span>
+              <div className="p-3.5 sm:p-4 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 flex items-center justify-between shrink-0 bg-light-surface-container-lowest/90 dark:bg-dark-surface-bright/80 backdrop-blur-sm">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-light-primary-tint/25 dark:bg-dark-primary-tint/20 text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 border border-light-primary/20">
+                    <span className="material-symbols-outlined text-[18px]">calendar_month</span>
                   </div>
-                  <span className="text-[11px] text-light-on-surface-variant font-mono mt-0.5 block">
-                    {curriculumDays.length} {curriculumDays.length === 1 ? 'Day' : 'Days'} Configured
-                  </span>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="text-xs font-bold text-light-on-surface dark:text-dark-on-surface tracking-tight uppercase">
+                        Course Days
+                      </h3>
+                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-light-surface-container-high dark:bg-dark-surface-container-high text-light-on-surface-variant font-mono">
+                        {curriculumDays.length}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-light-on-surface-variant">
+                      Structured curriculum schedule
+                    </p>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAddNewDay}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-light-primary text-light-on-primary hover:bg-light-primary-container text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-light-primary text-light-on-primary hover:bg-light-primary-container text-xs font-bold shadow-xs transition-all cursor-pointer"
                   title="Add Next Day"
                 >
                   <span className="material-symbols-outlined text-[15px]">add</span>
@@ -1269,25 +1276,23 @@ export function ModuleLibrary() {
               </div>
 
               {/* Day Search / Filter */}
-              {curriculumDays.length > 4 && (
-                <div className="p-2.5 border-b border-light-outline-variant/40 shrink-0 bg-light-surface-container-low/50">
-                  <div className="relative">
-                    <span className="material-symbols-outlined text-[15px] text-light-outline absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
-                      search
-                    </span>
-                    <input
-                      type="text"
-                      value={daySearchQuery}
-                      onChange={(e) => setDaySearchQuery(e.target.value)}
-                      placeholder="Filter days or activities..."
-                      className="w-full pl-8 pr-2.5 py-1 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    />
-                  </div>
+              <div className="p-3 border-b border-light-outline-variant/40 shrink-0 bg-light-surface-container-low/40">
+                <div className="relative">
+                  <span className="material-symbols-outlined text-[15px] text-light-outline absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                    search
+                  </span>
+                  <input
+                    type="text"
+                    value={daySearchQuery}
+                    onChange={(e) => setDaySearchQuery(e.target.value)}
+                    placeholder="Search days or topics..."
+                    className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary shadow-2xs transition-all"
+                  />
                 </div>
-              )}
+              </div>
 
               {/* Days List Scrollable */}
-              <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5 scrollbar-thin">
+              <div className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin">
                 {filteredCurriculumDays.map((d) => {
                   const isSelected = d.day === activeDay.day
                   const totalItems = d.lessons ? d.lessons.length : 0
@@ -1296,6 +1301,8 @@ export function ModuleLibrary() {
                   const quizCount = (d.lessons || []).filter((l) => l.type === 'quiz').length
                   const testCount = (d.lessons || []).filter((l) => l.type === 'test').length
 
+                  const displayTitle = d.day_title ? d.day_title.replace(/^Day\s*\d+:\s*/i, '').trim() : `Curriculum Plan`
+
                   return (
                     <div
                       key={d.day}
@@ -1303,89 +1310,106 @@ export function ModuleLibrary() {
                         setActiveDayNumber(d.day)
                         setShowItemForm(false)
                       }}
-                      className={`group p-2.5 rounded-xl border transition-all cursor-pointer relative ${
+                      className={`group p-3 rounded-xl border transition-all cursor-pointer relative ${
                         isSelected
-                          ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-primary/70 dark:border-dark-primary/70 shadow-xs ring-1 ring-light-primary/25'
+                          ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-primary/60 dark:border-dark-primary/60 shadow-sm ring-1 ring-light-primary/20'
                           : 'bg-light-surface-container-lowest/60 dark:bg-dark-surface-bright/40 border-light-outline-variant/60 dark:border-dark-outline-variant/60 hover:border-light-outline-variant hover:bg-light-surface-container-lowest'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span
-                            className={`px-1.5 py-0.2 rounded text-[10px] font-bold font-mono tracking-wider ${
-                              isSelected
-                                ? 'bg-light-primary text-light-on-primary'
-                                : 'bg-light-surface-container-high dark:bg-dark-surface-container-high text-light-on-surface-variant'
-                            }`}
-                          >
-                            DAY {d.day}
-                          </span>
-                          <span className="font-semibold text-xs text-light-on-surface dark:text-dark-on-surface truncate">
-                            {d.day_title.replace(/^Day \d+:\s*/, '') || `Day ${d.day}`}
-                          </span>
+                      <div className="flex items-start gap-2.5">
+                        {/* Elegant Numbered Day Badge */}
+                        <div
+                          className={`w-9 h-9 rounded-lg font-mono flex flex-col items-center justify-center shrink-0 transition-colors shadow-2xs ${
+                            isSelected
+                              ? 'bg-light-primary text-light-on-primary font-bold'
+                              : 'bg-light-surface-container-high dark:bg-dark-surface-container-high text-light-on-surface-variant group-hover:bg-light-primary-tint/20 group-hover:text-light-primary'
+                          }`}
+                        >
+                          <span className="text-[8px] uppercase tracking-wider font-sans opacity-75 leading-none">DAY</span>
+                          <span className="text-[13px] font-bold leading-none mt-0.5">{d.day}</span>
                         </div>
 
-                        {curriculumDays.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDeleteDay(d.day)
-                            }}
-                            className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-light-on-surface-variant hover:text-overdue transition-all cursor-pointer"
-                            title={`Delete Day ${d.day}`}
-                          >
-                            <span className="material-symbols-outlined text-[15px]">delete</span>
-                          </button>
-                        )}
-                      </div>
+                        {/* Title & Activities */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-1">
+                            <h4
+                              className={`text-xs font-semibold leading-snug line-clamp-2 ${
+                                isSelected
+                                  ? 'text-light-primary dark:text-dark-primary font-bold'
+                                  : 'text-light-on-surface dark:text-dark-on-surface group-hover:text-light-primary'
+                              }`}
+                              title={d.day_title}
+                            >
+                              {displayTitle || `Day ${d.day}`}
+                            </h4>
 
-                      {/* Activities pill breakdown */}
-                      <div className="flex items-center gap-1 text-[10px] text-light-on-surface-variant flex-wrap mt-1.5">
-                        {totalItems === 0 ? (
-                          <span className="text-[10px] text-light-outline italic">0 activities</span>
-                        ) : (
-                          <>
-                            {lessonCount > 0 && (
-                              <span className="px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium">
-                                {lessonCount}L
-                              </span>
+                            {curriculumDays.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeleteDay(d.day)
+                                }}
+                                className="opacity-0 group-hover:opacity-100 p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-all shrink-0 cursor-pointer"
+                                title={`Delete Day ${d.day}`}
+                              >
+                                <span className="material-symbols-outlined text-[15px]">delete</span>
+                              </button>
                             )}
-                            {taskCount > 0 && (
-                              <span className="px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
-                                {taskCount}T
-                              </span>
+                          </div>
+
+                          {/* Refined Activity Chips */}
+                          <div className="flex items-center gap-1 text-[10px] text-light-on-surface-variant flex-wrap mt-2">
+                            {totalItems === 0 ? (
+                              <span className="text-[10px] text-light-outline italic">0 activities</span>
+                            ) : (
+                              <>
+                                {lessonCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium border border-blue-500/20">
+                                    <span className="material-symbols-outlined text-[11px]">menu_book</span>
+                                    <span>{lessonCount}</span>
+                                  </span>
+                                )}
+                                {taskCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium border border-amber-500/20">
+                                    <span className="material-symbols-outlined text-[11px]">assignment</span>
+                                    <span>{taskCount}</span>
+                                  </span>
+                                )}
+                                {quizCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium border border-purple-500/20">
+                                    <span className="material-symbols-outlined text-[11px]">quiz</span>
+                                    <span>{quizCount}</span>
+                                  </span>
+                                )}
+                                {testCount > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 font-medium border border-rose-500/20">
+                                    <span className="material-symbols-outlined text-[11px]">military_tech</span>
+                                    <span>{testCount}</span>
+                                  </span>
+                                )}
+                                <span className="font-mono text-[9px] text-light-outline ml-auto">
+                                  {totalItems} total
+                                </span>
+                              </>
                             )}
-                            {quizCount > 0 && (
-                              <span className="px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium">
-                                {quizCount}Q
-                              </span>
-                            )}
-                            {testCount > 0 && (
-                              <span className="px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-medium">
-                                {testCount}Ex
-                              </span>
-                            )}
-                            <span className="font-mono text-[9px] text-light-outline ml-auto">
-                              {totalItems} total
-                            </span>
-                          </>
-                        )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )
                 })}
               </div>
 
-              {/* Sidebar Bottom: Quick Add Day */}
-              <div className="p-3 border-t border-light-outline-variant/60 dark:border-dark-outline-variant/60 shrink-0 bg-light-surface-container-lowest/80 dark:bg-dark-surface-bright/50">
+              {/* Sidebar Bottom: Sleek Add Day Button */}
+              <div className="p-3 border-t border-light-outline-variant/60 dark:border-dark-outline-variant/60 shrink-0 bg-light-surface-container-lowest/90 dark:bg-dark-surface-bright/80 backdrop-blur-sm">
                 <button
                   type="button"
                   onClick={handleAddNewDay}
-                  className="w-full py-2 px-3 rounded-xl border border-dashed border-light-primary/60 text-light-primary hover:bg-light-primary-tint/20 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="w-full py-2 px-3 rounded-xl border border-light-outline-variant hover:border-light-primary bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-primary-tint/20 text-light-on-surface dark:text-dark-on-surface hover:text-light-primary text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[16px]">add_circle</span>
-                  <span>Add Next Day (Day {curriculumDays.length + 1})</span>
+                  <span>Add Day {curriculumDays.length + 1}</span>
                 </button>
               </div>
             </aside>
