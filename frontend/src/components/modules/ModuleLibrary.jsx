@@ -9,38 +9,31 @@ export function generateDefaultCurriculum(title, days = 7) {
   const seedTopics = [
     {
       title: 'Foundations & Visual Core Principles',
-      lessons: [
-        { sno: 1, title: 'Introduction & Core Conceptual Principles', duration: '45 mins', description: 'Theoretical foundations, fundamental terminology, and industry standard mental models.' },
-        { sno: 2, title: 'Tooling, Scaffolding & Initial Setup', duration: '60 mins', description: 'Environment setup, project workspace configuration, shortcuts, and boilerplate architectures.' },
+      items: [
+        { sno: 1, type: 'lesson', title: 'Introduction & Core Conceptual Principles', duration: '45 mins', description: 'Theoretical foundations, fundamental terminology, and industry standard mental models.', format: 'Video Lecture' },
+        { sno: 2, type: 'task', title: 'Project Scaffolding & Design Tokens Setup', duration: '60 mins', description: 'Configure workspace, import token libraries, and verify color contrast ratios.', doc_link: 'https://bixcel.edu/docs/foundations-setup.pdf', image_url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=500' },
       ],
     },
     {
       title: 'Structural Architecture & Component Design',
-      lessons: [
-        { sno: 1, title: 'Component Hierarchy & Composition', duration: '50 mins', description: 'Breaking complex workflows into modular, reusable, and maintainable building blocks.' },
-        { sno: 2, title: 'Design Constraints & Spatial Layouts', duration: '55 mins', description: 'Grid systems, adaptive sizing, flex structures, and responsive boundaries.' },
-        { sno: 3, title: 'Hands-on Practice: Blueprint Assembly', duration: '40 mins', description: 'Guided exercise translating requirements into production-ready component prototypes.' },
+      items: [
+        { sno: 1, type: 'lesson', title: 'Component Hierarchy & Composition', duration: '50 mins', description: 'Breaking complex workflows into modular, reusable, and maintainable building blocks.', format: 'Interactive Lab' },
+        { sno: 2, type: 'task', title: 'Atomic Buttons & Form Inputs Exercise', duration: '55 mins', description: 'Construct atomic button states (hover, focus, disabled) matching WCAG AAA specs.', doc_link: 'https://figma.com/@bixcel-design-system', image_url: '' },
+        { sno: 3, type: 'quiz', title: 'Component Anatomy Checkpoint', duration: '20 mins', description: 'Verify understanding of props, slots, and design constraints.', questions_count: 5, pass_score: '80%' },
       ],
     },
     {
       title: 'Data Flow, State & Async Interactions',
-      lessons: [
-        { sno: 1, title: 'Unidirectional Data Flow & State Hooks', duration: '55 mins', description: 'Managing local state, derived computations, and predictable state transitions.' },
-        { sno: 2, title: 'Consuming External APIs & Handling Side Effects', duration: '60 mins', description: 'Async/await requests, loading skeletons, error boundaries, and cache validation.' },
+      items: [
+        { sno: 1, type: 'lesson', title: 'Unidirectional Data Flow & State Hooks', duration: '55 mins', description: 'Managing local state, derived computations, and predictable state transitions.', format: 'Video Lecture' },
+        { sno: 2, type: 'task', title: 'Async API Data Binding Assignment', duration: '60 mins', description: 'Implement fetch hooks with loading skeletons and robust error boundaries.', doc_link: 'https://github.com/bixcel-lms/api-specs', image_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500' },
       ],
     },
     {
       title: 'Advanced Patterns & Design Systems',
-      lessons: [
-        { sno: 1, title: 'Scalable Token Architecture & Theme Variables', duration: '45 mins', description: 'Atomic tokens, semantic color mappings, dark/light aliases, and WCAG AAA compliance.' },
-        { sno: 2, title: 'Micro-interactions & Accessible Feedback', duration: '50 mins', description: 'Subtle hover states, focus rings, keyboard navigation, and screen reader labels.' },
-      ],
-    },
-    {
-      title: 'Testing, QA & Performance Optimization',
-      lessons: [
-        { sno: 1, title: 'Automated Unit Verification & Test Cases', duration: '50 mins', description: 'Testing critical paths, assertions, mock adapters, and regression prevention.' },
-        { sno: 2, title: 'Runtime Performance & Bundle Auditing', duration: '45 mins', description: 'Profiling rendering bottlenecks, tree shaking, asset minification, and latency reduction.' },
+      items: [
+        { sno: 1, type: 'lesson', title: 'Scalable Token Architecture & Theme Variables', duration: '45 mins', description: 'Atomic tokens, semantic color mappings, dark/light aliases, and WCAG AAA compliance.', format: 'Live Workshop' },
+        { sno: 2, type: 'test', title: 'Design System Practical Milestone Test', duration: '90 mins', description: 'Comprehensive practical benchmark creating an enterprise component suite.', total_marks: 100, passing_marks: 50 },
       ],
     },
   ]
@@ -50,11 +43,12 @@ export function generateDefaultCurriculum(title, days = 7) {
     curriculum.push({
       day: d,
       day_title: `Day ${d}: ${template.title}`,
-      lessons: template.lessons.map((l) => ({
-        sno: l.sno,
-        title: `${l.title} (${title.slice(0, 20)})`,
-        duration: l.duration,
-        description: l.description,
+      lessons: template.items.map((item) => ({
+        ...item,
+        sno: item.sno,
+        title: item.title,
+        duration: item.duration,
+        description: item.description,
       })),
     })
   }
@@ -71,10 +65,10 @@ const DEFAULT_MODULES = [
     category: 'Design',
     status: 'Published',
     days: 7,
-    lessons: 15,
-    tasks: 6,
+    lessons: 10,
+    tasks: 4,
     assignments: 3,
-    tests: 2,
+    tests: 1,
     milestones: 1,
     updated_at: '2026-11-18',
     description: 'Fundamental principles of color theory, typography, grid layouts, and visual hierarchy using industry tools.',
@@ -83,57 +77,56 @@ const DEFAULT_MODULES = [
         day: 1,
         day_title: 'Day 1: Foundations of Visual Design & Hierarchy',
         lessons: [
-          { sno: 1, title: 'Principles of Visual Hierarchy & Balance', duration: '45 mins', description: 'Rule of thirds, optical center, focal points, scale contrast, and cognitive visual flow.' },
-          { sno: 2, title: 'Color Theory & Harmonious Palettes', duration: '50 mins', description: 'Color wheel relationships, RGB vs CMYK, psychological tints, and WCAG AAA contrast compliance.' },
+          { sno: 1, type: 'lesson', title: 'Principles of Visual Hierarchy & Balance', duration: '45 mins', description: 'Rule of thirds, optical center, focal points, scale contrast, and cognitive visual flow.', format: 'Video Lecture' },
+          { sno: 2, type: 'task', title: 'Layout Balance & Alignment Exercise', duration: '50 mins', description: 'Create 3 layout compositions following the rule of thirds and optical balancing.', doc_link: 'https://bixcel.edu/resources/visual-hierarchy.pdf', image_url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=500' },
         ],
       },
       {
         day: 2,
         day_title: 'Day 2: Typography & Composition Layouts',
         lessons: [
-          { sno: 1, title: 'Anatomy of Type & Font Pairings', duration: '45 mins', description: 'Serif vs sans-serif, kerning, leading, tracking, hierarchy pairing display titles with body text.' },
-          { sno: 2, title: 'Modular Grid Systems & 8pt Rhythm', duration: '60 mins', description: 'Baseline grids, column margins, gutters, and effective utilization of white space.' },
+          { sno: 1, type: 'lesson', title: 'Anatomy of Type & Font Pairings', duration: '45 mins', description: 'Serif vs sans-serif, kerning, leading, tracking, hierarchy pairing display titles with body text.', format: 'Interactive Lab' },
+          { sno: 2, type: 'quiz', title: 'Typography Fundamentals Quiz', duration: '15 mins', description: 'Evaluation of font scales, line heights, and readability principles.', questions_count: 5, pass_score: '80%' },
         ],
       },
       {
         day: 3,
         day_title: 'Day 3: Vector Graphics & Pen Tool Mastery',
         lessons: [
-          { sno: 1, title: 'Bézier Curves & Path Geometries', duration: '55 mins', description: 'Vector control handles, node points, boolean operations (union, subtract, intersect).' },
-          { sno: 2, title: 'Iconography Construction & Scalability', duration: '50 mins', description: 'Designing cohesive 24px icon sets with consistent stroke weights and optical sizing.' },
+          { sno: 1, type: 'lesson', title: 'Bézier Curves & Path Geometries', duration: '55 mins', description: 'Vector control handles, node points, boolean operations (union, subtract, intersect).', format: 'Live Workshop' },
+          { sno: 2, type: 'task', title: 'Vector Icon Set Construction', duration: '60 mins', description: 'Design a cohesive 6-piece icon set on a 24x24 pixel grid with 2px uniform stroke.', doc_link: 'https://figma.com/@bixcel-icons', image_url: '' },
         ],
       },
       {
         day: 4,
         day_title: 'Day 4: Image Masking & Raster Editing',
         lessons: [
-          { sno: 1, title: 'Non-Destructive Layer Masking', duration: '45 mins', description: 'Clipping masks, alpha channels, blend modes, and isolating complex edges.' },
-          { sno: 2, title: 'Color Correction & Tone Curves', duration: '50 mins', description: 'Histogram balancing, selective color adjustment, and high-fidelity retouching.' },
+          { sno: 1, type: 'lesson', title: 'Non-Destructive Layer Masking', duration: '45 mins', description: 'Clipping masks, alpha channels, blend modes, and isolating complex edges.', format: 'Video Lecture' },
+          { sno: 2, type: 'task', title: 'Selective Color Grading & Retouching', duration: '50 mins', description: 'Perform tone curves and histogram balancing on provided RAW photographic assets.', doc_link: '', image_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500' },
         ],
       },
       {
         day: 5,
         day_title: 'Day 5: Digital Branding & Identity Assets',
         lessons: [
-          { sno: 1, title: 'Brand Guidelines & Style Guides', duration: '45 mins', description: 'Logo clear-space specifications, primary/secondary palette documentation, and voice.' },
-          { sno: 2, title: 'Social Media Asset Pack Workshop', duration: '60 mins', description: 'Building multi-ratio promotional banners across Instagram, LinkedIn, and YouTube standards.' },
+          { sno: 1, type: 'lesson', title: 'Brand Guidelines & Style Guides', duration: '45 mins', description: 'Logo clear-space specifications, primary/secondary palette documentation, and voice.', format: 'Interactive Lab' },
+          { sno: 2, type: 'quiz', title: 'Brand Identity Standards Quiz', duration: '20 mins', description: 'Assessment of trademark clearance, asset ratios, and typography specifications.', questions_count: 6, pass_score: '85%' },
         ],
       },
       {
         day: 6,
         day_title: 'Day 6: Print Production & Prepress Standards',
         lessons: [
-          { sno: 1, title: 'Bleed, Slug, & CMYK Color Separations', duration: '50 mins', description: '300 DPI resolution requirements, crop marks, rich black vs 100K black, and paper stock.' },
-          { sno: 2, title: 'PDF/X Export & Preflight Verification', duration: '40 mins', description: 'Font embedding, vector flattening, ink limit verification, and printer proofing.' },
+          { sno: 1, type: 'lesson', title: 'Bleed, Slug, & CMYK Color Separations', duration: '50 mins', description: '300 DPI resolution requirements, crop marks, rich black vs 100K black, and paper stock.', format: 'Video Lecture' },
+          { sno: 2, type: 'task', title: 'Print-Ready PDF Preflight Export', duration: '40 mins', description: 'Export PDF/X-1a files verifying embedded fonts, ink limits, and bleed borders.', doc_link: 'https://bixcel.edu/print-specs.pdf', image_url: '' },
         ],
       },
       {
         day: 7,
-        day_title: 'Day 7: Capstone Portfolio Presentation & Critique',
+        day_title: 'Day 7: Capstone Portfolio Evaluation & Benchmark Test',
         lessons: [
-          { sno: 1, title: 'Case Study Storytelling & Mockups', duration: '50 mins', description: 'Presenting design solutions in realistic 3D isometric mockups with clear rationale.' },
-          { sno: 2, title: 'Peer Review & Design Critique Session', duration: '60 mins', description: 'Structured rubric evaluation, iteration feedback, and final portfolio publishing.' },
-          { sno: 3, title: 'Industry Handoff & Asset Archiving', duration: '35 mins', description: 'File naming taxonomies, layered PSD/AI archiving, and SVG optimization.' },
+          { sno: 1, type: 'lesson', title: 'Case Study Storytelling & Mockups', duration: '50 mins', description: 'Presenting design solutions in realistic 3D isometric mockups with clear rationale.', format: 'Live Workshop' },
+          { sno: 2, type: 'test', title: 'Final Graphic Design Benchmark Examination', duration: '90 mins', description: 'Comprehensive design assessment covering branding, typography, vector assets, and preflight.', total_marks: 100, passing_marks: 60 },
         ],
       },
     ],
@@ -145,168 +138,49 @@ const DEFAULT_MODULES = [
     version: 'v1.4',
     category: 'UI/UX',
     status: 'Published',
-    days: 10,
-    lessons: 18,
-    tasks: 10,
-    assignments: 4,
-    tests: 3,
-    milestones: 2,
+    days: 5,
+    lessons: 8,
+    tasks: 4,
+    assignments: 2,
+    tests: 1,
+    milestones: 1,
     updated_at: '2026-11-20',
-    description: 'Hands-on interactive prototyping, responsive auto-layouts, micro-animations, and user flow architectures.',
-    curriculum_lessons: [
-      {
-        day: 1,
-        day_title: 'Day 1: Figma Canvas, Frames & Constraints',
-        lessons: [
-          { sno: 1, title: 'Figma Workspace & Nested Frames', duration: '45 mins', description: 'Frame mechanics vs groups, artboard presets, layout grids, and pixel snapping.' },
-          { sno: 2, title: 'Responsive Pinning & Constraints', duration: '50 mins', description: 'Left/Right, Center, Scale, and Top/Bottom pinning across multi-device screens.' },
-        ],
-      },
-      {
-        day: 2,
-        day_title: 'Day 2: Low-Fidelity Wireframing & User Flows',
-        lessons: [
-          { sno: 1, title: 'Information Architecture & Site Maps', duration: '45 mins', description: 'Card sorting results, navigation hierarchies, and high-level user journey flows.' },
-          { sno: 2, title: 'Rapid Graybox Screen Mapping', duration: '60 mins', description: 'Constructing 8 primary application screens using standardized wireframe UI kits.' },
-        ],
-      },
-      {
-        day: 3,
-        day_title: 'Day 3: Auto-Layout 5.0 Mechanics',
-        lessons: [
-          { sno: 1, title: 'Flex Direction, Gaps & Hug vs Fill', duration: '50 mins', description: 'Horizontal and vertical layouts, uniform padding, and responsive container bounds.' },
-          { sno: 2, title: 'Auto-Layout Wrapping & Min/Max Widths', duration: '55 mins', description: 'Multi-line wrapping tags, sticky action bars, and container fluidity.' },
-        ],
-      },
-    ],
+    description: 'Rapid low-fidelity to high-fidelity wireframing, auto-layout mastery, interactive component prototyping, and user testing.',
+    curriculum_lessons: generateDefaultCurriculum('UI Wireframing in Figma', 5),
   },
   {
     id: 3,
-    title: 'Modern JavaScript & TypeScript Architecture',
+    title: 'Full-Stack JavaScript & Node.js Runtime',
     code: 'MOD-DEV-301',
     version: 'v3.0',
     category: 'Programming',
     status: 'Published',
-    days: 14,
-    lessons: 24,
-    tasks: 16,
-    assignments: 6,
-    tests: 4,
-    milestones: 3,
+    days: 6,
+    lessons: 10,
+    tasks: 5,
+    assignments: 3,
+    tests: 2,
+    milestones: 2,
     updated_at: '2026-11-22',
-    description: 'ES6+, functional programming paradigms, asynchronous patterns, TypeScript interfaces, and unit testing.',
-    curriculum_lessons: [
-      {
-        day: 1,
-        day_title: 'Day 1: Modern ECMAScript Syntax & Scope',
-        lessons: [
-          { sno: 1, title: 'Block Scoping, Closures & Execution Context', duration: '50 mins', description: 'Lexical environments, hoisting, closures, and garbage collection mechanisms.' },
-          { sno: 2, title: 'Destructuring, Rest & Spread Patterns', duration: '45 mins', description: 'Object and array pattern matching, shallow vs deep copying, and immutability.' },
-        ],
-      },
-      {
-        day: 2,
-        day_title: 'Day 2: Asynchronous Event Loop & Promises',
-        lessons: [
-          { sno: 1, title: 'Microtasks vs Macrotasks in V8', duration: '55 mins', description: 'Call stack, task queues, promise microtask ordering, and render cycle syncing.' },
-          { sno: 2, title: 'Async/Await & Resilient Error Handling', duration: '50 mins', description: 'Try/catch blocks, Promise.allSettled, timeout aborts, and circuit breakers.' },
-        ],
-      },
-      {
-        day: 3,
-        day_title: 'Day 3: TypeScript Foundations & Structural Typing',
-        lessons: [
-          { sno: 1, title: 'Primitive Types, Interfaces & Type Aliases', duration: '50 mins', description: 'Type inference, union types, intersection types, and strict null checks.' },
-          { sno: 2, title: 'Generics & Advanced Utility Types', duration: '60 mins', description: 'Generic constraints, Partial, Pick, Omit, Record, and conditional inference.' },
-        ],
-      },
-    ],
+    description: 'Asynchronous event loops, REST API design, Express middleware architecture, database integration, and deployment pipelines.',
+    curriculum_lessons: generateDefaultCurriculum('Full-Stack JavaScript & Node.js', 6),
   },
   {
     id: 4,
-    title: 'Responsive Layouts & Tailwind CSS',
-    code: 'MOD-CSS-102',
-    version: 'v2.0',
-    category: 'Programming',
-    status: 'Published',
+    title: 'Cloud Architecture & DevOps Deployment',
+    code: 'MOD-CLD-402',
+    version: 'v1.1',
+    category: 'Cloud Computing',
+    status: 'Draft',
     days: 5,
-    lessons: 10,
-    tasks: 8,
+    lessons: 8,
+    tasks: 3,
     assignments: 2,
     tests: 1,
     milestones: 1,
-    updated_at: '2026-11-15',
-    description: 'Utility-first CSS styling, mobile-first responsive breakpoints, dark mode tokens, and custom animation curves.',
-    curriculum_lessons: [
-      {
-        day: 1,
-        day_title: 'Day 1: Tailwind JIT Engine & Utility Philosophy',
-        lessons: [
-          { sno: 1, title: 'Utility-First vs Semantic CSS Trade-offs', duration: '45 mins', description: 'Build footprint, CSS purging, arbitrary values, and design token enforcement.' },
-          { sno: 2, title: 'Typography Scales & Spacing Systems', duration: '50 mins', description: 'Fluid typography, proportional padding/margin, and line-height balance.' },
-        ],
-      },
-      {
-        day: 2,
-        day_title: 'Day 2: Mobile-First Breakpoints & Fluid Grids',
-        lessons: [
-          { sno: 1, title: 'Responsive Modifiers (sm, md, lg, xl, 2xl)', duration: '45 mins', description: 'Mobile viewport testing, breakpoint overrides, and container queries.' },
-          { sno: 2, title: 'CSS Grid & Flexbox Alignment Utilities', duration: '55 mins', description: 'Auto-fit columns, minmax grid sizing, item positioning, and alignment.' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 5,
-    title: 'RESTful API Integration & Async State',
-    code: 'MOD-API-402',
-    version: 'v1.2',
-    category: 'Programming',
-    status: 'Draft',
-    days: 8,
-    lessons: 12,
-    tasks: 8,
-    assignments: 3,
-    tests: 2,
-    milestones: 1,
     updated_at: '2026-11-24',
-    description: 'Axios client configurations, token authentication workflows, optimistic mutations, and preflight CORS handling.',
-    curriculum_lessons: [
-      {
-        day: 1,
-        day_title: 'Day 1: HTTP Protocol & REST Architectural Constraints',
-        lessons: [
-          { sno: 1, title: 'HTTP Verbs, Headers, & Status Codes', duration: '45 mins', description: 'Idempotency, content negotiation, cache-control headers, and standard error payloads.' },
-          { sno: 2, title: 'Configuring Axios & Fetch Interceptors', duration: '50 mins', description: 'Base URLs, Bearer token injection, automatic refresh token loops, and timeout configs.' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 6,
-    title: 'Design Systems & Component Tokens',
-    code: 'MOD-UIX-305',
-    version: 'v1.0',
-    category: 'UI/UX',
-    status: 'Draft',
-    days: 6,
-    lessons: 12,
-    tasks: 6,
-    assignments: 2,
-    tests: 2,
-    milestones: 1,
-    updated_at: '2026-11-25',
-    description: 'Building scalable design systems with atomic design tokens, accessibility standards (WCAG AAA), and Figma variables.',
-    curriculum_lessons: [
-      {
-        day: 1,
-        day_title: 'Day 1: Atomic Design Methodology & Token Taxonomy',
-        lessons: [
-          { sno: 1, title: 'Atoms, Molecules, Organisms & Templates', duration: '45 mins', description: 'Hierarchical component architecture, breaking down user interfaces systematically.' },
-          { sno: 2, title: 'Design Tokens: Global, Semantic, & Component Scopes', duration: '55 mins', description: 'Color, spacing, radius, and elevation tokens using JSON specifications.' },
-        ],
-      },
-    ],
+    description: 'Containerization with Docker, Kubernetes orchestration, CI/CD pipelines, SSL automation, and cloud server provisioning.',
+    curriculum_lessons: generateDefaultCurriculum('Cloud Architecture & DevOps', 5),
   },
 ]
 
@@ -316,28 +190,15 @@ export function ModuleLibrary() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortOption, setSortOption] = useState('updated')
-  const [addedModules, setAddedModules] = useState({})
   const [toast, setToast] = useState('')
 
-  // Modals
-  const [showModal, setShowModal] = useState(false)
+  // Modals & Full-Screen Studio
+  const [fullScreenStudio, setFullScreenStudio] = useState(false)
   const [editingModule, setEditingModule] = useState(null)
   const [inspectModule, setInspectModule] = useState(null)
+  const [lightboxImage, setLightboxImage] = useState(null)
 
-  // Day-Wise Curriculum & Multiple Lessons Builder State
-  const [curriculumModule, setCurriculumModule] = useState(null)
-  const [curriculumDays, setCurriculumDays] = useState([])
-  const [activeDayNumber, setActiveDayNumber] = useState(1)
-  const [showAddLessonForm, setShowAddLessonForm] = useState(false)
-  const [editingLessonSno, setEditingLessonSno] = useState(null)
-  const [lessonFormData, setLessonFormData] = useState({
-    sno: 1,
-    title: '',
-    duration: '45 mins',
-    description: '',
-  })
-
-  // Create/Edit Form state
+  // Full-Screen Studio Form & Curriculum State
   const [formData, setFormData] = useState({
     title: '',
     code: '',
@@ -345,12 +206,27 @@ export function ModuleLibrary() {
     version: 'v1.0',
     status: 'Published',
     days: 7,
-    lessons: 12,
-    tasks: 6,
-    assignments: 3,
-    tests: 2,
-    milestones: 1,
     description: '',
+  })
+  const [curriculumDays, setCurriculumDays] = useState([])
+  const [activeDayNumber, setActiveDayNumber] = useState(1)
+
+  // Item Form State (inside Full-Screen Studio)
+  const [showItemForm, setShowItemForm] = useState(false)
+  const [editingItemSno, setEditingItemSno] = useState(null)
+  const [itemFormData, setItemFormData] = useState({
+    type: 'lesson', // 'lesson' | 'task' | 'quiz' | 'test'
+    sno: 1,
+    title: '',
+    duration: '45 mins',
+    description: '',
+    format: 'Video Lecture',
+    doc_link: '',
+    image_url: '',
+    questions_count: 5,
+    pass_score: '80%',
+    total_marks: 100,
+    passing_marks: 50,
   })
 
   // Fetch from backend
@@ -360,18 +236,27 @@ export function ModuleLibrary() {
       try {
         const res = await apiService.getModules()
         if (res && res.status === 'success' && res.data && isMounted) {
-          // Normalize modules to have curriculum_lessons
           const normalized = res.data.map((m) => {
             const days = Number(m.days) || 7
             const cur = (m.curriculum_lessons && Array.isArray(m.curriculum_lessons) && m.curriculum_lessons.length > 0)
               ? m.curriculum_lessons
               : generateDefaultCurriculum(m.title, days)
-            const totalLessons = cur.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0)
+            
+            let lCount = 0
+            let tCount = 0
+            cur.forEach((d) => {
+              (d.lessons || []).forEach((item) => {
+                if (item.type === 'task') tCount++
+                else lCount++
+              })
+            })
+
             return {
               ...m,
               curriculum_lessons: cur,
               days: cur.length,
-              lessons: totalLessons > 0 ? totalLessons : (Number(m.lessons) || days * 2),
+              lessons: lCount > 0 ? lCount : (Number(m.lessons) || days * 2),
+              tasks: tCount > 0 ? tCount : (Number(m.tasks) || 4),
             }
           })
           setModules(normalized)
@@ -384,6 +269,7 @@ export function ModuleLibrary() {
     return () => { isMounted = false }
   }, [])
 
+  // Open Full-Screen Studio for creating a new module
   const openCreateModal = () => {
     setEditingModule(null)
     setFormData({
@@ -393,38 +279,36 @@ export function ModuleLibrary() {
       version: 'v1.0',
       status: 'Published',
       days: 7,
-      lessons: 14,
-      tasks: 6,
-      assignments: 3,
-      tests: 2,
-      milestones: 1,
       description: '',
     })
-    setShowModal(true)
+    const initialDays = generateDefaultCurriculum('New Module', 7)
+    setCurriculumDays(initialDays)
+    setActiveDayNumber(1)
+    setShowItemForm(false)
+    setEditingItemSno(null)
+    setFullScreenStudio(true)
   }
 
+  // Open Full-Screen Studio for editing an existing module
   const openEditModal = (m) => {
     setEditingModule(m)
-    setFormData({ ...m })
-    setShowModal(true)
-  }
-
-  // Open Curriculum & Day-Wise Lessons Builder
-  const openCurriculumModal = (m) => {
-    setCurriculumModule(m)
+    setFormData({
+      title: m.title,
+      code: m.code,
+      category: m.category || 'UI/UX',
+      version: m.version || 'v1.0',
+      status: m.status || 'Published',
+      days: m.days || 7,
+      description: m.description || '',
+    })
     const initialDays = (m.curriculum_lessons && m.curriculum_lessons.length > 0)
       ? JSON.parse(JSON.stringify(m.curriculum_lessons))
       : generateDefaultCurriculum(m.title, m.days || 7)
     setCurriculumDays(initialDays)
-    setActiveDayNumber(initialDays[0] ? initialDays[0].day : 1)
-    setShowAddLessonForm(false)
-    setEditingLessonSno(null)
-    setLessonFormData({
-      sno: 1,
-      title: '',
-      duration: '45 mins',
-      description: '',
-    })
+    setActiveDayNumber(initialDays[0]?.day || 1)
+    setShowItemForm(false)
+    setEditingItemSno(null)
+    setFullScreenStudio(true)
   }
 
   // Active day object in curriculum builder
@@ -434,119 +318,48 @@ export function ModuleLibrary() {
     lessons: [],
   }
 
-  // Start adding a lesson into the active day
-  const handleStartAddLesson = () => {
-    const nextSno = activeDay.lessons && activeDay.lessons.length > 0
-      ? Math.max(...activeDay.lessons.map((l) => Number(l.sno) || 0)) + 1
-      : 1
-    setLessonFormData({
-      sno: nextSno,
-      title: '',
-      duration: '45 mins',
-      description: '',
-    })
-    setEditingLessonSno(null)
-    setShowAddLessonForm(true)
-  }
-
-  // Start editing an existing lesson in active day
-  const handleStartEditLesson = (lesson) => {
-    setLessonFormData({ ...lesson })
-    setEditingLessonSno(lesson.sno)
-    setShowAddLessonForm(true)
-  }
-
-  // Delete a lesson from active day
-  const handleDeleteLesson = (snoToDelete) => {
-    setCurriculumDays((prevDays) =>
-      prevDays.map((d) => {
-        if (d.day !== activeDay.day) return d
-        const updated = d.lessons.filter((l) => l.sno !== snoToDelete)
-        return { ...d, lessons: updated }
-      })
-    )
-    setToast(`Lesson #${snoToDelete} removed from Day ${activeDay.day}`)
-    setTimeout(() => setToast(''), 2500)
-  }
-
-  // Save lesson (new or edited) into active day
-  const handleSaveLesson = (e) => {
-    e.preventDefault()
-    if (!lessonFormData.title.trim()) return
-
-    const newLesson = {
-      sno: Number(lessonFormData.sno) || 1,
-      title: lessonFormData.title.trim(),
-      duration: lessonFormData.duration.trim() || '45 mins',
-      description: lessonFormData.description.trim() || 'Core instructional syllabus topics and exercises.',
-    }
-
-    setCurriculumDays((prevDays) =>
-      prevDays.map((d) => {
-        if (d.day !== activeDay.day) return d
-        const currentLessons = d.lessons || []
-        if (editingLessonSno !== null) {
-          // Editing existing lesson
-          const updated = currentLessons.map((l) =>
-            l.sno === editingLessonSno ? newLesson : l
-          )
-          return { ...d, lessons: updated }
-        } else {
-          // Adding new lesson (supports multiple lessons in day 1, 2, etc.)
-          const updated = [...currentLessons, newLesson]
-          return { ...d, lessons: updated }
-        }
-      })
-    )
-
-    setShowAddLessonForm(false)
-    setEditingLessonSno(null)
-    setToast(
-      editingLessonSno !== null
-        ? `Lesson #${newLesson.sno} updated for Day ${activeDay.day}`
-        : `Added Lesson #${newLesson.sno} to Day ${activeDay.day}`
-    )
-    setTimeout(() => setToast(''), 2500)
-  }
-
-  // Add a new day to the module
+  // Add a new Day to the module
   const handleAddNewDay = () => {
     const nextDayNum = curriculumDays.length + 1
     const newDay = {
       day: nextDayNum,
-      day_title: `Day ${nextDayNum}: In-Depth Practical Topics & Labs`,
+      day_title: `Day ${nextDayNum}: In-Depth Practical Topics & Activities`,
       lessons: [
         {
           sno: 1,
+          type: 'lesson',
           title: `Day ${nextDayNum} Core Lecture: Advanced Implementation`,
           duration: '45 mins',
+          format: 'Video Lecture',
           description: `Key conceptual lecture and practical walk-through for day ${nextDayNum}.`,
         },
       ],
     }
     setCurriculumDays([...curriculumDays, newDay])
     setActiveDayNumber(nextDayNum)
-    setToast(`Day ${nextDayNum} added with 1 initial lesson`)
+    setToast(`Day ${nextDayNum} added`)
     setTimeout(() => setToast(''), 2500)
   }
 
-  // Delete day from curriculum
+  // Delete a Day from the module
   const handleDeleteDay = (dayToDelete) => {
     if (curriculumDays.length <= 1) {
       alert('A module must contain at least 1 day.')
       return
     }
-    const filtered = curriculumDays
-      .filter((d) => d.day !== dayToDelete)
-      .map((d, idx) => ({
-        ...d,
-        day: idx + 1,
-        day_title: d.day_title.replace(/Day \d+:/, `Day ${idx + 1}:`),
-      }))
-    setCurriculumDays(filtered)
-    setActiveDayNumber(1)
-    setToast(`Day ${dayToDelete} deleted. Days re-indexed.`)
-    setTimeout(() => setToast(''), 2500)
+    if (window.confirm(`Delete Day ${dayToDelete} and all its activities?`)) {
+      const filtered = curriculumDays
+        .filter((d) => d.day !== dayToDelete)
+        .map((d, idx) => ({
+          ...d,
+          day: idx + 1,
+          day_title: d.day_title.replace(/Day \d+:/, `Day ${idx + 1}:`),
+        }))
+      setCurriculumDays(filtered)
+      setActiveDayNumber(1)
+      setToast(`Day ${dayToDelete} deleted. Days re-indexed.`)
+      setTimeout(() => setToast(''), 2500)
+    }
   }
 
   // Update Day Title
@@ -556,39 +369,177 @@ export function ModuleLibrary() {
     )
   }
 
-  // Save the entire curriculum back to module & API
-  const handleSaveCurriculum = async () => {
-    if (!curriculumModule) return
+  // Open item form for creating a new item
+  const handleStartAddItem = (type = 'lesson') => {
+    const currentItems = activeDay.lessons || []
+    const nextSno = currentItems.length > 0
+      ? Math.max(...currentItems.map((l) => Number(l.sno) || 0)) + 1
+      : 1
+
+    setItemFormData({
+      type,
+      sno: nextSno,
+      title: '',
+      duration: type === 'quiz' ? '20 mins' : type === 'test' ? '90 mins' : '45 mins',
+      description: '',
+      format: 'Video Lecture',
+      doc_link: '',
+      image_url: '',
+      questions_count: 5,
+      pass_score: '80%',
+      total_marks: 100,
+      passing_marks: 50,
+    })
+    setEditingItemSno(null)
+    setShowItemForm(true)
+  }
+
+  // Open item form for editing an existing item
+  const handleStartEditItem = (item) => {
+    setItemFormData({
+      type: item.type || 'lesson',
+      sno: item.sno || 1,
+      title: item.title || '',
+      duration: item.duration || '45 mins',
+      description: item.description || '',
+      format: item.format || 'Video Lecture',
+      doc_link: item.doc_link || '',
+      image_url: item.image_url || '',
+      questions_count: item.questions_count || 5,
+      pass_score: item.pass_score || '80%',
+      total_marks: item.total_marks || 100,
+      passing_marks: item.passing_marks || 50,
+    })
+    setEditingItemSno(item.sno)
+    setShowItemForm(true)
+  }
+
+  // Delete an item from active day
+  const handleDeleteItem = (snoToDelete) => {
+    setCurriculumDays((prevDays) =>
+      prevDays.map((d) => {
+        if (d.day !== activeDay.day) return d
+        const updated = (d.lessons || []).filter((l) => l.sno !== snoToDelete)
+        return { ...d, lessons: updated }
+      })
+    )
+    setToast(`Item #${snoToDelete} removed from Day ${activeDay.day}`)
+    setTimeout(() => setToast(''), 2500)
+  }
+
+  // Handle local image file upload for Task
+  const handleImageFileUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        setItemFormData((prev) => ({ ...prev, image_url: reader.result }))
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Save Item (Lesson, Task, Quiz, Test) into active day
+  const handleSaveItem = (e) => {
+    e.preventDefault()
+    if (!itemFormData.title.trim()) {
+      alert('Please provide a title for the activity.')
+      return
+    }
+
+    const newItem = {
+      sno: Number(itemFormData.sno) || 1,
+      type: itemFormData.type,
+      title: itemFormData.title.trim(),
+      duration: itemFormData.duration.trim() || '45 mins',
+      description: itemFormData.description.trim() || 'Instructional agenda and criteria.',
+      format: itemFormData.format,
+      doc_link: itemFormData.doc_link.trim(),
+      image_url: itemFormData.image_url,
+      questions_count: Number(itemFormData.questions_count) || 5,
+      pass_score: itemFormData.pass_score || '80%',
+      total_marks: Number(itemFormData.total_marks) || 100,
+      passing_marks: Number(itemFormData.passing_marks) || 50,
+    }
+
+    setCurriculumDays((prevDays) =>
+      prevDays.map((d) => {
+        if (d.day !== activeDay.day) return d
+        const currentItems = d.lessons || []
+        if (editingItemSno !== null) {
+          const updated = currentItems.map((l) =>
+            l.sno === editingItemSno ? newItem : l
+          )
+          return { ...d, lessons: updated }
+        } else {
+          return { ...d, lessons: [...currentItems, newItem] }
+        }
+      })
+    )
+
+    setShowItemForm(false)
+    setEditingItemSno(null)
+    setToast(`${newItem.type.toUpperCase()} #${newItem.sno} saved to Day ${activeDay.day}`)
+    setTimeout(() => setToast(''), 2500)
+  }
+
+  // Save Entire Module in Full-Screen Studio
+  const handleSaveFullScreenModule = async (e) => {
+    if (e) e.preventDefault()
+    if (!formData.title.trim() || !formData.code.trim()) {
+      alert('Module Title and Module Code are required.')
+      return
+    }
 
     const totalDays = curriculumDays.length
-    const totalLessons = curriculumDays.reduce(
-      (sum, d) => sum + (d.lessons ? d.lessons.length : 0),
-      0
-    )
+    let totalLessons = 0
+    let totalTasks = 0
+    let totalTests = 0
 
-    const updatedModule = {
-      ...curriculumModule,
-      curriculum_lessons: curriculumDays,
+    curriculumDays.forEach((d) => {
+      (d.lessons || []).forEach((item) => {
+        const t = item.type || 'lesson'
+        if (t === 'task') totalTasks++
+        else if (t === 'test' || t === 'quiz') totalTests++
+        else totalLessons++
+      })
+    })
+
+    const payload = {
+      ...formData,
       days: totalDays,
       lessons: totalLessons,
+      tasks: totalTasks,
+      tests: totalTests,
+      curriculum_lessons: curriculumDays,
+      updated_at: new Date().toISOString().slice(0, 10),
     }
-
-    setModules((prev) =>
-      prev.map((m) => (m.id === curriculumModule.id ? updatedModule : m))
-    )
 
     try {
-      await apiService.updateModule(curriculumModule.id, {
-        curriculum_lessons: curriculumDays,
-        days: totalDays,
-        lessons: totalLessons,
-      })
+      if (editingModule) {
+        const res = await apiService.updateModule(editingModule.id, payload)
+        const updated = res?.data ? { ...editingModule, ...res.data, curriculum_lessons: curriculumDays, days: totalDays, lessons: totalLessons, tasks: totalTasks } : { ...editingModule, ...payload }
+        setModules((prev) => prev.map((m) => (m.id === editingModule.id ? updated : m)))
+        setToast(`Module "${payload.title}" updated successfully!`)
+      } else {
+        const res = await apiService.createModule(payload)
+        const created = res?.data || { ...payload, id: Date.now() }
+        setModules([created, ...modules])
+        setToast(`Module "${payload.title}" created successfully!`)
+      }
     } catch (err) {
-      console.warn('API update module curriculum:', err)
+      console.warn('API error saving module:', err)
+      // Optimistic local update
+      if (editingModule) {
+        setModules((prev) => prev.map((m) => (m.id === editingModule.id ? { ...editingModule, ...payload } : m)))
+      } else {
+        setModules([{ ...payload, id: Date.now() }, ...modules])
+      }
+      setToast(`Saved locally: "${payload.title}"`)
     }
 
-    setCurriculumModule(null)
-    setToast(`Curriculum saved: ${totalDays} Days, ${totalLessons} Lessons for "${updatedModule.title}"`)
+    setFullScreenStudio(false)
+    setEditingModule(null)
     setTimeout(() => setToast(''), 3500)
   }
 
@@ -620,66 +571,7 @@ export function ModuleLibrary() {
     }
   }
 
-  const toggleAddedToCourse = (id, title) => {
-    const newState = !addedModules[id]
-    setAddedModules((prev) => ({ ...prev, [id]: newState }))
-    setToast(newState ? `"${title}" added to active course curriculum` : `Removed "${title}" from course`)
-    setTimeout(() => setToast(''), 3000)
-  }
-
-  const handleSave = async (e) => {
-    e.preventDefault()
-    if (!formData.title || !formData.code) return
-
-    if (editingModule) {
-      const updatedCurriculum = (editingModule.curriculum_lessons && editingModule.curriculum_lessons.length > 0)
-        ? editingModule.curriculum_lessons
-        : generateDefaultCurriculum(formData.title, formData.days)
-
-      const totalLessons = updatedCurriculum.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0)
-
-      const payload = {
-        ...formData,
-        curriculum_lessons: updatedCurriculum,
-        days: updatedCurriculum.length,
-        lessons: totalLessons > 0 ? totalLessons : formData.lessons,
-      }
-
-      try {
-        await apiService.updateModule(editingModule.id, payload)
-      } catch (err) {
-        console.warn('API update failed:', err)
-      }
-      setModules((prev) =>
-        prev.map((item) => (item.id === editingModule.id ? { ...item, ...payload } : item))
-      )
-      setToast(`Module "${formData.title}" updated`)
-    } else {
-      const newCurriculum = generateDefaultCurriculum(formData.title, formData.days || 7)
-      const totalLessons = newCurriculum.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0)
-
-      const newMod = {
-        id: Date.now(),
-        ...formData,
-        curriculum_lessons: newCurriculum,
-        days: newCurriculum.length,
-        lessons: totalLessons,
-        updated_at: new Date().toISOString().slice(0, 10),
-      }
-      try {
-        await apiService.createModule(newMod)
-      } catch (err) {
-        console.warn('API create failed:', err)
-      }
-      setModules([newMod, ...modules])
-      setToast(`Module "${formData.title}" created with ${newMod.days} Days & ${newMod.lessons} Lessons`)
-    }
-
-    setShowModal(false)
-    setTimeout(() => setToast(''), 3500)
-  }
-
-  // Filter & Sort
+  // Filter and Sort logic
   const filteredModules = modules
     .filter((m) => {
       const matchSearch =
@@ -690,14 +582,32 @@ export function ModuleLibrary() {
       return matchSearch && matchCategory && matchStatus
     })
     .sort((a, b) => {
-      if (sortOption === 'days-desc') return b.days - a.days
       if (sortOption === 'title-asc') return a.title.localeCompare(b.title)
-      return b.id - a.id
+      if (sortOption === 'days-desc') return b.days - a.days
+      return (b.id || 0) - (a.id || 0)
     })
 
   const publishedCount = modules.filter((m) => m.status === 'Published').length
   const draftCount = modules.filter((m) => m.status === 'Draft').length
   const categoriesCount = new Set(modules.map((m) => m.category)).size
+
+  // Summary counts for current studio
+  const studioTotalLessons = curriculumDays.reduce(
+    (acc, d) => acc + (d.lessons ? d.lessons.filter((l) => l.type === 'lesson' || !l.type).length : 0),
+    0
+  )
+  const studioTotalTasks = curriculumDays.reduce(
+    (acc, d) => acc + (d.lessons ? d.lessons.filter((l) => l.type === 'task').length : 0),
+    0
+  )
+  const studioTotalQuizzes = curriculumDays.reduce(
+    (acc, d) => acc + (d.lessons ? d.lessons.filter((l) => l.type === 'quiz').length : 0),
+    0
+  )
+  const studioTotalTests = curriculumDays.reduce(
+    (acc, d) => acc + (d.lessons ? d.lessons.filter((l) => l.type === 'test').length : 0),
+    0
+  )
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -721,27 +631,15 @@ export function ModuleLibrary() {
             Module Library &amp; Day-Wise Lessons
           </h1>
           <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-            Manage standardized modules, configure multiple lessons per day (S.No, Title, Description, Duration), and sync with course curricula.
+            Standardized academic curriculum units with full-screen authoring for Lessons, Tasks, Quizzes, and Tests.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => {
-              setToast('Curriculum import dialogue opened')
-              setTimeout(() => setToast(''), 3000)
-            }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright hover:bg-light-surface-container-low text-light-on-surface dark:text-dark-on-surface font-label text-xs font-semibold shadow-xs transition-colors"
-          >
-            <span className="material-symbols-outlined text-[15px]">file_download</span>
-            <span>Import Module</span>
-          </button>
-
-          <button
-            type="button"
             onClick={openCreateModal}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[16px]">add</span>
             <span>Create Custom Module</span>
@@ -779,7 +677,7 @@ export function ModuleLibrary() {
             </span>
             <span className="inline-flex items-center gap-1 text-on-success-container text-[10px] font-medium">
               <span className="material-symbols-outlined text-[12px]">verified</span>
-              <span>Ready for active courses</span>
+              <span>Active in batches</span>
             </span>
           </div>
           <div className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
@@ -797,7 +695,7 @@ export function ModuleLibrary() {
             </span>
             <span className="inline-flex items-center gap-1 text-pending text-[10px] font-medium">
               <span className="material-symbols-outlined text-[12px]">pending</span>
-              <span>Under curriculum review</span>
+              <span>Under review</span>
             </span>
           </div>
           <div className="w-7 h-7 rounded bg-pending-container text-on-pending-container flex items-center justify-center shrink-0">
@@ -840,7 +738,7 @@ export function ModuleLibrary() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Category Filter */}
+          {/* Domain Filter */}
           <div className="flex items-center gap-1">
             <span className="text-[11px] font-medium text-light-on-surface-variant">Domain:</span>
             <select
@@ -852,6 +750,7 @@ export function ModuleLibrary() {
               <option value="Design">Design</option>
               <option value="UI/UX">UI/UX</option>
               <option value="Programming">Programming</option>
+              <option value="Cloud Computing">Cloud Computing</option>
             </select>
           </div>
 
@@ -885,16 +784,16 @@ export function ModuleLibrary() {
         </div>
       </section>
 
-      {/* Module Directory: List View Table */}
+      {/* Module Directory: Clean Table View */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 text-light-on-surface-variant dark:text-dark-on-surface-variant font-label text-[11px] uppercase tracking-wider">
                 <th className="py-2.5 px-3">Module Identifier</th>
-                <th className="py-2.5 px-3">Title &amp; Learning Scope</th>
-                <th className="py-2.5 px-3">Duration &amp; Lessons</th>
-                <th className="py-2.5 px-3">Curriculum Breakdown</th>
+                <th className="py-2.5 px-3">Module Title</th>
+                <th className="py-2.5 px-3">Duration &amp; Activities</th>
+                <th className="py-2.5 px-3">Components Breakdown</th>
                 <th className="py-2.5 px-3 text-center">Status</th>
                 <th className="py-2.5 px-3 text-right">Actions</th>
               </tr>
@@ -911,7 +810,6 @@ export function ModuleLibrary() {
                 </tr>
               ) : (
                 filteredModules.map((m) => {
-                  const isAdded = addedModules[m.id]
                   const lessonsCount = m.lessons || (m.curriculum_lessons ? m.curriculum_lessons.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0) : m.days * 2)
 
                   return (
@@ -931,24 +829,14 @@ export function ModuleLibrary() {
                         </div>
                       </td>
 
-                      {/* Title & Description */}
-                      <td className="py-2.5 px-3 max-w-sm align-top">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="font-title text-[13.5px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                              {m.title}
-                            </span>
-                            <span className="px-1.5 py-0.2 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint dark:text-dark-on-primary-tint font-label text-[10px] font-semibold">
-                              {m.category}
-                            </span>
-                          </div>
-                          <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant line-clamp-2 leading-relaxed">
-                            {m.description}
-                          </p>
-                        </div>
+                      {/* Clean Title Only (No UI/UX tag, no description snippet) */}
+                      <td className="py-2.5 px-3 align-top">
+                        <span className="font-title text-[13.5px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                          {m.title}
+                        </span>
                       </td>
 
-                      {/* Duration & Lessons (Clickable to open Day-wise lessons manager) */}
+                      {/* Duration & Lessons (Click opens Full Screen Studio) */}
                       <td className="py-2.5 px-3 whitespace-nowrap align-top">
                         <div className="flex flex-col gap-1">
                           <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
@@ -956,30 +844,30 @@ export function ModuleLibrary() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => openCurriculumModal(m)}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary transition-colors text-left"
-                            title="Manage Day-wise Multiple Lessons"
+                            onClick={() => openEditModal(m)}
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary transition-colors text-left cursor-pointer"
+                            title="Open Full Screen Studio"
                           >
                             <span className="material-symbols-outlined text-[13px]">view_timeline</span>
-                            <span>{lessonsCount} Lessons (Day-wise)</span>
+                            <span>{lessonsCount} Activities</span>
                           </button>
                         </div>
                       </td>
 
-                      {/* Curriculum Components Breakdown */}
+                      {/* Curriculum Breakdown */}
                       <td className="py-2.5 px-3 align-top">
                         <div className="grid grid-cols-2 gap-1 min-w-[170px]">
                           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tasks}</span> Tasks
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tasks || 4}</span> Tasks
                           </span>
                           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.assignments}</span> Assign.
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.assignments || 2}</span> Assign.
                           </span>
                           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tests}</span> Tests
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tests || 1}</span> Tests
                           </span>
                           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.milestones}</span> Milestones
+                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.milestones || 1}</span> Milestone
                           </span>
                         </div>
                       </td>
@@ -1002,59 +890,33 @@ export function ModuleLibrary() {
                         </span>
                       </td>
 
-                      {/* Actions */}
+                      {/* Actions (+ Course Button REMOVED) */}
                       <td className="py-2.5 px-3 whitespace-nowrap text-right align-top">
                         <div className="flex items-center justify-end gap-1">
-                          {/* Manage Curriculum & Lessons button */}
                           <button
                             type="button"
-                            onClick={() => openCurriculumModal(m)}
-                            title="Manage Day-Wise Lessons (S.No, Title, Description, Duration)"
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-primary hover:bg-light-primary-tint hover:text-light-primary font-label text-[11px] font-semibold transition-colors"
+                            onClick={() => openEditModal(m)}
+                            title="Edit Module & Activities in Full Screen Studio"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-[11px] font-semibold transition-colors cursor-pointer"
                           >
-                            <span className="material-symbols-outlined text-[15px]">menu_book</span>
-                            <span>Lessons</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => toggleAddedToCourse(m.id, m.title)}
-                            title={isAdded ? 'Remove from Course' : 'Add to Course'}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded font-label text-[11px] font-semibold transition-colors ${
-                              isAdded
-                                ? 'bg-success text-white'
-                                : 'bg-light-primary text-light-on-primary hover:bg-light-primary-container'
-                            }`}
-                          >
-                            <span className="material-symbols-outlined text-[13px]">
-                              {isAdded ? 'check' : 'add'}
-                            </span>
-                            <span>{isAdded ? 'Added' : 'Course'}</span>
+                            <span className="material-symbols-outlined text-[14px]">edit</span>
+                            <span>Edit</span>
                           </button>
 
                           <button
                             type="button"
                             onClick={() => setInspectModule(m)}
                             title="View Details"
-                            className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+                            className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
                           >
                             <span className="material-symbols-outlined text-[16px]">visibility</span>
                           </button>
 
                           <button
                             type="button"
-                            onClick={() => openEditModal(m)}
-                            title="Edit Module Details"
-                            className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[16px]">edit</span>
-                          </button>
-
-                          <button
-                            type="button"
                             onClick={() => handleDuplicate(m)}
                             title="Duplicate Module"
-                            className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+                            className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
                           >
                             <span className="material-symbols-outlined text-[16px]">content_copy</span>
                           </button>
@@ -1063,7 +925,7 @@ export function ModuleLibrary() {
                             type="button"
                             onClick={() => handleDelete(m.id, m.title)}
                             title="Delete Module"
-                            className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors"
+                            className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors cursor-pointer"
                           >
                             <span className="material-symbols-outlined text-[16px]">delete</span>
                           </button>
@@ -1087,433 +949,854 @@ export function ModuleLibrary() {
       </section>
 
       {/* ===================================================================== */}
-      {/* MODAL 1: DAY-WISE MULTIPLE LESSONS MANAGER & BUILDER                  */}
+      {/* FULL SCREEN STUDIO: BASIC INFORMATION + DAY-WISE ACTIVITY CREATION   */}
       {/* ===================================================================== */}
-      {curriculumModule && (
-        <div className="fixed inset-0 z-50 bg-sidebar/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className="p-3.5 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between gap-3 bg-light-surface-container-low/50 dark:bg-dark-surface-container/50">
-              <div className="flex items-center gap-2.5">
-                <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[18px]">menu_book</span>
+      {fullScreenStudio && (
+        <div className="fixed inset-0 z-50 bg-light-surface-container-lowest dark:bg-dark-surface-bright flex flex-col overflow-hidden animate-in fade-in duration-200">
+          {/* Studio Top Navigation Bar */}
+          <header className="h-14 border-b border-light-outline-variant dark:border-dark-outline-variant px-5 flex items-center justify-between gap-4 bg-light-surface-container-lowest dark:bg-dark-surface-bright sticky top-0 z-30 shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setFullScreenStudio(false)}
+                className="p-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors"
+                title="Exit Full Screen Studio"
+              >
+                <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+              </button>
+
+              <div className="w-8 h-8 rounded-lg bg-light-primary text-light-on-primary flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                <span className="material-symbols-outlined text-[18px]">edit_square</span>
+              </div>
+
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-light-primary dark:text-dark-primary">
+                    {formData.code || 'MOD-NEW'}
+                  </span>
+                  <span className="text-light-outline text-[12px]">•</span>
+                  <h2 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface truncate">
+                    {formData.title ? formData.title : 'New Module Studio'}
+                  </h2>
+                </div>
+                <span className="text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                  Full Screen Authoring Studio • Basic Information &amp; Day-Wise Activity Creation
                 </span>
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] font-bold text-light-primary dark:text-dark-primary">
-                      {curriculumModule.code}
-                    </span>
-                    <span className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                      {curriculumModule.title}
-                    </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setFullScreenStudio(false)}
+                className="px-3 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant hover:bg-light-surface-container-low text-xs font-semibold transition-colors"
+              >
+                Discard
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveFullScreenModule}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-light-primary hover:bg-light-primary-container text-light-on-primary text-xs font-bold shadow-sm transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px]">save</span>
+                <span>Save Module &amp; Activities</span>
+              </button>
+            </div>
+          </header>
+
+          {/* Studio Scrollable Workspace */}
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
+            {/* PART 1: TOP SECTION - BASIC MODULE INFORMATION */}
+            <section className="bg-light-surface-container-low/50 dark:bg-dark-surface-container/30 border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-4 sm:p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded bg-light-primary/10 text-light-primary flex items-center justify-center font-bold text-xs">
+                    1
+                  </span>
+                  <h3 className="font-title text-[14px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                    Basic Module Information
+                  </h3>
+                </div>
+                <span className="text-[11px] text-light-on-surface-variant">
+                  Front details, discipline categorization, and learning scope
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {/* Module Title */}
+                <div>
+                  <label className="block text-[11px] font-bold text-light-on-surface dark:text-dark-on-surface mb-1 uppercase tracking-wider">
+                    Module Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g. Advanced UI/UX Design Systems &amp; Component Tokens"
+                    className="w-full px-3 py-2 text-sm font-semibold rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-light-primary shadow-xs"
+                  />
+                </div>
+
+                {/* Grid 4 Columns */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                      Module Code *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.code}
+                      onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                      placeholder="MOD-UIX-204"
+                      className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary uppercase"
+                    />
                   </div>
-                  <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    Configure Day-by-Day Lessons. Add multiple lessons per day with Serial Number (S.No), Title, Description, and Duration.
-                  </p>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                      Discipline Domain
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    >
+                      <option value="UI/UX">UI/UX Design</option>
+                      <option value="Design">Graphic &amp; Brand Design</option>
+                      <option value="Programming">Programming &amp; Software Dev</option>
+                      <option value="Cloud Computing">Cloud Computing &amp; DevOps</option>
+                      <option value="Data Science">Data Science &amp; AI</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                      Version
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.version}
+                      onChange={(e) => setFormData({ ...formData, version: e.target.value })}
+                      placeholder="v2.1"
+                      className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                      Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    >
+                      <option value="Published">Published</option>
+                      <option value="Draft">Draft</option>
+                      <option value="Under Review">Under Review</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                    Module Description &amp; Learning Objectives
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Outline curriculum goals, prerequisite knowledge, target competencies, and tool requirements..."
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary leading-relaxed"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* PART 2: BOTTOM SECTION - DAY-WISE LEARNING ACTIVITIES (LESSON, TASK, QUIZ, TEST) */}
+            <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-4 sm:p-5 shadow-xs">
+              {/* Header with Activity Counters */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-light-outline-variant dark:border-dark-outline-variant gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
+                    2
+                  </span>
+                  <div>
+                    <h3 className="font-title text-[14px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                      Day-Wise Curriculum &amp; Learning Activities
+                    </h3>
+                    <p className="text-[11px] text-light-on-surface-variant">
+                      Create day-by-day sequence of Lessons, Tasks (with docs &amp; images), Quizzes, and Tests
+                    </p>
+                  </div>
+                </div>
+
+                {/* Metric Summary Badges */}
+                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                  <span className="px-2 py-0.5 rounded-full bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface font-semibold text-[11px]">
+                    {curriculumDays.length} Days
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold text-[11px]">
+                    {studioTotalLessons} Lessons
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold text-[11px]">
+                    {studioTotalTasks} Tasks
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold text-[11px]">
+                    {studioTotalQuizzes} Quizzes
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold text-[11px]">
+                    {studioTotalTests} Tests
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              {/* Day Navigation Tabs Strip */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-2.5 mb-4 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 scrollbar-thin">
+                {curriculumDays.map((d) => {
+                  const isSelected = d.day === activeDay.day
+                  const itemCount = d.lessons ? d.lessons.length : 0
+
+                  return (
+                    <button
+                      key={d.day}
+                      type="button"
+                      onClick={() => {
+                        setActiveDayNumber(d.day)
+                        setShowItemForm(false)
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                        isSelected
+                          ? 'bg-light-primary text-light-on-primary shadow-xs font-bold'
+                          : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container'
+                      }`}
+                    >
+                      <span>Day {d.day}</span>
+                      <span
+                        className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                          isSelected ? 'bg-white/20 text-white' : 'bg-black/5 dark:bg-white/10 text-light-outline'
+                        }`}
+                      >
+                        {itemCount}
+                      </span>
+                    </button>
+                  )
+                })}
+
                 <button
                   type="button"
                   onClick={handleAddNewDay}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-surface-container text-light-on-surface dark:text-dark-on-surface font-label text-xs font-semibold border border-light-outline-variant dark:border-dark-outline-variant shadow-xs transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed border-light-primary text-light-primary hover:bg-light-primary-tint/20 text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer"
+                  title="Add Next Day"
                 >
                   <span className="material-symbols-outlined text-[15px]">add</span>
                   <span>Add Day</span>
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setCurriculumModule(null)}
-                  className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded"
-                >
-                  <span className="material-symbols-outlined text-[18px]">close</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Sub-header metric banner */}
-            <div className="px-4 py-2 border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright flex flex-wrap items-center justify-between text-xs text-light-on-surface-variant gap-2">
-              <div className="flex items-center gap-3">
-                <span>
-                  Total Days: <strong className="text-light-on-surface dark:text-dark-on-surface font-bold">{curriculumDays.length}</strong>
-                </span>
-                <span>•</span>
-                <span>
-                  Total Lessons across module: <strong className="text-light-primary dark:text-dark-primary font-bold">
-                    {curriculumDays.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0)}
-                  </strong>
-                </span>
-              </div>
-              <span className="text-[11px] text-light-on-surface-variant italic">
-                Active: Day {activeDay.day} ({activeDay.lessons ? activeDay.lessons.length : 0} lessons configured)
-              </span>
-            </div>
-
-            {/* Body: Two Column Layout */}
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-[380px]">
-              {/* Left Sidebar: Days List */}
-              <div className="w-full md:w-64 border-r border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/30 dark:bg-dark-surface-container/20 flex flex-col shrink-0">
-                <div className="p-2.5 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
-                  <span className="font-label text-[11px] font-bold text-light-on-surface-variant uppercase tracking-wider">
-                    Days Schedule ({curriculumDays.length})
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleAddNewDay}
-                    className="p-1 rounded text-light-primary hover:bg-light-primary-tint"
-                    title="Add a new Day"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">add_circle</span>
-                  </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-2 space-y-1.5 max-h-[220px] md:max-h-none">
-                  {curriculumDays.map((d) => {
-                    const isSelected = d.day === activeDay.day
-                    const lCount = d.lessons ? d.lessons.length : 0
-
-                    return (
-                      <div
-                        key={d.day}
-                        onClick={() => {
-                          setActiveDayNumber(d.day)
-                          setShowAddLessonForm(false)
-                        }}
-                        className={`p-2 rounded cursor-pointer transition-colors border text-left flex items-center justify-between gap-1.5 ${
-                          isSelected
-                            ? 'bg-light-primary text-light-on-primary border-light-primary shadow-xs'
-                            : 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-outline-variant dark:border-dark-outline-variant hover:bg-light-surface-container'
-                        }`}
-                      >
-                        <div className="flex flex-col min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className={`font-mono text-[11px] font-bold ${isSelected ? 'text-white' : 'text-light-primary'}`}>
-                              Day {d.day}
-                            </span>
-                            <span
-                              className={`px-1.5 py-0.2 rounded-full text-[10px] font-semibold ${
-                                isSelected
-                                  ? 'bg-white/20 text-white'
-                                  : 'bg-light-surface-container text-light-on-surface-variant'
-                              }`}
-                            >
-                              {lCount} {lCount === 1 ? 'lesson' : 'lessons'}
-                            </span>
-                          </div>
-                          <span
-                            className={`text-[11px] truncate mt-0.5 ${
-                              isSelected ? 'text-white/90' : 'text-light-on-surface-variant'
-                            }`}
-                          >
-                            {d.day_title.replace(/^Day \d+:\s*/, '')}
-                          </span>
-                        </div>
-
-                        {curriculumDays.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDeleteDay(d.day)
-                            }}
-                            title={`Delete Day ${d.day}`}
-                            className={`p-1 rounded opacity-60 hover:opacity-100 ${
-                              isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-overdue-container/30 text-overdue'
-                            }`}
-                          >
-                            <span className="material-symbols-outlined text-[14px]">delete</span>
-                          </button>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
               </div>
 
-              {/* Right Content: Active Day Multiple Lessons Manager */}
-              <div className="flex-1 flex flex-col overflow-y-auto p-4 gap-3 bg-light-surface-container-lowest dark:bg-dark-surface-bright">
-                {/* Active Day Title Bar */}
-                <div className="p-3 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex-1">
-                    <span className="font-label text-[10px] text-light-primary dark:text-dark-primary font-bold uppercase tracking-wider block">
-                      Active Day Header &amp; Theme
+              {/* Active Day Canvas */}
+              <div className="bg-light-surface-container-low/30 dark:bg-dark-surface-container/20 border border-light-outline-variant/80 dark:border-dark-outline-variant/80 rounded-xl p-4 space-y-4">
+                {/* Active Day Title & Action Toolbar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60">
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="px-2 py-0.5 rounded bg-light-primary text-light-on-primary font-mono text-xs font-bold shrink-0">
+                      Day {activeDay.day}
                     </span>
                     <input
                       type="text"
                       value={activeDay.day_title}
                       onChange={(e) => handleUpdateDayTitle(e.target.value)}
-                      placeholder={`e.g. Day ${activeDay.day}: Visual Hierarchy & Layouts`}
-                      className="w-full mt-0.5 px-2.5 py-1 text-xs font-bold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                      placeholder={`e.g. Day ${activeDay.day}: Practical Paradigms & Implementation`}
+                      className="flex-1 px-2.5 py-1 text-xs font-semibold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleStartAddLesson}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-semibold shadow-xs shrink-0 self-start sm:self-auto"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">add</span>
-                    <span>Add Lesson to Day {activeDay.day}</span>
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Add Item Action Buttons */}
+                    <button
+                      type="button"
+                      onClick={() => handleStartAddItem('lesson')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-white text-xs font-semibold border border-blue-500/20 transition-all cursor-pointer"
+                      title="Add a Lesson to this day"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">menu_book</span>
+                      <span>+ Lesson</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleStartAddItem('task')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white text-xs font-semibold border border-amber-500/20 transition-all cursor-pointer"
+                      title="Add a Task with Doc Link & Image"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">assignment</span>
+                      <span>+ Task</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleStartAddItem('quiz')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500 hover:text-white text-xs font-semibold border border-purple-500/20 transition-all cursor-pointer"
+                      title="Add a Quiz to this day"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">quiz</span>
+                      <span>+ Quiz</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleStartAddItem('test')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white text-xs font-semibold border border-rose-500/20 transition-all cursor-pointer"
+                      title="Add a Test / Exam to this day"
+                    >
+                      <span className="material-symbols-outlined text-[15px]">military_tech</span>
+                      <span>+ Test</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteDay(activeDay.day)}
+                      className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors"
+                      title={`Delete Day ${activeDay.day}`}
+                    >
+                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Inline Add / Edit Lesson Form */}
-                {showAddLessonForm && (
+                {/* Inline Item Creation / Edit Form */}
+                {showItemForm && (
                   <form
-                    onSubmit={handleSaveLesson}
-                    className="p-3.5 rounded border-2 border-light-primary/40 dark:border-dark-primary/40 bg-light-primary-tint/15 dark:bg-dark-primary-tint/15 flex flex-col gap-3 animate-in fade-in duration-200"
+                    onSubmit={handleSaveItem}
+                    className="p-4 rounded-xl border-2 border-light-primary/30 bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-md space-y-4 animate-in fade-in zoom-in-95 duration-150"
                   >
-                    <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-2">
-                      <span className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-[16px] text-light-primary">
-                          {editingLessonSno !== null ? 'edit_note' : 'post_add'}
+                    {/* Item Type Selector Tabs */}
+                    <div className="flex items-center justify-between pb-2 border-b border-light-outline-variant/60">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-bold text-light-on-surface dark:text-dark-on-surface mr-2">
+                          Activity Type:
                         </span>
-                        <span>
-                          {editingLessonSno !== null
-                            ? `Edit Lesson #${editingLessonSno} (Day ${activeDay.day})`
-                            : `Add New Lesson to Day ${activeDay.day}`}
-                        </span>
-                      </span>
+                        {[
+                          { id: 'lesson', label: 'Lesson', icon: 'menu_book', color: 'text-blue-600 border-blue-500' },
+                          { id: 'task', label: 'Task', icon: 'assignment', color: 'text-amber-600 border-amber-500' },
+                          { id: 'quiz', label: 'Quiz', icon: 'quiz', color: 'text-purple-600 border-purple-500' },
+                          { id: 'test', label: 'Test / Exam', icon: 'military_tech', color: 'text-rose-600 border-rose-500' },
+                        ].map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setItemFormData((prev) => ({ ...prev, type: t.id }))}
+                            className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1 transition-all ${
+                              itemFormData.type === t.id
+                                ? `bg-light-primary text-light-on-primary shadow-xs`
+                                : 'bg-light-surface-container-low text-light-on-surface-variant hover:bg-light-surface-container'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-[14px]">{t.icon}</span>
+                            <span>{t.label}</span>
+                          </button>
+                        ))}
+                      </div>
+
                       <button
                         type="button"
-                        onClick={() => setShowAddLessonForm(false)}
-                        className="text-light-on-surface-variant hover:text-light-on-surface"
+                        onClick={() => setShowItemForm(false)}
+                        className="text-light-on-surface-variant hover:text-light-on-surface p-1"
                       >
                         <span className="material-symbols-outlined text-[16px]">close</span>
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
-                      {/* S.No Input */}
-                      <div>
-                        <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                          S.No # *
+                    {/* Common Row: S.No, Title, Duration */}
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                          S.No *
                         </label>
                         <input
                           type="number"
                           min="1"
                           required
-                          value={lessonFormData.sno}
-                          onChange={(e) => setLessonFormData({ ...lessonFormData, sno: Number(e.target.value) })}
-                          className="w-full px-2.5 py-1 text-xs font-mono font-bold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                          value={itemFormData.sno}
+                          onChange={(e) => setItemFormData({ ...itemFormData, sno: e.target.value })}
+                          className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                         />
                       </div>
 
-                      {/* Lesson Title Input */}
-                      <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                          Lesson Title *
+                      <div className="sm:col-span-7">
+                        <label className="block text-[11px] font-bold text-light-on-surface dark:text-dark-on-surface mb-1">
+                          {itemFormData.type === 'task'
+                            ? 'Task Title *'
+                            : itemFormData.type === 'quiz'
+                            ? 'Quiz Title *'
+                            : itemFormData.type === 'test'
+                            ? 'Test / Exam Title *'
+                            : 'Lesson Title *'}
                         </label>
                         <input
                           type="text"
                           required
-                          value={lessonFormData.title}
-                          onChange={(e) => setLessonFormData({ ...lessonFormData, title: e.target.value })}
-                          placeholder="e.g. Color Harmonies & Contrast Ratios"
-                          className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                          value={itemFormData.title}
+                          onChange={(e) => setItemFormData({ ...itemFormData, title: e.target.value })}
+                          placeholder={
+                            itemFormData.type === 'task'
+                              ? 'e.g. Build Responsive Component Token Library'
+                              : itemFormData.type === 'quiz'
+                              ? 'e.g. CSS Grid & Flexbox Knowledge Check'
+                              : itemFormData.type === 'test'
+                              ? 'e.g. Mid-Term Practical Evaluation'
+                              : 'e.g. Deep Dive into Component Architecture'
+                          }
+                          className="w-full px-2.5 py-1.5 text-xs font-semibold rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                         />
                       </div>
 
-                      {/* Duration Input */}
-                      <div>
-                        <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                          Duration *
+                      <div className="sm:col-span-3">
+                        <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                          Duration
                         </label>
                         <input
                           type="text"
-                          required
-                          value={lessonFormData.duration}
-                          onChange={(e) => setLessonFormData({ ...lessonFormData, duration: e.target.value })}
+                          value={itemFormData.duration}
+                          onChange={(e) => setItemFormData({ ...itemFormData, duration: e.target.value })}
                           placeholder="e.g. 45 mins"
-                          className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                          className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                         />
                       </div>
                     </div>
 
-                    {/* Quick Duration Preset Pills */}
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-[10px] text-light-on-surface-variant font-medium">Quick Duration:</span>
-                      {['30 mins', '45 mins', '60 mins', '90 mins', '2 hours'].map((dur) => (
-                        <button
-                          key={dur}
-                          type="button"
-                          onClick={() => setLessonFormData({ ...lessonFormData, duration: dur })}
-                          className={`px-2 py-0.5 rounded text-[10px] font-semibold border transition-colors ${
-                            lessonFormData.duration === dur
-                              ? 'bg-light-primary text-light-on-primary border-light-primary'
-                              : 'bg-light-surface-container-low dark:bg-dark-surface-container border-light-outline-variant text-light-on-surface-variant hover:text-light-on-surface'
-                          }`}
-                        >
-                          {dur}
-                        </button>
-                      ))}
-                    </div>
+                    {/* TYPE SPECIFIC FIELDS: TASK (Doc Link & Image) */}
+                    {itemFormData.type === 'task' && (
+                      <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-3">
+                        <span className="font-label text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[15px]">attach_file</span>
+                          Task Resources: Document Link &amp; Visual Reference
+                        </span>
 
-                    {/* Description Textarea */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {/* Document Link */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface">
+                                Uploaded Document Link (URL)
+                              </label>
+                              {itemFormData.doc_link && (
+                                <a
+                                  href={itemFormData.doc_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[11px] text-light-primary hover:underline flex items-center gap-0.5"
+                                >
+                                  <span>Test Link</span>
+                                  <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                                </a>
+                              )}
+                            </div>
+                            <div className="relative">
+                              <span className="material-symbols-outlined text-light-outline text-[16px] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                link
+                              </span>
+                              <input
+                                type="url"
+                                value={itemFormData.doc_link}
+                                onChange={(e) => setItemFormData({ ...itemFormData, doc_link: e.target.value })}
+                                placeholder="https://drive.google.com/... or Figma / Notion / PDF link"
+                                className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-amber-500"
+                              />
+                            </div>
+                            <p className="text-[10px] text-light-on-surface-variant mt-0.5">
+                              Paste link to briefing sheets, starter templates, Figma files, or cloud documents.
+                            </p>
+                          </div>
+
+                          {/* Image Attachment (URL or Local File) */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface">
+                                Task Reference Image
+                              </label>
+                              {itemFormData.image_url && (
+                                <button
+                                  type="button"
+                                  onClick={() => setItemFormData({ ...itemFormData, image_url: '' })}
+                                  className="text-[11px] text-overdue hover:underline flex items-center gap-0.5"
+                                >
+                                  <span>Remove Image</span>
+                                </button>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="relative flex-1">
+                                <span className="material-symbols-outlined text-light-outline text-[16px] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                  image
+                                </span>
+                                <input
+                                  type="text"
+                                  value={itemFormData.image_url}
+                                  onChange={(e) => setItemFormData({ ...itemFormData, image_url: e.target.value })}
+                                  placeholder="Paste Image URL (https://...)"
+                                  className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                />
+                              </div>
+
+                              <label className="px-2.5 py-1.5 rounded border border-light-outline-variant hover:bg-light-surface-container text-xs font-semibold cursor-pointer shrink-0 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[15px]">upload_file</span>
+                                <span>Upload</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleImageFileUpload}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+
+                            {/* Live Thumbnail Preview */}
+                            {itemFormData.image_url && (
+                              <div className="mt-2 flex items-center gap-2 p-1.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant/60">
+                                <img
+                                  src={itemFormData.image_url}
+                                  alt="Task visual preview"
+                                  className="w-12 h-12 rounded object-cover border border-light-outline-variant shrink-0"
+                                />
+                                <div className="text-[10px] text-light-on-surface-variant flex-1 min-w-0">
+                                  <span className="font-semibold text-light-on-surface block truncate">Image Attachment Active</span>
+                                  <span className="truncate block opacity-80">{itemFormData.image_url.slice(0, 45)}...</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TYPE SPECIFIC FIELDS: QUIZ */}
+                    {itemFormData.type === 'quiz' && (
+                      <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-purple-500/5 border border-purple-500/20">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                            Number of Questions
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={itemFormData.questions_count}
+                            onChange={(e) => setItemFormData({ ...itemFormData, questions_count: e.target.value })}
+                            className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface focus:outline-none focus:ring-1 focus:ring-purple-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                            Passing Score (%)
+                          </label>
+                          <input
+                            type="text"
+                            value={itemFormData.pass_score}
+                            onChange={(e) => setItemFormData({ ...itemFormData, pass_score: e.target.value })}
+                            placeholder="e.g. 80%"
+                            className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface focus:outline-none focus:ring-1 focus:ring-purple-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TYPE SPECIFIC FIELDS: TEST */}
+                    {itemFormData.type === 'test' && (
+                      <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-rose-500/5 border border-rose-500/20">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                            Total Marks
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={itemFormData.total_marks}
+                            onChange={(e) => setItemFormData({ ...itemFormData, total_marks: e.target.value })}
+                            className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface focus:outline-none focus:ring-1 focus:ring-rose-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                            Passing Marks
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={itemFormData.passing_marks}
+                            onChange={(e) => setItemFormData({ ...itemFormData, passing_marks: e.target.value })}
+                            className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-lowest text-light-on-surface focus:outline-none focus:ring-1 focus:ring-rose-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Description / Instructions */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                        Lesson Syllabus &amp; Description *
+                      <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                        {itemFormData.type === 'task'
+                          ? 'Task Instructions & Deliverables *'
+                          : itemFormData.type === 'quiz'
+                          ? 'Quiz Topics & Coverage'
+                          : itemFormData.type === 'test'
+                          ? 'Examination Syllabus & Assessment Rules'
+                          : 'Lesson Curriculum Summary & Agenda'}
                       </label>
                       <textarea
                         rows={2}
-                        required
-                        value={lessonFormData.description}
-                        onChange={(e) => setLessonFormData({ ...lessonFormData, description: e.target.value })}
-                        placeholder="Detail the core syllabus concepts, practical examples, exercises, and takeaways..."
-                        className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        value={itemFormData.description}
+                        onChange={(e) => setItemFormData({ ...itemFormData, description: e.target.value })}
+                        placeholder="Detail the activities, topics, steps to complete, or instructions..."
+                        className="w-full px-3 py-2 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                       />
                     </div>
 
-                    <div className="flex items-center justify-end gap-2 pt-1">
+                    {/* Form Action Buttons */}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-light-outline-variant/60">
                       <button
                         type="button"
-                        onClick={() => setShowAddLessonForm(false)}
-                        className="px-2.5 py-1 rounded border border-light-outline-variant text-xs font-semibold hover:bg-light-surface-container-low"
+                        onClick={() => setShowItemForm(false)}
+                        className="px-3 py-1.5 rounded text-xs font-semibold hover:bg-light-surface-container-low"
                       >
                         Cancel
                       </button>
+
                       <button
                         type="submit"
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded bg-light-primary text-light-on-primary text-xs font-semibold shadow-xs hover:bg-light-primary-container"
+                        className="px-4 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary text-xs font-bold shadow-xs transition-colors cursor-pointer"
                       >
-                        <span className="material-symbols-outlined text-[14px]">save</span>
-                        <span>{editingLessonSno !== null ? 'Update Lesson' : 'Add Lesson'}</span>
+                        {editingItemSno !== null ? 'Update Item' : `Save ${itemFormData.type.toUpperCase()} to Day ${activeDay.day}`}
                       </button>
                     </div>
                   </form>
                 )}
 
-                {/* Lessons List in Active Day */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-label text-[11px] font-bold text-light-on-surface-variant uppercase tracking-wider">
-                      Day {activeDay.day} Lessons ({activeDay.lessons ? activeDay.lessons.length : 0})
-                    </span>
-                    {(!activeDay.lessons || activeDay.lessons.length === 0) && (
-                      <span className="text-[11px] text-pending font-medium">No lessons added yet for this day</span>
-                    )}
-                  </div>
-
+                {/* Items List for Active Day */}
+                <div className="space-y-2.5">
                   {(!activeDay.lessons || activeDay.lessons.length === 0) ? (
-                    <div className="p-6 border border-dashed border-light-outline-variant dark:border-dark-outline-variant rounded-md text-center flex flex-col items-center justify-center gap-2">
-                      <span className="material-symbols-outlined text-[32px] text-light-outline">
-                        post_add
+                    <div className="py-8 text-center text-light-on-surface-variant border border-dashed border-light-outline-variant rounded-xl bg-light-surface-container-lowest/50 dark:bg-dark-surface-bright/50">
+                      <span className="material-symbols-outlined text-[32px] text-light-outline mb-1 block">
+                        event_note
                       </span>
-                      <p className="text-xs text-light-on-surface-variant">
-                        Day {activeDay.day} currently has no lessons. Click the button below to add multiple lessons.
+                      <p className="font-semibold text-xs text-light-on-surface dark:text-dark-on-surface">
+                        No activities scheduled for Day {activeDay.day} yet.
                       </p>
-                      <button
-                        type="button"
-                        onClick={handleStartAddLesson}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary font-label text-xs font-semibold shadow-xs"
-                      >
-                        <span className="material-symbols-outlined text-[15px]">add</span>
-                        <span>Add First Lesson to Day {activeDay.day}</span>
-                      </button>
+                      <p className="text-[11px] text-light-on-surface-variant mt-0.5 mb-3">
+                        Use the buttons below to create Lessons, Tasks with document &amp; image links, Quizzes, or Tests.
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleStartAddItem('lesson')}
+                          className="px-3 py-1 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold text-xs border border-blue-500/20 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
+                        >
+                          + Add Lesson
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleStartAddItem('task')}
+                          className="px-3 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold text-xs border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all cursor-pointer"
+                        >
+                          + Add Task
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleStartAddItem('quiz')}
+                          className="px-3 py-1 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold text-xs border border-purple-500/20 hover:bg-purple-500 hover:text-white transition-all cursor-pointer"
+                        >
+                          + Add Quiz
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleStartAddItem('test')}
+                          className="px-3 py-1 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-semibold text-xs border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
+                        >
+                          + Add Test
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="space-y-2">
-                      {activeDay.lessons.map((lesson) => (
+                    activeDay.lessons.map((item) => {
+                      const itemType = item.type || 'lesson'
+                      const isTask = itemType === 'task'
+                      const isQuiz = itemType === 'quiz'
+                      const isTest = itemType === 'test'
+
+                      const typeConfig = {
+                        lesson: {
+                          label: 'LESSON',
+                          icon: 'menu_book',
+                          color: 'border-l-blue-500 bg-blue-500/5 text-blue-600 dark:text-blue-400',
+                          badge: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+                        },
+                        task: {
+                          label: 'TASK',
+                          icon: 'assignment',
+                          color: 'border-l-amber-500 bg-amber-500/5 text-amber-600 dark:text-amber-400',
+                          badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                        },
+                        quiz: {
+                          label: 'QUIZ',
+                          icon: 'quiz',
+                          color: 'border-l-purple-500 bg-purple-500/5 text-purple-600 dark:text-purple-400',
+                          badge: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+                        },
+                        test: {
+                          label: 'TEST / EXAM',
+                          icon: 'military_tech',
+                          color: 'border-l-rose-500 bg-rose-500/5 text-rose-600 dark:text-rose-400',
+                          badge: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
+                        },
+                      }[itemType] || {
+                        label: 'LESSON',
+                        icon: 'menu_book',
+                        color: 'border-l-blue-500 bg-blue-500/5 text-blue-600',
+                        badge: 'bg-blue-500/10 text-blue-600',
+                      }
+
+                      return (
                         <div
-                          key={lesson.sno}
-                          className="p-3 rounded-md border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/30 dark:bg-dark-surface-container/30 hover:border-light-primary/60 transition-colors flex flex-col gap-1.5"
+                          key={item.sno}
+                          className={`p-3.5 rounded-lg border border-light-outline-variant/80 dark:border-dark-outline-variant/80 bg-light-surface-container-lowest dark:bg-dark-surface-bright border-l-4 ${typeConfig.color} shadow-xs space-y-2`}
                         >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              {/* S.No badge */}
-                              <span className="w-6 h-6 rounded bg-light-primary text-white font-mono text-[11px] font-bold flex items-center justify-center shrink-0">
-                                {lesson.sno}
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-2.5 min-w-0">
+                              <span className="w-7 h-7 rounded-md bg-light-surface-container-low dark:bg-dark-surface-container flex items-center justify-center shrink-0">
+                                <span className="material-symbols-outlined text-[17px] text-light-on-surface">
+                                  {typeConfig.icon}
+                                </span>
                               </span>
 
-                              {/* Title */}
-                              <h4 className="font-title text-[13px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                                {lesson.title}
-                              </h4>
+                              <div className="flex flex-col min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold tracking-wider font-mono ${typeConfig.badge}`}>
+                                    {typeConfig.label} • #{item.sno}
+                                  </span>
 
-                              {/* Duration Badge */}
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-light-surface-container dark:bg-dark-surface-container border border-light-outline-variant/60 font-mono text-[10px] font-bold text-light-on-surface-variant">
-                                <span className="material-symbols-outlined text-[12px] text-light-primary">schedule</span>
-                                <span>{lesson.duration}</span>
-                              </span>
+                                  <span className="font-title text-[13.5px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                                    {item.title}
+                                  </span>
+
+                                  {item.duration && (
+                                    <span className="font-mono text-[10px] text-light-outline font-semibold">
+                                      • {item.duration}
+                                    </span>
+                                  )}
+
+                                  {isQuiz && item.questions_count && (
+                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium">
+                                      {item.questions_count} Questions (Pass: {item.pass_score || '80%'})
+                                    </span>
+                                  )}
+
+                                  {isTest && item.total_marks && (
+                                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 font-medium">
+                                      {item.total_marks} Marks (Passing: {item.passing_marks || 50})
+                                    </span>
+                                  )}
+                                </div>
+
+                                <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1 leading-relaxed">
+                                  {item.description}
+                                </p>
+                              </div>
                             </div>
 
-                            {/* Lesson Actions */}
                             <div className="flex items-center gap-1 shrink-0">
                               <button
                                 type="button"
-                                onClick={() => handleStartEditLesson(lesson)}
-                                title="Edit Lesson"
-                                className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container transition-colors"
+                                onClick={() => handleStartEditItem(item)}
+                                title="Edit Activity"
+                                className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low transition-colors cursor-pointer"
                               >
-                                <span className="material-symbols-outlined text-[15px]">edit</span>
+                                <span className="material-symbols-outlined text-[16px]">edit</span>
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleDeleteLesson(lesson.sno)}
-                                title="Delete Lesson"
-                                className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors"
+                                onClick={() => handleDeleteItem(item.sno)}
+                                title="Delete Activity"
+                                className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors cursor-pointer"
                               >
-                                <span className="material-symbols-outlined text-[15px]">delete</span>
+                                <span className="material-symbols-outlined text-[16px]">delete</span>
                               </button>
                             </div>
                           </div>
 
-                          {/* Description */}
-                          <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant leading-relaxed pl-8">
-                            {lesson.description}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          {/* TASK RESOURCES: DOCUMENT LINK & IMAGE THUMBNAIL */}
+                          {isTask && (item.doc_link || item.image_url) && (
+                            <div className="pt-2 border-t border-light-outline-variant/60 dark:border-dark-outline-variant/60 flex flex-wrap items-center gap-3">
+                              {item.doc_link && (
+                                <a
+                                  href={item.doc_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 text-[11px] font-semibold border border-amber-500/30 transition-colors"
+                                  title="Open attached task document"
+                                >
+                                  <span className="material-symbols-outlined text-[14px]">description</span>
+                                  <span>Attached Document: {item.doc_link.replace(/^https?:\/\//, '').slice(0, 30)}...</span>
+                                  <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                                </a>
+                              )}
 
-                  {/* Quick Add Another Lesson button at the bottom of the list */}
-                  {activeDay.lessons && activeDay.lessons.length > 0 && !showAddLessonForm && (
-                    <button
-                      type="button"
-                      onClick={handleStartAddLesson}
-                      className="mt-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded border border-dashed border-light-primary/50 text-light-primary hover:bg-light-primary-tint/20 text-xs font-semibold transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-[15px]">add</span>
-                      <span>+ Add Another Lesson to Day {activeDay.day}</span>
-                    </button>
+                              {item.image_url && (
+                                <div
+                                  onClick={() => setLightboxImage(item.image_url)}
+                                  className="inline-flex items-center gap-2 p-1 pr-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant/60 cursor-pointer hover:border-light-primary transition-colors"
+                                  title="Click to view full image preview"
+                                >
+                                  <img
+                                    src={item.image_url}
+                                    alt="Task visual attachment"
+                                    className="w-7 h-7 rounded object-cover border border-black/10 shrink-0"
+                                  />
+                                  <span className="text-[11px] font-medium text-light-on-surface flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[13px]">zoom_in</span>
+                                    <span>Task Reference Image</span>
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
                   )}
                 </div>
               </div>
-            </div>
+            </section>
+          </main>
+        </div>
+      )}
 
-            {/* Modal Footer */}
-            <div className="p-3 border-t border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/40 flex items-center justify-between gap-3">
-              <span className="text-[11px] text-light-on-surface-variant">
-                Configured: <strong>{curriculumDays.length} Days</strong> with <strong>{curriculumDays.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0)} Total Lessons</strong>
-              </span>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCurriculumModule(null)}
-                  className="px-3.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant text-xs font-semibold hover:bg-light-surface-container transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveCurriculum}
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary text-xs font-bold shadow-xs transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[16px]">check</span>
-                  <span>Save Curriculum &amp; Lessons</span>
-                </button>
-              </div>
-            </div>
+      {/* ===================================================================== */}
+      {/* LIGHTBOX MODAL FOR TASK REFERENCE IMAGES                             */}
+      {/* ===================================================================== */}
+      {lightboxImage && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="relative max-w-3xl max-h-[90vh] bg-black/40 rounded-xl overflow-hidden p-2 flex flex-col items-center">
+            <button
+              type="button"
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-3 right-3 p-1.5 rounded-full bg-black/70 text-white hover:bg-black transition-colors z-10 cursor-pointer"
+              title="Close Preview"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+            <img
+              src={lightboxImage}
+              alt="Full resolution task attachment"
+              className="max-w-full max-h-[82vh] object-contain rounded-lg"
+            />
           </div>
         </div>
       )}
 
       {/* ===================================================================== */}
-      {/* MODAL 2: VIEW DETAILS & DAY-WISE LESSONS INSPECTION                  */}
+      {/* MODAL: VIEW DETAILS & INSPECT MODULE                                  */}
       {/* ===================================================================== */}
       {inspectModule && (
         <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in zoom-in-95 duration-200">
@@ -1530,7 +1813,7 @@ export function ModuleLibrary() {
               <button
                 type="button"
                 onClick={() => setInspectModule(null)}
-                className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded"
+                className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
@@ -1538,7 +1821,7 @@ export function ModuleLibrary() {
 
             <div className="space-y-3 font-body text-xs overflow-y-auto pr-1 flex-1">
               <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant leading-relaxed">
-                {inspectModule.description}
+                {inspectModule.description || 'No detailed summary provided.'}
               </p>
 
               <div className="grid grid-cols-3 gap-2 p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-xs">
@@ -1552,51 +1835,25 @@ export function ModuleLibrary() {
                 </div>
                 <div>
                   <span className="text-[10px] text-light-on-surface-variant block uppercase font-medium">Status:</span>
-                  <strong className="text-light-on-surface dark:text-dark-on-surface">{inspectModule.status}</strong>
+                  <strong className="text-success font-semibold">{inspectModule.status}</strong>
                 </div>
               </div>
 
-              {/* Day-Wise Lessons Explorer inside View Details */}
-              <div className="pt-2">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px] text-light-primary">menu_book</span>
-                    <span>Day-by-Day Lessons Breakdown</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const mod = inspectModule
-                      setInspectModule(null)
-                      openCurriculumModal(mod)
-                    }}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-light-primary hover:underline"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">edit</span>
-                    <span>Manage / Add Lessons</span>
-                  </button>
-                </div>
-
-                {/* List of Days & Multiple Lessons */}
-                <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-                  {(inspectModule.curriculum_lessons && inspectModule.curriculum_lessons.length > 0
-                    ? inspectModule.curriculum_lessons
-                    : generateDefaultCurriculum(inspectModule.title, inspectModule.days)
-                  ).map((dayObj) => (
+              {/* Day-Wise Activities Inspection */}
+              <div className="mt-3">
+                <h4 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface mb-2">
+                  Curriculum Structure ({inspectModule.curriculum_lessons?.length || inspectModule.days} Days)
+                </h4>
+                <div className="space-y-2">
+                  {(inspectModule.curriculum_lessons || []).map((dayObj) => (
                     <div
                       key={dayObj.day}
-                      className="p-2.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/30 flex flex-col gap-1.5"
+                      className="p-2.5 rounded border border-light-outline-variant/60 bg-light-surface-container-low/40 dark:bg-dark-surface-container/30 space-y-1.5"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
-                          {dayObj.day_title}
-                        </span>
-                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary">
-                          {dayObj.lessons ? dayObj.lessons.length : 0} lessons
-                        </span>
-                      </div>
-
-                      <div className="space-y-1.5 pl-2">
+                      <span className="font-label text-xs font-bold text-light-primary block">
+                        {dayObj.day_title}
+                      </span>
+                      <div className="space-y-1 pl-2 border-l-2 border-light-outline-variant">
                         {dayObj.lessons && dayObj.lessons.map((l) => (
                           <div
                             key={l.sno}
@@ -1605,7 +1862,7 @@ export function ModuleLibrary() {
                             <div className="flex items-center justify-between gap-2">
                               <span className="font-medium text-[11px] text-light-on-surface dark:text-dark-on-surface">
                                 <strong className="font-mono text-light-primary mr-1">#{l.sno}</strong>
-                                {l.title}
+                                [{l.type ? l.type.toUpperCase() : 'LESSON'}] {l.title}
                               </span>
                               <span className="font-mono text-[10px] text-light-on-surface-variant font-bold shrink-0">
                                 {l.duration}
@@ -1623,164 +1880,26 @@ export function ModuleLibrary() {
               </div>
             </div>
 
-            <div className="flex justify-end pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant mt-3">
+            <div className="flex justify-end pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant mt-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const m = inspectModule
+                  setInspectModule(null)
+                  openEditModal(m)
+                }}
+                className="px-3.5 py-1.5 rounded bg-light-primary text-light-on-primary text-xs font-bold hover:bg-light-primary-container transition-colors cursor-pointer"
+              >
+                Open in Studio
+              </button>
               <button
                 type="button"
                 onClick={() => setInspectModule(null)}
-                className="px-4 py-1.5 rounded bg-light-surface-container-low text-xs font-semibold hover:bg-light-surface-container transition-colors"
+                className="px-4 py-1.5 rounded bg-light-surface-container-low text-xs font-semibold hover:bg-light-surface-container transition-colors cursor-pointer"
               >
                 Close
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ===================================================================== */}
-      {/* MODAL 3: CREATE / EDIT MODULE MODAL                                  */}
-      {/* ===================================================================== */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in zoom-in-95 duration-200">
-          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-xl w-full max-w-lg p-4 sm:p-5">
-            <div className="flex items-center justify-between pb-3 border-b border-light-outline-variant dark:border-dark-outline-variant mb-3">
-              <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                {editingModule ? 'Edit Module' : 'Create Custom Module'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded"
-              >
-                <span className="material-symbols-outlined text-[18px]">close</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleSave} className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                  Module Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g. Introduction to Graphic Design"
-                  className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Module Code *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    placeholder="MOD-DES-101"
-                    className="w-full px-2.5 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary uppercase"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Version
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.version}
-                    onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                    placeholder="v1.0"
-                    className="w-full px-2.5 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  >
-                    <option value="Design">Design</option>
-                    <option value="UI/UX">UI/UX</option>
-                    <option value="Programming">Programming</option>
-                    <option value="Cloud & DevOps">Cloud & DevOps</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Days Duration
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.days}
-                    onChange={(e) => setFormData({ ...formData, days: Number(e.target.value) })}
-                    className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Lessons (Day-wise)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.lessons}
-                    onChange={(e) => setFormData({ ...formData, lessons: Number(e.target.value) })}
-                    className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Practical Tasks
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.tasks}
-                    onChange={(e) => setFormData({ ...formData, tasks: Number(e.target.value) })}
-                    className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                  Module Summary &amp; Learning Objectives
-                </label>
-                <textarea
-                  rows={2}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Outline core competency targets, practical projects, and prerequisites..."
-                  className="w-full px-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-light-outline-variant dark:border-dark-outline-variant">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-3 py-1 rounded border border-light-outline-variant dark:border-dark-outline-variant text-xs hover:bg-light-surface-container-low transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-3.5 py-1 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-semibold text-xs shadow-xs transition-colors"
-                >
-                  {editingModule ? 'Save Changes' : 'Create Module'}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

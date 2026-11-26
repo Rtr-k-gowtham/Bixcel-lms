@@ -35,8 +35,19 @@ class ModuleController extends BaseApiController
             }
 
             $totalLessons = 0;
+            $totalTasks = 0;
+            $totalTests = 0;
             foreach ($curriculum as $dayItem) {
-                $totalLessons += count($dayItem['lessons'] ?? []);
+                foreach ($dayItem['lessons'] ?? [] as $item) {
+                    $itemType = strtolower((string)($item['type'] ?? 'lesson'));
+                    if ($itemType === 'task') {
+                        $totalTasks++;
+                    } elseif ($itemType === 'test' || $itemType === 'quiz') {
+                        $totalTests++;
+                    } else {
+                        $totalLessons++;
+                    }
+                }
             }
 
             $modules[] = [
@@ -49,9 +60,9 @@ class ModuleController extends BaseApiController
                 'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 10),
                 'lessons'            => $totalLessons > 0 ? $totalLessons : (int) (($mod['duration_days'] ?? 10) * 2),
                 'curriculum_lessons' => $curriculum,
-                'tasks'              => 6,
-                'assignments'        => 3,
-                'tests'              => 2,
+                'tasks'              => $totalTasks > 0 ? $totalTasks : 4,
+                'assignments'        => $totalTasks > 0 ? $totalTasks : 3,
+                'tests'              => $totalTests > 0 ? $totalTests : 2,
                 'milestones'         => 1,
                 'updated_at'         => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
                 'description'        => $mod['description'] ?? '',
@@ -85,8 +96,19 @@ class ModuleController extends BaseApiController
         }
 
         $totalLessons = 0;
+        $totalTasks = 0;
+        $totalTests = 0;
         foreach ($curriculum as $dayItem) {
-            $totalLessons += count($dayItem['lessons'] ?? []);
+            foreach ($dayItem['lessons'] ?? [] as $item) {
+                $itemType = strtolower((string)($item['type'] ?? 'lesson'));
+                if ($itemType === 'task') {
+                    $totalTasks++;
+                } elseif ($itemType === 'test' || $itemType === 'quiz') {
+                    $totalTests++;
+                } else {
+                    $totalLessons++;
+                }
+            }
         }
 
         return $this->respond([
@@ -101,9 +123,9 @@ class ModuleController extends BaseApiController
                 'days'               => count($curriculum) > 0 ? count($curriculum) : (int) $mod['duration_days'],
                 'lessons'            => $totalLessons > 0 ? $totalLessons : (int) ($mod['duration_days'] * 2),
                 'curriculum_lessons' => $curriculum,
-                'tasks'              => 6,
-                'assignments'        => 3,
-                'tests'              => 2,
+                'tasks'              => $totalTasks > 0 ? $totalTasks : 4,
+                'assignments'        => $totalTasks > 0 ? $totalTasks : 3,
+                'tests'              => $totalTests > 0 ? $totalTests : 2,
                 'milestones'         => 1,
                 'updated_at'         => substr($mod['updated_at'] ?? date('Y-m-d'), 0, 10),
                 'description'        => $mod['description'],
