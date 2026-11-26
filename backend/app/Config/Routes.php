@@ -10,8 +10,8 @@ $routes->options('(:any)', static function () {
     return service('response')->setStatusCode(200);
 });
 
-// API Routes
-$routes->group('api', static function ($routes) {
+// API Routes definition function (supports both /api/path and /path)
+$defineApiRoutes = static function ($routes) {
     $routes->get('health', 'Api\HealthController::index');
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
     $routes->resource('modules', ['controller' => 'Api\ModuleController']);
@@ -43,4 +43,10 @@ $routes->group('api', static function ($routes) {
     $routes->get('profile', 'Api\ProfileController::index');
     $routes->put('profile', 'Api\ProfileController::update');
     $routes->delete('profile/sessions/(:segment)', 'Api\ProfileController::revokeSession/$1');
-});
+};
+
+// Route group under /api
+$routes->group('api', $defineApiRoutes);
+
+// Direct routes for when dispatched from api/ front controller
+$defineApiRoutes($routes);
