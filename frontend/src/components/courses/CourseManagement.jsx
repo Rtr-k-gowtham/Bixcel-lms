@@ -283,7 +283,7 @@ export function CourseManagement({ onNavigateToModules }) {
   const totalFees = courses.reduce((acc, c) => acc + (Number(c.price) || 0), 0)
 
   return (
-    <div className="flex-1 flex flex-col gap-4 p-4 sm:p-5 bg-light-surface-container-lowest/40 dark:bg-dark-surface-container-lowest/30 min-h-screen">
+    <div className="flex flex-col gap-4 w-full">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-5 right-5 z-50 bg-light-surface-container-highest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface px-4 py-2.5 rounded-lg shadow-lg border border-light-outline-variant dark:border-dark-outline-variant font-label text-xs font-semibold flex items-center gap-2 animate-fade-in">
