@@ -399,7 +399,7 @@ class StudentController extends BaseApiController
                 'department' => $input['track'] ?? 'Academic Student Portal',
                 'phone' => $studentData['phone'],
                 'status' => $studentData['status'] ?? 'Active',
-                'avatar' => !empty($studentData['avatar']) ? $studentData['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+                'avatar' => (!empty($studentData['avatar']) && !str_contains($studentData['avatar'], 'unsplash.com')) ? $studentData['avatar'] : '',
             ];
             if ($existingUser) {
                 $userModel->update($existingUser['id'], $userData);

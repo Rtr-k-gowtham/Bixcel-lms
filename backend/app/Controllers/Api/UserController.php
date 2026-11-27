@@ -106,7 +106,7 @@ class UserController extends BaseApiController
             'phone'       => $data['phone'] ?? '+1 (555) 000-0000',
             'status'      => $data['status'] ?? 'Active',
             'last_login'  => $data['last_login'] ?? 'Never',
-            'avatar'      => $data['avatar'] ?? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces',
+            'avatar'      => (!empty($data['avatar']) && !str_contains($data['avatar'], 'unsplash.com')) ? $data['avatar'] : '',
             'bio'         => $data['bio'] ?? '',
             'office'      => $data['office'] ?? 'Main Campus',
             'timezone'    => $data['timezone'] ?? 'UTC+05:30 (Asia/Kolkata)',

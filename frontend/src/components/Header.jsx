@@ -14,11 +14,19 @@ export function Header({
   const { theme, toggleTheme } = useTheme()
   const [profileOpen, setProfileOpen] = useState(false)
 
-  const userName = currentUser?.name || 'Elena Rostova'
+  const userName = currentUser?.name || 'Administrator'
   const userRole = currentUser?.role || 'Super Admin'
-  const userEmail = currentUser?.email || 'admin@bixcel.edu'
-  const userEmpId = currentUser?.emp_id || 'BX-ADM-002'
-  const userAvatar = currentUser?.avatar || ''
+  const userEmail = currentUser?.email || 'admin@bixceltech.com'
+  const userEmpId = currentUser?.emp_id || currentUser?.student_id || 'BX-ADM-001'
+
+  // Real avatar resolution: prioritize user-uploaded photo, then currentUser.avatar (ignoring stock unsplash)
+  const userKey = currentUser?.student_id || currentUser?.emp_id || currentUser?.id || 'current'
+  let localAvatar = null
+  try {
+    localAvatar = localStorage.getItem(`bx_student_avatar_${userKey}`)
+  } catch {}
+  const rawAvatar = localAvatar || currentUser?.avatar || ''
+  const userAvatar = (rawAvatar && !rawAvatar.includes('unsplash.com')) ? rawAvatar : ''
 
   // Compute initials
   const initials = userName
@@ -27,7 +35,7 @@ export function Header({
     .map((part) => part[0])
     .slice(0, 2)
     .join('')
-    .toUpperCase() || 'ER'
+    .toUpperCase() || 'BX'
 
   return (
     <header className="h-16 bg-light-surface-container-lowest dark:bg-dark-surface-bright border-b border-light-outline-variant dark:border-dark-outline-variant px-6 flex items-center justify-between gap-4 sticky top-0 z-20 transition-colors duration-state-change">

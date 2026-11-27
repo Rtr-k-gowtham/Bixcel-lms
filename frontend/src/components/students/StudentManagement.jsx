@@ -877,7 +877,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
                           {/* Student Name */}
                           <td className="py-2.5 px-3 whitespace-nowrap align-middle">
                             <div className="flex items-center gap-2">
-                              {s.avatar ? (
+                              {s.avatar && !s.avatar.includes('unsplash.com') ? (
                                 <img
                                   src={s.avatar}
                                   alt={s.full_name}

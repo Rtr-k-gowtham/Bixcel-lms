@@ -97,7 +97,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_SUPER_ADMIN',
                 'department' => 'Executive Office',
                 'emp_id' => 'BX-SADM-001',
-                'avatar' => 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces',
+                'avatar' => '',
             ],
             'admin@bixceltech.com' => [
                 'password' => 'Admin@123',
@@ -106,7 +106,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_ADMIN',
                 'department' => 'Academic Operations',
                 'emp_id' => 'BX-ADM-001',
-                'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=faces',
+                'avatar' => '',
             ],
             'admin@bixcel.edu' => [
                 'password' => 'Admin@123',
@@ -115,7 +115,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_SUPER_ADMIN',
                 'department' => 'Executive Office',
                 'emp_id' => 'BX-ADM-002',
-                'avatar' => 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces',
+                'avatar' => '',
             ],
             'e.rostova@bixcel.edu' => [
                 'password' => 'Admin@123',
@@ -124,7 +124,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_SUPER_ADMIN',
                 'department' => 'Executive Office',
                 'emp_id' => 'BX-ADM-002',
-                'avatar' => 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces',
+                'avatar' => '',
             ],
             'dean@bixcel.edu' => [
                 'password' => 'Dean@123',
@@ -133,7 +133,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_DEAN',
                 'department' => 'Computer Science',
                 'emp_id' => 'BX-FAC-014',
-                'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+                'avatar' => '',
             ],
             'faculty@bixcel.edu' => [
                 'password' => 'Faculty@123',
@@ -142,7 +142,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_TUTOR',
                 'department' => 'UI / UX Design',
                 'emp_id' => 'BX-TUT-089',
-                'avatar' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces',
+                'avatar' => '',
             ],
             'student@bixcel.edu' => [
                 'password' => 'Student@123',
@@ -151,7 +151,7 @@ class AuthController extends BaseApiController
                 'role_code' => 'ROLE_STUDENT',
                 'department' => 'Full-Stack Web Development',
                 'emp_id' => 'STU-2026-0842',
-                'avatar' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces',
+                'avatar' => '',
             ],
         ];
 
@@ -191,7 +191,7 @@ class AuthController extends BaseApiController
                         'role' => 'Student',
                         'role_code' => 'ROLE_STUDENT',
                         'department' => 'Student Learning Portal',
-                        'avatar' => !empty($studentRecord['avatar']) ? $studentRecord['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+                        'avatar' => !empty($studentRecord['avatar']) && !str_contains($studentRecord['avatar'], 'unsplash.com') ? $studentRecord['avatar'] : '',
                     ];
                 }
             }
@@ -228,7 +228,7 @@ class AuthController extends BaseApiController
                         'role' => 'Tutor / Faculty',
                         'role_code' => 'ROLE_TUTOR',
                         'department' => $tutorRecord['assigned_track'] ?? ($tutorRecord['specialization'] ?? 'Instructional Faculty'),
-                        'avatar' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces',
+                        'avatar' => !empty($tutorRecord['avatar']) && !str_contains($tutorRecord['avatar'], 'unsplash.com') ? $tutorRecord['avatar'] : '',
                     ];
                 }
             }
@@ -287,7 +287,7 @@ class AuthController extends BaseApiController
                         'role_code' => $dbUser['role_code'] ?? ($dbUser['role'] === 'Student' ? 'ROLE_STUDENT' : ($dbUser['role'] === 'Tutor / Faculty' ? 'ROLE_TUTOR' : 'ROLE_SUPER_ADMIN')),
                         'department' => $dbUser['department'] ?? 'General',
                         'emp_id' => $dbUser['emp_id'] ?? 'BX-001',
-                        'avatar' => $dbUser['avatar'] ?? '',
+                        'avatar' => (!empty($dbUser['avatar']) && !str_contains($dbUser['avatar'], 'unsplash.com')) ? $dbUser['avatar'] : '',
                     ];
                 }
             }
@@ -309,7 +309,7 @@ class AuthController extends BaseApiController
                     'role' => 'Student',
                     'role_code' => 'ROLE_STUDENT',
                     'department' => 'Full-Stack Web Development',
-                    'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+                    'avatar' => '',
                 ];
             } elseif ($portal === 'tutor' || str_contains($lowerEmail, 'tutor') || str_contains($lowerEmail, 'faculty')) {
                 $authenticatedUserData = [
@@ -322,7 +322,7 @@ class AuthController extends BaseApiController
                     'role' => 'Tutor / Faculty',
                     'role_code' => 'ROLE_TUTOR',
                     'department' => 'UI / UX Product Design',
-                    'avatar' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces',
+                    'avatar' => '',
                 ];
             } else {
                 $authenticatedUserData = [
@@ -334,7 +334,7 @@ class AuthController extends BaseApiController
                     'role_code' => 'ROLE_SUPER_ADMIN',
                     'department' => 'Executive Office',
                     'emp_id' => 'BX-ADM-002',
-                    'avatar' => 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces',
+                    'avatar' => '',
                 ];
             }
         }

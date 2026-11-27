@@ -91,7 +91,7 @@ class ProfileController extends BaseApiController
             'join_date'   => 'January 15, 2024',
             'timezone'    => $user['timezone'] ?? 'UTC+05:30 (Asia/Kolkata)',
             'bio'         => $user['bio'] ?? '',
-            'avatar'      => $user['avatar'] ?? 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces',
+            'avatar'      => (!empty($user['avatar']) && !str_contains($user['avatar'], 'unsplash.com')) ? $user['avatar'] : '',
             'security'    => self::$mockSecurity,
             'sessions'    => self::$mockSessions,
             'preferences' => self::$mockPreferences,

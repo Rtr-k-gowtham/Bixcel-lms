@@ -1,71 +1,84 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import { apiService } from '../../services/api'
 
-const DEFAULT_PROFILE = {
-  id: 2,
-  name: 'Elena Rostova',
-  first_name: 'Elena',
-  last_name: 'Rostova',
-  email: 'e.rostova@bixcel.edu',
-  emp_id: 'BX-ADM-002',
-  role: 'Super Admin',
-  role_code: 'ROLE_SUPER_ADMIN',
-  department: 'Executive Office',
-  institution: 'Bixcel Institute of Technologies Private Limited',
-  phone: '+1 (555) 876-5432',
-  office: 'Suite 401, Tech Tower A',
-  join_date: 'January 15, 2024',
-  timezone: 'UTC+05:30 (Asia/Kolkata)',
-  bio: 'Principal Executive Director overseeing institutional LMS architecture, academic compliance, and multi-tenant security operations at Bixcel Institute.',
-  avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=faces',
-  security: {
-    two_factor_enabled: true,
-    auth_app_synced: true,
-    password_changed_at: 'October 12, 2026',
-    failed_logins: 0,
-  },
-  sessions: [
-    {
-      id: 'SES-901',
-      device: 'Windows 11 • Chrome 128',
-      is_current: true,
-      ip: '192.168.1.102',
-      location: 'Chennai, India',
-      started: 'Today at 08:30 AM',
-      status: 'Active',
-    },
-    {
-      id: 'SES-902',
-      device: 'macOS Sonoma • Safari 17',
-      is_current: false,
-      ip: '192.168.1.115',
-      location: 'Bangalore, India',
-      started: 'Yesterday at 04:12 PM',
-      status: 'Idle',
-    },
-    {
-      id: 'SES-903',
-      device: 'iPhone 15 Pro • Bixcel Mobile App',
-      is_current: false,
-      ip: '10.0.0.54',
-      location: 'Chennai, India',
-      started: 'Nov 24, 2026',
-      status: 'Idle',
-    },
-  ],
-  preferences: {
-    theme: 'system',
-    email_digest: 'daily',
-    sms_critical_alerts: true,
-    default_landing: 'dashboard',
-    language: 'en-US',
-  },
-}
-
-export function UserProfileScreen() {
+export function UserProfileScreen({ currentUser }) {
   const { theme, toggleTheme } = useTheme()
-  const [profile, setProfile] = useState(DEFAULT_PROFILE)
+  const fileInputRef = useRef(null)
+
+  // Resolve active session user
+  const sessionUser = currentUser || apiService.getCurrentUser() || {}
+  const activeEmpId = sessionUser.student_id || sessionUser.emp_id || 'BX-ADM-001'
+
+  // Photo avatar state (uploaded or local storage)
+  const [avatar, setAvatar] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`bx_student_avatar_${activeEmpId}`)
+      if (saved) return saved
+      if (sessionUser.avatar && !sessionUser.avatar.includes('unsplash.com')) {
+        return sessionUser.avatar
+      }
+    } catch {}
+    return null
+  })
+
+  // Profile data state
+  const [profile, setProfile] = useState(() => {
+    const rawName = sessionUser.name || 'Administrator'
+    const names = rawName.split(' ')
+    return {
+      id: sessionUser.id || 1,
+      name: rawName,
+      first_name: names[0] || 'Admin',
+      last_name: names.slice(1).join(' ') || 'User',
+      email: sessionUser.email || 'admin@bixceltech.com',
+      emp_id: activeEmpId,
+      role: sessionUser.role || 'Super Admin',
+      role_code: sessionUser.role_code || 'ROLE_SUPER_ADMIN',
+      department: sessionUser.department || 'Executive Operations',
+      institution: 'Bixcel Technologies (bixceltech.com)',
+      phone: sessionUser.phone || '+1 (555) 876-5432',
+      office: 'Suite 401, Tech Tower A',
+      join_date: 'January 15, 2024',
+      timezone: 'UTC+05:30 (Asia/Kolkata)',
+      bio: sessionUser.bio || 'Authorized institutional administrator at Bixcel Technologies.',
+      avatar: '',
+      security: {
+        two_factor_enabled: true,
+        auth_app_synced: true,
+        password_changed_at: 'October 12, 2026',
+        failed_logins: 0,
+      },
+      sessions: [
+        {
+          id: 'SES-901',
+          device: 'Windows 11 • Chrome 128',
+          is_current: true,
+          ip: '192.168.1.102',
+          location: 'Chennai, India',
+          started: 'Today at 08:30 AM',
+          status: 'Active',
+        },
+        {
+          id: 'SES-902',
+          device: 'macOS Sonoma • Safari 17',
+          is_current: false,
+          ip: '192.168.1.115',
+          location: 'Bangalore, India',
+          started: 'Yesterday at 04:12 PM',
+          status: 'Idle',
+        },
+      ],
+      preferences: {
+        theme: 'system',
+        email_digest: 'daily',
+        sms_critical_alerts: true,
+        default_landing: 'dashboard',
+        language: 'en-US',
+      },
+    }
+  })
+
   const [activeTab, setActiveTab] = useState('INFO')
   const [toast, setToast] = useState('')
   const [saving, setSaving] = useState(false)
@@ -77,14 +90,18 @@ export function UserProfileScreen() {
     confirm: '',
   })
 
-  // Load profile from CI4 API
+  // Load profile from CI4 API if available
   useEffect(() => {
     let isMounted = true
     const loadProfile = async () => {
       try {
         const res = await apiService.getProfile()
         if (res && res.status === 'success' && res.data && isMounted) {
-          setProfile(res.data)
+          const apiData = res.data
+          if (apiData.avatar && apiData.avatar.includes('unsplash.com')) {
+            apiData.avatar = ''
+          }
+          setProfile((prev) => ({ ...prev, ...apiData }))
         }
       } catch (err) {
         console.warn('Using local fallback for Profile:', err)
@@ -93,6 +110,71 @@ export function UserProfileScreen() {
     loadProfile()
     return () => { isMounted = false }
   }, [])
+
+  // Handle Photo Upload
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setToast('Please select a valid image file (PNG, JPG, WEBP).')
+      setTimeout(() => setToast(''), 3000)
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setToast('Image file size must be under 5MB.')
+      setTimeout(() => setToast(''), 3000)
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const base64Data = event.target?.result
+      if (base64Data) {
+        setAvatar(base64Data)
+        try {
+          localStorage.setItem(`bx_student_avatar_${activeEmpId}`, base64Data)
+          const storedAuth = localStorage.getItem('bx_auth_user')
+          if (storedAuth) {
+            const userObj = JSON.parse(storedAuth)
+            userObj.avatar = base64Data
+            localStorage.setItem('bx_auth_user', JSON.stringify(userObj))
+          }
+        } catch {}
+        setToast('Profile photo updated successfully!')
+        setTimeout(() => setToast(''), 3000)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Handle Remove Photo
+  const handleRemovePhoto = () => {
+    setAvatar(null)
+    try {
+      localStorage.removeItem(`bx_student_avatar_${activeEmpId}`)
+      const storedAuth = localStorage.getItem('bx_auth_user')
+      if (storedAuth) {
+        const userObj = JSON.parse(storedAuth)
+        userObj.avatar = ''
+        localStorage.setItem('bx_auth_user', JSON.stringify(userObj))
+      }
+    } catch {}
+    setToast('Profile photo removed')
+    setTimeout(() => setToast(''), 3000)
+  }
+
+  // Initials
+  const initials = profile.name
+    ? profile.name
+        .split(' ')
+        .filter(Boolean)
+        .map((p) => p[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'BX'
 
   const handleInfoSubmit = async (e) => {
     e.preventDefault()
@@ -163,10 +245,35 @@ export function UserProfileScreen() {
       {/* Profile Header Hero Card */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 sm:p-4 shadow-xs flex flex-col md:flex-row items-center md:items-start justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-center sm:text-left">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full bg-light-primary text-white flex items-center justify-center font-bold text-xl shadow-xs border-2 border-light-surface-container-lowest dark:border-dark-surface-bright overflow-hidden">
-              {profile.name.charAt(0)}
-            </div>
+          {/* Real Photo / Initials with Upload Overlay */}
+          <div className="relative group shrink-0">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handlePhotoUpload}
+              accept="image/png,image/jpeg,image/webp,image/jpg"
+              className="hidden"
+            />
+            {avatar ? (
+              <img
+                src={avatar}
+                alt={profile.name}
+                className="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-light-surface-container-lowest dark:border-dark-surface-bright ring-2 ring-light-primary/30"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-light-primary to-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-xs border-2 border-light-surface-container-lowest dark:border-dark-surface-bright tracking-wider">
+                {initials}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute inset-0 rounded-full bg-black/55 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              title="Upload Profile Photo"
+            >
+              <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+              <span className="text-[9px] font-semibold">{avatar ? 'Change' : 'Upload'}</span>
+            </button>
             <span className="w-4 h-4 rounded-full bg-success border-2 border-light-surface-container-lowest dark:border-dark-surface-bright absolute bottom-0 right-0" title="Online" />
           </div>
 
@@ -191,6 +298,30 @@ export function UserProfileScreen() {
             <p className="font-body text-xs text-light-on-surface-variant max-w-xl mt-0.5">
               {profile.bio}
             </p>
+
+            <div className="flex items-center gap-2 mt-1">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-[11px] font-semibold text-light-primary hover:underline flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[13px]">upload</span>
+                <span>{avatar ? 'Change Photo' : 'Upload Photo'}</span>
+              </button>
+              {avatar && (
+                <>
+                  <span className="text-light-outline text-xs">•</span>
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="text-[11px] font-semibold text-rose-500 hover:underline flex items-center gap-0.5"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">delete</span>
+                    <span>Remove Photo</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

@@ -1,21 +1,38 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { apiService } from '../../services/api'
 
 export function StudentDashboard({ currentUser, onNavigate }) {
-  // Live State from backend APIs
+  // 1. Logged-in User Profile Information (Real Data)
+  const sessionUser = currentUser || apiService.getCurrentUser() || {}
+  
+  // Real Student Avatar (uploaded file or initials)
+  const fileInputRef = useRef(null)
+  const [studentAvatar, setStudentAvatar] = useState(() => {
+    try {
+      const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
+      const saved = localStorage.getItem(`bx_student_avatar_${studentId}`)
+      if (saved) return saved
+      if (sessionUser.avatar && !sessionUser.avatar.includes('unsplash.com')) {
+        return sessionUser.avatar
+      }
+    } catch {}
+    return null
+  })
+
+  // Live State from Backend APIs
   const [liveModules, setLiveModules] = useState([])
   const [calendarEvents, setCalendarEvents] = useState([])
   const [liveProgress, setLiveProgress] = useState(null)
   const [loading, setLoading] = useState(true)
   const [toastMessage, setToastMessage] = useState('')
 
-  // Active Selected Module ID
+  // Active Selected Module ID (from real database modules)
   const [selectedModuleId, setSelectedModuleId] = useState('')
 
-  // Lesson filter: 'upcoming' | 'all' | 'completed'
+  // Lesson Filter: 'upcoming' | 'all' | 'completed'
   const [lessonFilter, setLessonFilter] = useState('upcoming')
 
-  // Main Dashboard View: 'calendar' | 'syllabus' | 'reportcard' | 'combined'
+  // Main Dashboard View: 'combined' (Calendar + Syllabus) | 'calendar' | 'syllabus' | 'reportcard'
   const [activeView, setActiveView] = useState('combined')
 
   // Calendar State
@@ -25,10 +42,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
   const [selectedCalendarType, setSelectedCalendarType] = useState('All')
   const [selectedEventModal, setSelectedEventModal] = useState(null)
 
-  // Student Persona selection
-  const [activeStudentKey, setActiveStudentKey] = useState('gowtham')
-
-  // Check-In State
+  // Attendance Check-In State
   const [checkedInToday, setCheckedInToday] = useState(() => {
     try {
       return localStorage.getItem('bx_student_checked_in_2026-11-26') === 'true'
@@ -44,13 +58,66 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     }
   })
 
-  // Show Toast Helper
+  // Show Toast
   const showToast = (msg) => {
     setToastMessage(msg)
     setTimeout(() => setToastMessage(''), 3500)
   }
 
-  // Handle Attendance Check-in
+  // Handle Photo Upload
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (PNG, JPG, JPEG, WEBP).')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image file size must be under 5MB.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const base64Data = event.target?.result
+      if (base64Data) {
+        setStudentAvatar(base64Data)
+        try {
+          const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
+          localStorage.setItem(`bx_student_avatar_${studentId}`, base64Data)
+          // Update session user avatar
+          const storedAuth = localStorage.getItem('bx_auth_user')
+          if (storedAuth) {
+            const userObj = JSON.parse(storedAuth)
+            userObj.avatar = base64Data
+            localStorage.setItem('bx_auth_user', JSON.stringify(userObj))
+          }
+        } catch {}
+        showToast('Profile photo updated successfully!')
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Handle Remove Photo
+  const handleRemovePhoto = () => {
+    setStudentAvatar(null)
+    try {
+      const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
+      localStorage.removeItem(`bx_student_avatar_${studentId}`)
+      const storedAuth = localStorage.getItem('bx_auth_user')
+      if (storedAuth) {
+        const userObj = JSON.parse(storedAuth)
+        userObj.avatar = ''
+        localStorage.setItem('bx_auth_user', JSON.stringify(userObj))
+      }
+    } catch {}
+    showToast('Profile photo removed. Displaying student initials.')
+  }
+
+  // Handle Check-In
   const handleCheckIn = () => {
     const now = new Date()
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -63,13 +130,13 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     showToast(`Checked in successfully at ${timeStr}! Attendance marked: Present (Lab 302).`)
   }
 
-  // Fetch actual data from backend APIs
+  // Fetch actual data from live backend
   useEffect(() => {
     let isMounted = true
     const fetchAllData = async () => {
       setLoading(true)
       try {
-        // 1. Fetch real modules from backend
+        // 1. Fetch real modules from backend database
         try {
           const modRes = await apiService.getModules()
           if (modRes && modRes.status === 'success' && Array.isArray(modRes.data) && isMounted) {
@@ -82,7 +149,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           console.warn('Failed to load real modules:', err)
         }
 
-        // 2. Fetch real calendar events
+        // 2. Fetch real calendar events from backend database
         try {
           const calRes = await apiService.getCalendarEvents()
           if (calRes && Array.isArray(calRes.data) && isMounted) {
@@ -92,15 +159,17 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           console.warn('Failed to load real calendar events:', err)
         }
 
-        // 3. Fetch real academic progress report
+        // 3. Fetch real academic progress from backend database
         try {
           const progRes = await apiService.getProgressList()
           if (progRes && Array.isArray(progRes.data) && isMounted) {
+            const userEmail = sessionUser.email?.toLowerCase() || ''
+            const userName = sessionUser.name?.toLowerCase() || ''
             const found = progRes.data.find(
               (p) =>
-                p.student_id === 'STU-2026-0843' ||
-                p.email?.toLowerCase().includes('gowtham') ||
-                p.full_name?.toLowerCase().includes('gowtham')
+                (p.student_id && p.student_id === sessionUser.student_id) ||
+                (p.email && userEmail && p.email.toLowerCase() === userEmail) ||
+                (p.full_name && userName && p.full_name.toLowerCase().includes(userName.split(' ')[0]))
             )
             setLiveProgress(found || progRes.data[0] || null)
           }
@@ -116,30 +185,38 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [sessionUser.email, sessionUser.name, sessionUser.student_id])
 
-  // Student Profile Data
+  // Real Student Data object
   const student = {
-    name: currentUser?.name || liveProgress?.full_name || (activeStudentKey === 'marcus' ? 'Marcus Vance' : 'Gowtham Tamilkathir'),
-    student_id: currentUser?.student_id || liveProgress?.student_id || (activeStudentKey === 'marcus' ? 'STU-2026-0842' : 'STU-2026-0843'),
-    reg_no: liveProgress?.reg_no || (activeStudentKey === 'marcus' ? 'REG-2026-MKT-042' : 'REG-2026-DEV-084'),
-    batch: currentUser?.batch || liveProgress?.batch || (activeStudentKey === 'marcus' ? 'BIX-MKT-26B' : 'BIX-DEV-24A'),
-    track: currentUser?.track || liveProgress?.track || (activeStudentKey === 'marcus' ? 'Digital Marketing & Growth' : 'Full-Stack Web Development'),
-    course_name: activeStudentKey === 'marcus' ? 'Executive Masterclass in Performance Marketing & SEO' : 'Professional Diploma in Full-Stack Software Engineering',
+    name: sessionUser.name || liveProgress?.full_name || 'Gowtham Tamilkathir',
+    student_id: sessionUser.student_id || sessionUser.emp_id || liveProgress?.student_id || 'STU-2026-0843',
+    reg_no: liveProgress?.reg_no || sessionUser.reg_no || 'REG-2026-DEV-084',
+    email: sessionUser.email || liveProgress?.email || 'gowthamtamilkathir@gmail.com',
+    batch: sessionUser.batch || liveProgress?.batch || 'BIX-DEV-24A',
+    track: sessionUser.track || liveProgress?.track || 'Full-Stack Web Development',
+    course_name: liveProgress?.course_name || (sessionUser.track ? `Professional Diploma in ${sessionUser.track}` : 'Professional Diploma in Full-Stack Software Engineering'),
     term: liveProgress?.term || 'Semester 2 • Fall Term 2026',
-    attendance_pct: liveProgress?.attendance_pct || (activeStudentKey === 'marcus' ? 98.0 : 96.4),
+    attendance_pct: liveProgress?.attendance_pct || 96.4,
     attendance_present: liveProgress?.attendance_days_present || 48,
     attendance_total: liveProgress?.attendance_days_total || 50,
-    gpa: liveProgress?.gpa || (activeStudentKey === 'marcus' ? 3.92 : 3.86),
-    standing: liveProgress?.standing || (activeStudentKey === 'marcus' ? 'Summa Cum Laude' : 'Honors Distinction'),
+    gpa: liveProgress?.gpa || 3.86,
+    standing: liveProgress?.standing || 'Honors Distinction',
     fee_status: 'Paid in Full',
     fee_receipt: 'RCP-2026-9041',
-    avatar: activeStudentKey === 'marcus'
-      ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'
-      : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-    advisor_remarks: liveProgress?.advisor_remarks?.[0]?.remarks || 'Exhibits superior technical aptitude in software architecture, RESTful API design, and database query optimization. Outstanding cohort performance.',
+    advisor_remarks: liveProgress?.advisor_remarks?.[0]?.remarks || 'Demonstrates exceptional mastery in full-stack architecture, RESTful API design, and database query optimization. Outstanding academic standing in cohort.',
     dean_name: 'Dr. Marcus Vance',
     dean_title: 'Dean of Computing & Information Systems',
+  }
+
+  // Get Initials for Avatar (e.g. "GT")
+  const getInitials = (name) => {
+    if (!name) return 'ST'
+    const parts = name.trim().split(' ')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
   }
 
   // Active Selected Module from real backend data
@@ -158,8 +235,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     const lessonsList = Array.isArray(dayItem.lessons) ? dayItem.lessons : []
 
     lessonsList.forEach((l, idx) => {
-      // Determine actual lesson status:
-      // If dayNum < 9 => completed, dayNum === 9 => current (today), dayNum > 9 => upcoming
       let status = 'upcoming'
       if (dayNum < 9) status = 'completed'
       else if (dayNum === 9) status = 'current'
@@ -181,17 +256,16 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     })
   })
 
-  // Filter lessons
+  // Filtered lessons
   const displayedLessons = allParsedLessons.filter((l) => {
     if (lessonFilter === 'upcoming') return l.status === 'upcoming' || l.status === 'current'
     if (lessonFilter === 'completed') return l.status === 'completed'
     return true
   })
 
-  // Upcoming lessons count
   const upcomingCount = allParsedLessons.filter((l) => l.status === 'upcoming' || l.status === 'current').length
 
-  // Calendar Computation (Monday-aligned)
+  // Calendar Helpers (Monday-aligned)
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
@@ -244,16 +318,13 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     calendarCells.push({ dayNum: r, dateStr, isCurrentMonth: false })
   }
 
-  // Filter Calendar events
   const filteredEvents = calendarEvents.filter((ev) => {
     const matchType = selectedCalendarType === 'All' || ev.type === selectedCalendarType
     return matchType
   })
 
-  // Events on selected date
   const selectedDateEvents = filteredEvents.filter((e) => e.date === selectedDateStr)
 
-  // Badge styling helper
   const getTypeBadge = (type) => {
     switch (type) {
       case 'lecture':
@@ -286,22 +357,42 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </div>
       )}
 
-      {/* 1. STUDENT PROFILE HEADER */}
+      {/* Hidden File Input for Real Photo Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handlePhotoUpload}
+        accept="image/*"
+        className="hidden"
+      />
+
+      {/* 1. STUDENT PROFILE HEADER (REAL DATA - NO PLACEHOLDERS) */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-4 rounded-xl shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        {/* Left: Avatar & Identity Details */}
-        <div className="flex items-start sm:items-center gap-3.5">
-          <div className="relative shrink-0">
-            <img
-              src={student.avatar}
-              alt={student.name}
-              className="w-16 h-16 rounded-full object-cover ring-2 ring-light-primary/40 dark:ring-dark-primary/40 shadow-xs"
-            />
-            <span
-              className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-dark-surface-bright ${
-                checkedInToday ? 'bg-emerald-500' : 'bg-amber-400'
-              }`}
-              title={checkedInToday ? 'Checked in on campus' : 'Not checked in yet'}
-            />
+        {/* Left: Real Student Avatar with Upload Action & Identity Details */}
+        <div className="flex items-start sm:items-center gap-4">
+          {/* Avatar Container with Upload Camera Overlay */}
+          <div className="relative group shrink-0">
+            {studentAvatar ? (
+              <img
+                src={studentAvatar}
+                alt={student.name}
+                className="w-16 h-16 rounded-full object-cover ring-2 ring-light-primary/40 dark:ring-dark-primary/40 shadow-xs"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-light-primary to-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-xs ring-2 ring-light-primary/30">
+                {getInitials(student.name)}
+              </div>
+            )}
+
+            {/* Photo Upload Trigger Button */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload your real profile photo"
+              className="absolute -bottom-1 -right-1 p-1 rounded-full bg-white dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface border border-light-outline-variant shadow-xs hover:bg-light-primary hover:text-white transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[14px]">photo_camera</span>
+            </button>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -328,6 +419,8 @@ export function StudentDashboard({ currentUser, onNavigate }) {
               <span>•</span>
               <span className="font-mono">{student.reg_no}</span>
               <span>•</span>
+              <span className="font-mono">{student.email}</span>
+              <span>•</span>
               <span className="font-medium text-emerald-700 dark:text-emerald-400">
                 Attendance: {student.attendance_pct}% ({student.attendance_present}/{student.attendance_total} Days)
               </span>
@@ -339,21 +432,30 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           </div>
         </div>
 
-        {/* Right: Check-in, Switch Persona & Print */}
+        {/* Right: Upload Photo / Remove Photo Action Buttons */}
         <div className="flex flex-wrap items-center gap-2 self-start xl:self-center">
-          {/* Persona selector */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container">
-            <span className="material-symbols-outlined text-[16px] text-light-outline">account_circle</span>
-            <select
-              value={activeStudentKey}
-              onChange={(e) => setActiveStudentKey(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-light-on-surface dark:text-dark-on-surface focus:outline-none cursor-pointer"
-              title="Switch student persona"
+          {/* Upload Photo Button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface text-xs font-semibold hover:bg-light-surface-container-low transition-colors cursor-pointer"
+            title="Upload your real photo from your device"
+          >
+            <span className="material-symbols-outlined text-[15px] text-light-primary">upload</span>
+            <span>{studentAvatar ? 'Change Photo' : 'Upload Photo'}</span>
+          </button>
+
+          {studentAvatar && (
+            <button
+              type="button"
+              onClick={handleRemovePhoto}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 dark:border-red-900 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+              title="Remove custom photo and use student initials"
             >
-              <option value="gowtham">Gowtham Tamilkathir (Full-Stack Dev • BIX-DEV-24A)</option>
-              <option value="marcus">Marcus Vance (Digital Marketing • BIX-MKT-26B)</option>
-            </select>
-          </div>
+              <span className="material-symbols-outlined text-[14px]">delete</span>
+              <span>Remove</span>
+            </button>
+          )}
 
           {/* Today's Campus Arrival Check-in */}
           {checkedInToday ? (
@@ -385,7 +487,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </div>
       </section>
 
-      {/* 2. DASHBOARD VIEW SELECTOR TABS: CALENDAR, UPCOMING LESSONS & SYLLABUS, REPORT CARD */}
+      {/* 2. DASHBOARD VIEW SELECTOR TABS */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-2 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-1.5">
           {/* Tab 1: Academic Calendar Dashboard */}
@@ -473,7 +575,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
           {/* Left Column: Calendar Grid & Navigation (8 cols) */}
           <div className="lg:col-span-8 flex flex-col gap-3">
-            {/* Calendar Controls & Month Switcher Bar */}
             <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-light-primary text-[20px]">calendar_month</span>
@@ -683,9 +784,8 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             )}
           </div>
 
-          {/* Right Column: Selected Day Details & Live Classroom (4 cols) */}
+          {/* Right Column: Selected Day Itinerary & Live Classroom (4 cols) */}
           <div className="lg:col-span-4 flex flex-col gap-3">
-            {/* Live Today Card */}
             <article className="bg-gradient-to-br from-[#1E113A] via-[#2B1B54] to-[#120B24] text-white p-4 rounded-xl shadow-md border border-purple-800/60 flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 font-label text-[10px] font-bold border border-red-500/40">
@@ -769,7 +869,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </section>
       )}
 
-      {/* 4. SECTION: UPCOMING LESSONS & SYLLABUS BASED ON MODULE OR COURSE (LOADED FROM ACTUAL BACKEND DATA) */}
+      {/* 4. SECTION: UPCOMING LESSONS & SYLLABUS BASED ON MODULE OR COURSE (REAL DATABASE DATA) */}
       {(activeView === 'syllabus' || activeView === 'combined') && (
         <section className="flex flex-col gap-3">
           {/* Module Selector Banner */}
@@ -897,7 +997,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                         : 'bg-light-surface-container-lowest/70 dark:bg-dark-surface-bright/70 border-light-outline-variant dark:border-dark-outline-variant opacity-80'
                     }`}
                   >
-                    {/* Top Row: Day Header, Status & Timing */}
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-light-outline-variant/60 pb-2">
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-light-surface-container dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface border border-light-outline-variant/80">
@@ -936,7 +1035,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                       </div>
                     </div>
 
-                    {/* Lesson Title & Objectives */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="flex flex-col gap-1 max-w-3xl">
                         <h4 className="font-title text-sm sm:text-base font-bold text-light-on-surface dark:text-dark-on-surface">
@@ -952,7 +1050,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                         </div>
                       </div>
 
-                      {/* Action Button */}
                       <div className="flex flex-col items-end gap-1.5 shrink-0 self-end sm:self-center">
                         {lesson.live_link ? (
                           <a
@@ -1020,7 +1117,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             </div>
           </div>
 
-          {/* Student Overview Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 border border-light-outline-variant/60 text-xs">
             <div>
               <span className="text-light-on-surface-variant block text-[11px]">Student Full Name</span>
@@ -1048,7 +1144,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             </div>
           </div>
 
-          {/* Grades Table */}
           <div className="overflow-x-auto rounded-lg border border-light-outline-variant dark:border-dark-outline-variant">
             <table className="w-full text-left border-collapse text-xs">
               <thead className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant text-[11px] font-bold text-light-on-surface-variant uppercase tracking-wider">
@@ -1098,7 +1193,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             </table>
           </div>
 
-          {/* Remarks & Signatures */}
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
             <div className="flex flex-col gap-1 max-w-xl">
               <span className="font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1.5">

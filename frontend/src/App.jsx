@@ -402,7 +402,7 @@ function Dashboard({ currentUser, onLogout }) {
           ) : currentTab === 'notifications' ? (
             <NotificationsScreen onNavigate={(tab) => handleTabChange(tab)} />
           ) : currentTab === 'profile' ? (
-            <UserProfileScreen />
+            <UserProfileScreen currentUser={currentUser} />
           ) : isStudent ? (
             <StudentDashboard
               currentUser={currentUser}
