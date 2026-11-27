@@ -566,7 +566,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-light-primary text-[18px]">groups</span>
             <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
-              Student Management &amp; Onboarding
+              {activeTab === 'wizard' ? 'Student Onboarding Wizard' : 'Student Management'}
             </h1>
             <span className="px-2 py-0.5 rounded-full bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint dark:text-dark-on-primary-tint font-mono text-[10px] font-bold">
               {totalCount} Total
@@ -577,37 +577,9 @@ export function StudentManagement({ initialTab = 'directory' }) {
           </p>
         </div>
 
-        {/* View Switcher Pills */}
+        {/* Action Button */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex items-center p-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant">
-            <button
-              type="button"
-              onClick={() => setActiveTab('directory')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${activeTab === 'directory'
-                ? 'bg-light-primary text-light-on-primary shadow-xs'
-                : 'text-light-on-surface-variant hover:text-light-on-surface'
-                }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">badge</span>
-              <span>Student Directory</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('wizard')
-                setWizardStep(1)
-              }}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${activeTab === 'wizard'
-                ? 'bg-light-primary text-light-on-primary shadow-xs'
-                : 'text-light-on-surface-variant hover:text-light-on-surface'
-                }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">person_add</span>
-              <span>Onboarding Wizard</span>
-            </button>
-          </div>
-
-          {activeTab === 'directory' && (
+          {activeTab === 'directory' ? (
             <button
               type="button"
               onClick={() => {
@@ -618,6 +590,15 @@ export function StudentManagement({ initialTab = 'directory' }) {
             >
               <span className="material-symbols-outlined text-[15px]">add</span>
               <span>Onboard Student</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setActiveTab('directory')}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-container font-label text-xs font-semibold shadow-xs transition-colors whitespace-nowrap"
+            >
+              <span className="material-symbols-outlined text-[15px]">arrow_back</span>
+              <span>Back to Directory</span>
             </button>
           )}
         </div>
@@ -1561,11 +1542,10 @@ export function StudentManagement({ initialTab = 'directory' }) {
                             <div
                               key={mod.id || mod.code}
                               onClick={() => handleToggleModule(mod)}
-                              className={`p-2.5 rounded border transition-all cursor-pointer flex items-start gap-2.5 ${
-                                isChecked
-                                  ? 'border-light-primary bg-light-primary-tint/25 dark:bg-dark-primary-tint/25 shadow-xs'
-                                  : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:border-light-primary/60'
-                              }`}
+                              className={`p-2.5 rounded border transition-all cursor-pointer flex items-start gap-2.5 ${isChecked
+                                ? 'border-light-primary bg-light-primary-tint/25 dark:bg-dark-primary-tint/25 shadow-xs'
+                                : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:border-light-primary/60'
+                                }`}
                             >
                               <input
                                 type="checkbox"

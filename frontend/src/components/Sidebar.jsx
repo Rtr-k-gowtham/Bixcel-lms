@@ -19,7 +19,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
       group: 'People',
       items: [
         { id: 'students', label: 'Student Management', icon: 'groups' },
-        { id: 'onboarding', label: 'Student Onboarding', icon: 'person_add' },
         { id: 'tutors', label: 'Tutor Management', icon: 'co_present' },
       ],
     },
