@@ -12,7 +12,9 @@ class UserModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'name',
+        'username',
         'email',
+        'password',
         'emp_id',
         'role',
         'role_code',

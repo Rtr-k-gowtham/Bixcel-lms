@@ -36,6 +36,7 @@ $defineApiRoutes = static function ($routes) {
     $routes->post('progress/remark', 'Api\ProgressController::remark');
     $routes->resource('progress', ['controller' => 'Api\ProgressController']);
     $routes->get('students/tracks', 'Api\StudentController::tracks');
+    $routes->post('students/credentials', 'Api\StudentController::credentials');
     $routes->resource('students', ['controller' => 'Api\StudentController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);
     $routes->resource('roles', ['controller' => 'Api\RoleController']);

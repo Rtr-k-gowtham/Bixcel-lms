@@ -163,6 +163,8 @@ class StudentController extends BaseApiController
                 'id' => (int) $s['id'],
                 'student_id' => $s['student_id'],
                 'full_name' => $s['full_name'],
+                'username' => !empty($s['username']) ? $s['username'] : (!empty($s['full_name']) ? strtolower(str_replace(' ', '.', trim((string) $s['full_name']))) : $s['student_id']),
+                'raw_password' => $s['raw_password'] ?? 'Student@123',
                 'guardian_name' => $s['guardian_name'] ?? 'Guardian',
                 'guardian_relation' => $s['guardian_relation'] ?? 'Parent',
                 'guardian_phone' => $s['guardian_phone'] ?? $s['phone'],
@@ -288,6 +290,8 @@ class StudentController extends BaseApiController
             'id' => (int) $student['id'],
             'student_id' => $student['student_id'],
             'full_name' => $student['full_name'],
+            'username' => !empty($student['username']) ? $student['username'] : (!empty($student['full_name']) ? strtolower(str_replace(' ', '.', trim((string) $student['full_name']))) : $student['student_id']),
+            'raw_password' => $student['raw_password'] ?? 'Student@123',
             'guardian_name' => $student['guardian_name'] ?? 'Guardian',
             'guardian_relation' => $student['guardian_relation'] ?? 'Parent',
             'guardian_phone' => $student['guardian_phone'] ?? $student['phone'],
@@ -350,10 +354,17 @@ class StudentController extends BaseApiController
         $studentCode = !empty($input['student_id']) ? trim((string) $input['student_id']) : $generatedId;
         $now = date('Y-m-d H:i:s');
 
+        $rawUsername = !empty($input['username']) ? trim((string) $input['username']) : (!empty($input['full_name']) ? strtolower(str_replace(' ', '.', trim((string) $input['full_name']))) : $studentCode);
+        $rawPassword = !empty($input['password']) ? trim((string) $input['password']) : 'Student@123';
+        $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
+
         // 1. Insert into students table
         $studentData = [
             'student_id' => $studentCode,
             'full_name' => trim((string) $input['full_name']),
+            'username' => $rawUsername,
+            'password' => $hashedPassword,
+            'raw_password' => $rawPassword,
             'guardian_name' => trim((string) $input['guardian_name']),
             'guardian_relation' => $input['guardian_relation'] ?? 'Guardian',
             'guardian_phone' => !empty($input['guardian_phone']) ? trim((string) $input['guardian_phone']) : trim((string) $input['phone']),
@@ -369,6 +380,32 @@ class StudentController extends BaseApiController
             'updated_at' => $now,
         ];
         $studentId = $studentModel->insert($studentData);
+
+        // Synchronize into users table
+        try {
+            $userModel = new \App\Models\UserModel();
+            $existingUser = $userModel->where('emp_id', $studentCode)->orWhere('email', $studentData['email'])->first();
+            $userData = [
+                'name' => $studentData['full_name'],
+                'username' => $rawUsername,
+                'email' => $studentData['email'],
+                'password' => $hashedPassword,
+                'emp_id' => $studentCode,
+                'role' => 'Student',
+                'role_code' => 'ROLE_STUDENT',
+                'department' => $input['track'] ?? 'Academic Student Portal',
+                'phone' => $studentData['phone'],
+                'status' => $studentData['status'] ?? 'Active',
+                'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+            ];
+            if ($existingUser) {
+                $userModel->update($existingUser['id'], $userData);
+            } else {
+                $userModel->insert($userData);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error syncing user record: ' . $e->getMessage());
+        }
 
         // 2. Insert into student_enrollments table
         $track = $input['track'] ?? 'Full-Stack Web Development';
@@ -493,14 +530,38 @@ class StudentController extends BaseApiController
         }
 
         $updateData = [];
-        foreach (['full_name', 'guardian_name', 'guardian_relation', 'guardian_phone', 'guardian_email', 'phone', 'email', 'dob', 'gender', 'blood_group', 'address', 'status'] as $field) {
+        foreach (['full_name', 'username', 'guardian_name', 'guardian_relation', 'guardian_phone', 'guardian_email', 'phone', 'email', 'dob', 'gender', 'blood_group', 'address', 'status'] as $field) {
             if (isset($input[$field])) {
                 $updateData[$field] = $input[$field];
             }
         }
+        if (!empty($input['password'])) {
+            $rawPass = trim((string) $input['password']);
+            $updateData['password'] = password_hash($rawPass, PASSWORD_DEFAULT);
+            $updateData['raw_password'] = $rawPass;
+        }
         $updateData['updated_at'] = date('Y-m-d H:i:s');
 
         $studentModel->update($student['id'], $updateData);
+
+        // Sync with users table
+        try {
+            $userModel = new \App\Models\UserModel();
+            $user = $userModel->where('emp_id', $student['student_id'])->orWhere('email', $student['email'])->first();
+            if ($user) {
+                $userPayload = [
+                    'name' => $updateData['full_name'] ?? $student['full_name'],
+                    'username' => $updateData['username'] ?? ($student['username'] ?? null),
+                    'email' => $updateData['email'] ?? $student['email'],
+                ];
+                if (!empty($updateData['password'])) {
+                    $userPayload['password'] = $updateData['password'];
+                }
+                $userModel->update($user['id'], $userPayload);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error updating user record: ' . $e->getMessage());
+        }
 
         if (isset($input['batch']) || isset($input['batch_id'])) {
             $batchCode = $input['batch'] ?? $input['batch_id'];
@@ -518,6 +579,78 @@ class StudentController extends BaseApiController
             'status' => 'success',
             'message' => "Student {$student['full_name']} details updated successfully in database.",
             'data' => array_merge($student, $updateData),
+        ]);
+    }
+
+    /**
+     * Save or reset student portal credentials (username & password)
+     */
+    public function credentials()
+    {
+        $input = $this->getRequestData();
+        $studentCode = $input['student_id'] ?? $input['student_code'] ?? null;
+        $username = !empty($input['username']) ? trim((string) $input['username']) : null;
+        $password = !empty($input['password']) ? trim((string) $input['password']) : null;
+
+        if (empty($studentCode)) {
+            return $this->failValidationErrors(['student_id' => 'Student ID is required.']);
+        }
+
+        $studentModel = new StudentModel();
+        $student = $studentModel->where('student_id', $studentCode)->orWhere('id', $studentCode)->first();
+        if (!$student) {
+            return $this->failNotFound('Student record not found.');
+        }
+
+        $updateFields = [];
+        if (!empty($username)) {
+            $updateFields['username'] = $username;
+        }
+        if (!empty($password)) {
+            $updateFields['password'] = password_hash($password, PASSWORD_DEFAULT);
+            $updateFields['raw_password'] = $password;
+        }
+        $updateFields['updated_at'] = date('Y-m-d H:i:s');
+
+        $studentModel->update($student['id'], $updateFields);
+
+        // Synchronize with users table
+        try {
+            $userModel = new \App\Models\UserModel();
+            $user = $userModel->where('emp_id', $student['student_id'])
+                ->orWhere('email', $student['email'])
+                ->first();
+
+            $effectiveUsername = $username ?? (!empty($student['username']) ? $student['username'] : strtolower(str_replace(' ', '.', $student['full_name'])));
+            $userData = [
+                'name' => $student['full_name'],
+                'username' => $effectiveUsername,
+                'email' => $student['email'],
+                'emp_id' => $student['student_id'],
+                'role' => 'Student',
+                'role_code' => 'ROLE_STUDENT',
+                'department' => 'Academic Student Portal',
+                'status' => $student['status'] ?? 'Active',
+            ];
+            if (!empty($password)) {
+                $userData['password'] = password_hash($password, PASSWORD_DEFAULT);
+            }
+
+            if ($user) {
+                $userModel->update($user['id'], $userData);
+            } else {
+                $userModel->insert($userData);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error syncing user credential: ' . $e->getMessage());
+        }
+
+        return $this->respond([
+            'status' => 'success',
+            'message' => "Login credentials updated successfully for student {$student['full_name']}.",
+            'student_id' => $student['student_id'],
+            'username' => $username ?? $student['username'],
+            'raw_password' => $password ?? ($student['raw_password'] ?? 'Student@123'),
         ]);
     }
 

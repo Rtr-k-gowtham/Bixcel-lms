@@ -239,6 +239,10 @@ export const apiService = {
     const response = await apiClient.delete(`/students/${id}`)
     return response.data
   },
+  updateStudentCredentials: async (payload) => {
+    const response = await apiClient.post('/students/credentials', payload)
+    return response.data
+  },
 
   // Batch Management API
   getBatches: async (params = {}) => {

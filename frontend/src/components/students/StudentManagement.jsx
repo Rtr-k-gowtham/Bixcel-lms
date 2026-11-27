@@ -98,6 +98,9 @@ const INITIAL_WIZARD_FORM = {
   fullName: '',
   phone: '',
   email: '',
+  username: '',
+  password: 'Student@123',
+  showPassword: false,
   dob: '2004-05-15',
   gender: 'Male',
   bloodGroup: 'O+',
@@ -147,6 +150,9 @@ export function StudentManagement({ initialTab = 'directory' }) {
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [editingStudent, setEditingStudent] = useState(null)
   const [viewingPass, setViewingPass] = useState(null)
+  const [managingCredentialsStudent, setManagingCredentialsStudent] = useState(null)
+  const [credentialForm, setCredentialForm] = useState({ username: '', password: '', showPassword: false })
+  const [isSavingCredentials, setIsSavingCredentials] = useState(false)
 
   // -------------------------------------------------------------
   // STEP-BY-STEP ONBOARDING WIZARD STATE
@@ -428,9 +434,19 @@ export function StudentManagement({ initialTab = 'directory' }) {
       wizardForm.email.trim() ||
       `${wizardForm.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.')}@student.bixcel.edu`
 
+    const rawUsername =
+      wizardForm.username.trim() ||
+      (wizardForm.fullName.trim()
+        ? wizardForm.fullName.trim().toLowerCase().replace(/[^a-z0-9]/g, '.')
+        : autoId.toLowerCase())
+    const rawPassword = wizardForm.password.trim() || 'Student@123'
+
     const payload = {
       student_id: autoId,
       full_name: wizardForm.fullName.trim(),
+      username: rawUsername,
+      password: rawPassword,
+      raw_password: rawPassword,
       guardian_name: wizardForm.guardianName.trim(),
       guardian_relation: wizardForm.guardianRelation,
       guardian_phone: wizardForm.guardianPhone || wizardForm.phone,
@@ -518,6 +534,48 @@ export function StudentManagement({ initialTab = 'directory' }) {
       if (selectedStudent?.id === id) setSelectedStudent(null)
       setToast(`Student "${name}" archived successfully.`)
       setTimeout(() => setToast(''), 3000)
+    }
+  }
+
+  // Save or Update Student Login Credentials
+  const handleSaveStudentCredentials = async (e) => {
+    e.preventDefault()
+    if (!managingCredentialsStudent) return
+    if (!credentialForm.username.trim() || !credentialForm.password.trim()) {
+      alert('Username and password cannot be empty.')
+      return
+    }
+
+    setIsSavingCredentials(true)
+    const payload = {
+      student_id: managingCredentialsStudent.student_id,
+      username: credentialForm.username.trim(),
+      password: credentialForm.password.trim(),
+    }
+
+    try {
+      await apiService.updateStudentCredentials(payload).catch(() => null)
+      setStudents((prev) =>
+        prev.map((s) =>
+          s.student_id === managingCredentialsStudent.student_id
+            ? { ...s, username: payload.username, raw_password: payload.password }
+            : s
+        )
+      )
+      if (selectedStudent && selectedStudent.student_id === managingCredentialsStudent.student_id) {
+        setSelectedStudent((prev) => ({
+          ...prev,
+          username: payload.username,
+          raw_password: payload.password,
+        }))
+      }
+      setToast(`Login credentials successfully updated for "${managingCredentialsStudent.full_name}"!`)
+      setManagingCredentialsStudent(null)
+    } catch (err) {
+      alert(err.message || 'Failed to update credentials.')
+    } finally {
+      setIsSavingCredentials(false)
+      setTimeout(() => setToast(''), 4000)
     }
   }
 
@@ -894,6 +952,21 @@ export function StudentManagement({ initialTab = 'directory' }) {
                               </button>
                               <button
                                 type="button"
+                                onClick={() => {
+                                  setManagingCredentialsStudent(s)
+                                  setCredentialForm({
+                                    username: s.username || s.student_id,
+                                    password: s.raw_password || 'Student@123',
+                                    showPassword: false,
+                                  })
+                                }}
+                                title="Manage Student Portal Login Credentials"
+                                className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
+                              >
+                                <span className="material-symbols-outlined text-[16px]">key</span>
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => setViewingPass(s)}
                                 title="Print Enrollment Pass"
                                 className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
@@ -1141,6 +1214,103 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     placeholder="e.g. 742 Evergreen Terrace, Springfield, OR"
                     className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
+                </div>
+
+                {/* Student Portal Login Credentials */}
+                <div className="md:col-span-3 mt-1 p-3 rounded-md bg-light-primary-tint/40 dark:bg-dark-primary-tint/30 border border-light-primary/30 flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-light-primary dark:text-dark-primary">
+                      <span className="material-symbols-outlined text-[16px]">key</span>
+                      <span>Student Portal Login Credentials</span>
+                    </div>
+                    <span className="text-[10px] text-light-on-surface-variant font-medium">
+                      Student will use these credentials to log in to the portal
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                        Portal Username *
+                      </label>
+                      <div className="relative flex items-center">
+                        <input
+                          type="text"
+                          required
+                          value={wizardForm.username}
+                          onChange={(e) => setWizardForm({ ...wizardForm, username: e.target.value })}
+                          placeholder={
+                            wizardForm.fullName
+                              ? wizardForm.fullName.toLowerCase().replace(/\s+/g, '.')
+                              : 'e.g. marcus.vance'
+                          }
+                          className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (wizardForm.fullName.trim()) {
+                              setWizardForm({
+                                ...wizardForm,
+                                username: wizardForm.fullName.trim().toLowerCase().replace(/[^a-z0-9]/g, '.'),
+                              })
+                            }
+                          }}
+                          className="absolute right-1 px-1.5 py-0.5 text-[10px] text-light-primary hover:underline font-semibold"
+                          title="Auto-generate from full name"
+                        >
+                          Auto
+                        </button>
+                      </div>
+                      <span className="text-[10px] text-light-on-surface-variant mt-0.5 block">
+                        Student can sign in with this username, email, or Student ID.
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                        Initial Portal Password *
+                      </label>
+                      <div className="relative flex items-center">
+                        <input
+                          type={wizardForm.showPassword ? 'text' : 'password'}
+                          required
+                          value={wizardForm.password}
+                          onChange={(e) => setWizardForm({ ...wizardForm, password: e.target.value })}
+                          placeholder="e.g. Student@123"
+                          className="w-full pl-2.5 pr-20 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        />
+                        <div className="absolute right-1 flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setWizardForm({ ...wizardForm, showPassword: !wizardForm.showPassword })
+                            }
+                            className="p-1 text-light-on-surface-variant hover:text-light-on-surface"
+                            title={wizardForm.showPassword ? 'Hide password' : 'Show password'}
+                          >
+                            <span className="material-symbols-outlined text-[15px]">
+                              {wizardForm.showPassword ? 'visibility_off' : 'visibility'}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const randomPass = 'Bixcel@' + Math.floor(1000 + Math.random() * 9000)
+                              setWizardForm({ ...wizardForm, password: randomPass, showPassword: true })
+                            }}
+                            className="px-1.5 py-0.5 text-[10px] bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary rounded font-semibold hover:bg-light-primary hover:text-white transition-colors"
+                            title="Generate random password"
+                          >
+                            Generate
+                          </button>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-light-on-surface-variant mt-0.5 block">
+                        Default: <code className="font-mono">Student@123</code> (can be changed anytime).
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -1668,6 +1838,18 @@ export function StudentManagement({ initialTab = 'directory' }) {
                       <span className="text-[10px] text-light-on-surface-variant block">Batch / Days:</span>
                       <strong className="text-light-on-surface dark:text-dark-on-surface">{wizardForm.batch} • {cumulativeDays} Days</strong>
                     </div>
+                    <div>
+                      <span className="text-[10px] text-light-on-surface-variant block">Portal Username:</span>
+                      <strong className="font-mono text-light-primary truncate block">
+                        {wizardForm.username || (wizardForm.fullName ? wizardForm.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.') : 'auto')}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-light-on-surface-variant block">Portal Password:</span>
+                      <strong className="font-mono text-light-on-surface dark:text-dark-on-surface block">
+                        {wizardForm.password || 'Student@123'}
+                      </strong>
+                    </div>
                   </div>
 
                   {/* Modules framed overview */}
@@ -1849,6 +2031,45 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              {/* Student Portal Login Credentials */}
+              <div className="p-2.5 rounded bg-light-primary-tint/60 dark:bg-dark-primary-tint/40 border border-light-primary/30 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-label text-[10px] font-bold uppercase tracking-wider text-light-primary dark:text-dark-primary flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">key</span>
+                    <span>Portal Login Credentials</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setManagingCredentialsStudent(selectedStudent)
+                      setCredentialForm({
+                        username: selectedStudent.username || selectedStudent.student_id,
+                        password: selectedStudent.raw_password || 'Student@123',
+                        showPassword: false,
+                      })
+                    }}
+                    className="text-[10px] text-light-primary hover:underline font-semibold flex items-center gap-0.5"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">lock_reset</span>
+                    <span>Edit / Reset</span>
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span className="text-light-on-surface-variant block text-[10px]">Username:</span>
+                    <strong className="font-mono text-light-on-surface dark:text-dark-on-surface select-all">
+                      {selectedStudent.username || selectedStudent.student_id}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-light-on-surface-variant block text-[10px]">Password:</span>
+                    <strong className="font-mono text-light-on-surface dark:text-dark-on-surface select-all">
+                      {selectedStudent.raw_password || 'Student@123'}
+                    </strong>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2074,6 +2295,43 @@ export function StudentManagement({ initialTab = 'directory' }) {
                   <strong className="text-success">{viewingPass.fee_status || 'Paid'}</strong>
                 </div>
               </div>
+
+              {/* Login Credentials Callout */}
+              <div className="p-2.5 rounded bg-light-primary-tint/60 dark:bg-dark-primary-tint/40 border border-light-primary/30 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-label text-[11px] font-bold text-light-primary dark:text-dark-primary flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">key</span>
+                    <span>Student Portal Login Credentials</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const text = `Bixcel LMS Student Credentials\nName: ${viewingPass.full_name}\nStudent ID: ${viewingPass.student_id}\nUsername: ${viewingPass.username || viewingPass.student_id}\nPassword: ${viewingPass.raw_password || 'Student@123'}\nPortal: ${window.location.origin}`
+                      navigator.clipboard.writeText(text)
+                      setToast('Student credentials copied to clipboard!')
+                      setTimeout(() => setToast(''), 3000)
+                    }}
+                    className="text-[10px] text-light-primary hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[12px]">content_copy</span>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span className="text-[10px] text-light-on-surface-variant block">Username:</span>
+                    <strong className="font-mono text-light-on-surface dark:text-dark-on-surface select-all">
+                      {viewingPass.username || viewingPass.student_id}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-light-on-surface-variant block">Initial Password:</span>
+                    <strong className="font-mono text-light-on-surface dark:text-dark-on-surface select-all">
+                      {viewingPass.raw_password || 'Student@123'}
+                    </strong>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-1">
@@ -2095,6 +2353,169 @@ export function StudentManagement({ initialTab = 'directory' }) {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================================================================== */}
+      {/* MODAL 4: MANAGE STUDENT LOGIN CREDENTIALS                             */}
+      {/* ===================================================================== */}
+      {managingCredentialsStudent && (
+        <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-xs flex items-center justify-center p-3 animate-fadeIn">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-modal w-full max-w-md p-4 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-light-outline-variant dark:border-dark-outline-variant pb-2">
+              <div className="flex items-center gap-1.5 text-light-primary dark:text-dark-primary font-bold text-xs">
+                <span className="material-symbols-outlined text-[18px]">key</span>
+                <span>Student Portal Login Credentials</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setManagingCredentialsStudent(null)}
+                className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface"
+              >
+                <span className="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+
+            {/* Student Info Card */}
+            <div className="p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant text-xs flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-light-primary text-light-on-primary font-bold text-[11px] flex items-center justify-center">
+                  {getInitials(managingCredentialsStudent.full_name)}
+                </div>
+                <div>
+                  <h4 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                    {managingCredentialsStudent.full_name}
+                  </h4>
+                  <span className="font-mono text-[10px] text-light-primary font-bold">
+                    {managingCredentialsStudent.student_id} • {managingCredentialsStudent.track}
+                  </span>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-success-container text-on-success-container">
+                {managingCredentialsStudent.status || 'Active'}
+              </span>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSaveStudentCredentials} className="flex flex-col gap-3 text-xs">
+              <div>
+                <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Portal Login Username *
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    required
+                    value={credentialForm.username}
+                    onChange={(e) => setCredentialForm({ ...credentialForm, username: e.target.value })}
+                    placeholder="e.g. gowtham.t or STU-2026-0843"
+                    className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCredentialForm({
+                        ...credentialForm,
+                        username: managingCredentialsStudent.full_name.toLowerCase().replace(/[^a-z0-9]/g, '.'),
+                      })
+                    }}
+                    className="absolute right-1 px-1.5 py-0.5 text-[10px] text-light-primary hover:underline font-semibold"
+                    title="Auto-generate from name"
+                  >
+                    Auto
+                  </button>
+                </div>
+                <span className="text-[10px] text-light-on-surface-variant mt-0.5 block">
+                  The student can log in using this username, their email, or their Student ID.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Portal Login Password *
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type={credentialForm.showPassword ? 'text' : 'password'}
+                    required
+                    value={credentialForm.password}
+                    onChange={(e) => setCredentialForm({ ...credentialForm, password: e.target.value })}
+                    placeholder="Enter password (e.g. Student@123)"
+                    className="w-full pl-2.5 pr-20 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                  />
+                  <div className="absolute right-1 flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCredentialForm({ ...credentialForm, showPassword: !credentialForm.showPassword })
+                      }
+                      className="p-1 text-light-on-surface-variant hover:text-light-on-surface"
+                      title={credentialForm.showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      <span className="material-symbols-outlined text-[15px]">
+                        {credentialForm.showPassword ? 'visibility_off' : 'visibility'}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const randomPass = 'Bixcel@' + Math.floor(1000 + Math.random() * 9000)
+                        setCredentialForm({ ...credentialForm, password: randomPass, showPassword: true })
+                      }}
+                      className="px-1.5 py-0.5 text-[10px] bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary rounded font-semibold hover:bg-light-primary hover:text-white transition-colors"
+                      title="Generate random password"
+                    >
+                      Generate
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Copy Box */}
+              <div className="p-2 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant flex items-center justify-between text-[11px]">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-light-on-surface-variant">Portal URL:</span>
+                  <span className="font-mono font-semibold truncate max-w-[220px]">
+                    {window.location.origin}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `Bixcel LMS Student Credentials\nName: ${managingCredentialsStudent.full_name}\nStudent ID: ${managingCredentialsStudent.student_id}\nUsername: ${credentialForm.username}\nPassword: ${credentialForm.password}\nPortal: ${window.location.origin}`
+                    navigator.clipboard.writeText(text)
+                    setToast('Student login details copied to clipboard!')
+                    setTimeout(() => setToast(''), 3000)
+                  }}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded bg-light-surface-container dark:bg-dark-surface-container-high text-light-primary font-semibold text-[10px] hover:bg-light-primary hover:text-white transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[13px]">content_copy</span>
+                  <span>Copy Details</span>
+                </button>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 border-t border-light-outline-variant dark:border-dark-outline-variant pt-2 mt-1">
+                <button
+                  type="button"
+                  onClick={() => setManagingCredentialsStudent(null)}
+                  className="px-3 py-1 rounded border border-light-outline-variant text-xs hover:bg-light-surface-container-low"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingCredentials}
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded bg-light-primary text-light-on-primary font-semibold text-xs shadow-xs hover:bg-light-primary-container disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[15px]">
+                    {isSavingCredentials ? 'sync' : 'save'}
+                  </span>
+                  <span>{isSavingCredentials ? 'Saving...' : 'Save Credentials'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

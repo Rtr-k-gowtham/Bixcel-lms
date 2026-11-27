@@ -14,7 +14,10 @@ class StudentModel extends Model
     protected $allowedFields = [
         'student_id',
         'full_name',
+        'username',
         'email',
+        'password',
+        'raw_password',
         'phone',
         'dob',
         'gender',
