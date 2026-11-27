@@ -3,9 +3,40 @@ import { apiService } from '../../services/api'
 
 const DEFAULT_USERS = [
   {
+    id: 101,
+    name: 'Elena Rostova (Super Admin)',
+    username: 'superadmin',
+    email: 'superadmin@bixceltech.com',
+    emp_id: 'BX-SADM-001',
+    role: 'Super Admin',
+    role_code: 'ROLE_SUPER_ADMIN',
+    department: 'Executive Office',
+    phone: '+1 (555) 876-5432',
+    status: 'Active',
+    last_login: 'Just now',
+    raw_password: 'Admin@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
+  },
+  {
+    id: 102,
+    name: 'Alexander Hayes (Admin)',
+    username: 'admin',
+    email: 'admin@bixceltech.com',
+    emp_id: 'BX-ADM-001',
+    role: 'Admin',
+    role_code: 'ROLE_ADMIN',
+    department: 'Academic Operations',
+    phone: '+1 (555) 890-1234',
+    status: 'Active',
+    last_login: '5 mins ago',
+    raw_password: 'Admin@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
+  },
+  {
     id: 1,
     name: 'Dr. Marcus Vance',
-    email: 'm.vance@bixcel.edu',
+    username: 'm.vance',
+    email: 'dean@bixcel.edu',
     emp_id: 'BX-FAC-014',
     role: 'Academic Dean',
     role_code: 'ROLE_DEAN',
@@ -13,23 +44,14 @@ const DEFAULT_USERS = [
     phone: '+1 (555) 234-8901',
     status: 'Active',
     last_login: '10 mins ago',
-  },
-  {
-    id: 2,
-    name: 'Elena Rostova',
-    email: 'e.rostova@bixcel.edu',
-    emp_id: 'BX-ADM-002',
-    role: 'Super Admin',
-    role_code: 'ROLE_SUPER_ADMIN',
-    department: 'Executive Office',
-    phone: '+1 (555) 876-5432',
-    status: 'Active',
-    last_login: 'Just now',
+    raw_password: 'Dean@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
   },
   {
     id: 3,
     name: 'Sophia Chen',
-    email: 's.chen@bixcel.edu',
+    username: 's.chen',
+    email: 'faculty@bixcel.edu',
     emp_id: 'BX-TUT-089',
     role: 'Tutor / Faculty',
     role_code: 'ROLE_TUTOR',
@@ -37,11 +59,14 @@ const DEFAULT_USERS = [
     phone: '+1 (555) 345-6789',
     status: 'Active',
     last_login: '2 hours ago',
+    raw_password: 'Faculty@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
   },
   {
     id: 4,
     name: 'David Miller',
-    email: 'd.miller@bixcel.edu',
+    username: 'd.miller',
+    email: 'd.miller@bixceltech.com',
     emp_id: 'BX-TUT-092',
     role: 'Tutor / Faculty',
     role_code: 'ROLE_TUTOR',
@@ -49,11 +74,14 @@ const DEFAULT_USERS = [
     phone: '+1 (555) 456-7890',
     status: 'Active',
     last_login: 'Yesterday',
+    raw_password: 'Admin@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
   },
   {
     id: 5,
     name: 'Priya Sharma',
-    email: 'p.sharma@bixcel.edu',
+    username: 'p.sharma',
+    email: 'p.sharma@bixceltech.com',
     emp_id: 'BX-OPS-031',
     role: 'Admission Officer',
     role_code: 'ROLE_ADMISSIONS',
@@ -61,11 +89,14 @@ const DEFAULT_USERS = [
     phone: '+1 (555) 567-8901',
     status: 'Active',
     last_login: '3 hours ago',
+    raw_password: 'Admin@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
   },
   {
     id: 6,
     name: 'Michael Sterling',
-    email: 'm.sterling@bixcel.edu',
+    username: 'm.sterling',
+    email: 'm.sterling@bixceltech.com',
     emp_id: 'BX-FIN-019',
     role: 'Accountant',
     role_code: 'ROLE_FINANCE',
@@ -73,30 +104,8 @@ const DEFAULT_USERS = [
     phone: '+1 (555) 678-9012',
     status: 'Active',
     last_login: '1 day ago',
-  },
-  {
-    id: 7,
-    name: 'Alex Vance',
-    email: 'a.vance@student.bixcel.edu',
-    emp_id: 'BX-STU-1044',
-    role: 'Student / Learner',
-    role_code: 'ROLE_STUDENT',
-    department: 'Full-Stack Web Dev',
-    phone: '+1 (555) 789-0123',
-    status: 'Active',
-    last_login: '45 mins ago',
-  },
-  {
-    id: 8,
-    name: 'Robert Langdon',
-    email: 'r.langdon@bixcel.edu',
-    emp_id: 'BX-ADM-005',
-    role: 'Admin',
-    role_code: 'ROLE_ADMIN',
-    department: 'Academic Operations',
-    phone: '+1 (555) 890-1234',
-    status: 'Inactive',
-    last_login: '3 weeks ago',
+    raw_password: 'Admin@123',
+    institution: 'Bixcel Technologies (bixceltech.com)',
   },
 ]
 
@@ -111,10 +120,11 @@ const ROLES_LIST = [
 ]
 
 const DEPARTMENTS = [
+  'Executive Office',
+  'Academic Operations',
   'Computer Science',
   'UI / UX Design',
   'Cloud & DevOps',
-  'Executive Office',
   'Student Affairs',
   'Bursar & Finance',
   'Full-Stack Web Dev',
@@ -130,16 +140,38 @@ export function UserMaster() {
   const [editingUser, setEditingUser] = useState(null)
   const [toast, setToast] = useState('')
 
-  // Form state
+  // Credentials Management Modal State
+  const [selectedCredentialUser, setSelectedCredentialUser] = useState(null)
+  const [credentialNewPass, setCredentialNewPass] = useState('')
+  const [showPassInModal, setShowPassInModal] = useState(false)
+
+  // Delete User Confirmation Modal State
+  const [userToDelete, setUserToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Form state for creating / editing user
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
+    password: 'Admin@123',
     emp_id: '',
-    role: 'Tutor / Faculty',
-    department: 'Computer Science',
+    role: 'Admin',
+    department: 'Academic Operations',
     phone: '',
     status: 'Active',
   })
+  const [showFormPassword, setShowFormPassword] = useState(false)
+
+  // Helper to generate secure password
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%'
+    let pass = 'Bixcel@'
+    for (let i = 0; i < 4; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    setFormData((prev) => ({ ...prev, password: pass }))
+  }
 
   // Fetch users from CI4 API
   useEffect(() => {
@@ -148,7 +180,15 @@ export function UserMaster() {
       try {
         const res = await apiService.getUsers()
         if (res && res.status === 'success' && res.data && isMounted) {
-          setUsers(res.data)
+          // Merge API users with bixceltech demo users if not present
+          const apiUsers = res.data
+          const merged = [...apiUsers]
+          DEFAULT_USERS.forEach((def) => {
+            if (!merged.some((u) => u.email.toLowerCase() === def.email.toLowerCase())) {
+              merged.push(def)
+            }
+          })
+          setUsers(merged)
         }
       } catch (err) {
         console.warn('Using local fallback for Users:', err)
@@ -158,82 +198,123 @@ export function UserMaster() {
     return () => { isMounted = false }
   }, [])
 
-  // Open modal for Create or Edit
+  // Open modal for Create
   const openCreateModal = () => {
     setEditingUser(null)
+    const empId = `BX-ADM-0${users.length + 10}`
     setFormData({
       name: '',
+      username: '',
       email: '',
-      emp_id: `BX-USR-0${users.length + 12}`,
-      role: 'Tutor / Faculty',
-      department: 'Computer Science',
-      phone: '',
+      password: 'Admin@123',
+      emp_id: empId,
+      role: 'Admin',
+      department: 'Academic Operations',
+      phone: '+1 (555) 000-0000',
       status: 'Active',
     })
+    setShowFormPassword(false)
     setShowModal(true)
   }
 
+  // Open modal for Edit
   const openEditModal = (u) => {
     setEditingUser(u)
     setFormData({
       name: u.name,
+      username: u.username || u.email.split('@')[0],
       email: u.email,
+      password: u.raw_password || 'Admin@123',
       emp_id: u.emp_id,
       role: u.role,
       department: u.department,
-      phone: u.phone,
+      phone: u.phone || '',
       status: u.status,
     })
+    setShowFormPassword(false)
     setShowModal(true)
   }
 
+  // Save (Create or Update)
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!formData.name || !formData.email) return
+    if (!formData.name.trim() || !formData.email.trim()) return
+
+    const roleCode =
+      formData.role === 'Super Admin'
+        ? 'ROLE_SUPER_ADMIN'
+        : formData.role === 'Admin'
+        ? 'ROLE_ADMIN'
+        : formData.role === 'Academic Dean'
+        ? 'ROLE_DEAN'
+        : 'ROLE_TUTOR'
+
+    const payload = {
+      ...formData,
+      role_code: roleCode,
+      raw_password: formData.password,
+    }
 
     if (editingUser) {
       // Update existing
       try {
-        await apiService.updateUser(editingUser.id, formData)
+        await apiService.updateUser(editingUser.id, payload)
       } catch (err) {
         console.warn('API update failed, updating locally:', err)
       }
       setUsers((prev) =>
-        prev.map((item) => (item.id === editingUser.id ? { ...item, ...formData } : item))
+        prev.map((item) => (item.id === editingUser.id ? { ...item, ...payload } : item))
       )
-      setToast(`User "${formData.name}" updated successfully`)
+      setToast(`User "${formData.name}" credentials and details updated successfully!`)
     } else {
-      // Create new
+      // Create new user with credentials
       const newUser = {
         id: Date.now(),
-        ...formData,
+        ...payload,
         last_login: 'Never',
       }
       try {
-        await apiService.createUser(formData)
+        const createdRes = await apiService.createUser(payload)
+        if (createdRes && createdRes.data && createdRes.data.id) {
+          newUser.id = createdRes.data.id
+        }
       } catch (err) {
         console.warn('API create failed, saving locally:', err)
       }
       setUsers((prev) => [newUser, ...prev])
-      setToast(`User "${formData.name}" created successfully`)
+      setToast(`User "${formData.name}" created with login access (${formData.email})!`)
     }
 
     setShowModal(false)
     setTimeout(() => setToast(''), 3500)
   }
 
-  const handleDelete = async (id, name) => {
-    if (!confirm(`Are you sure you want to remove user "${name}"?`)) return
+  // Open Delete Confirmation Modal
+  const confirmDeleteUser = (user) => {
+    setUserToDelete(user)
+  }
+
+  // Execute Deletion
+  const handleExecuteDelete = async () => {
+    if (!userToDelete) return
+    setIsDeleting(true)
+    const targetId = userToDelete.id
+    const targetName = userToDelete.name
+
     try {
-      await apiService.deleteUser(id)
+      await apiService.deleteUser(targetId)
     } catch (err) {
       console.warn('API delete failed, removing locally:', err)
     }
-    setUsers((prev) => prev.filter((u) => u.id !== id))
-    setToast(`User "${name}" removed`)
-    setTimeout(() => setToast(''), 3000)
+
+    setUsers((prev) => prev.filter((u) => u.id !== targetId))
+    setIsDeleting(false)
+    setUserToDelete(null)
+    setToast(`User "${targetName}" was permanently deleted from the platform.`)
+    setTimeout(() => setToast(''), 3500)
   }
 
+  // Toggle user active status
   const toggleStatus = async (user) => {
     const newStatus = user.status === 'Active' ? 'Inactive' : 'Active'
     try {
@@ -246,64 +327,106 @@ export function UserMaster() {
     )
   }
 
-  // Filtered list
+  // Open Credentials modal
+  const openCredentialsModal = (user) => {
+    setSelectedCredentialUser(user)
+    setCredentialNewPass(user.raw_password || 'Admin@123')
+    setShowPassInModal(false)
+  }
+
+  // Save Updated Password in Credentials modal
+  const handleSaveCredentialPass = async () => {
+    if (!selectedCredentialUser || !credentialNewPass.trim()) return
+    const userId = selectedCredentialUser.id
+
+    try {
+      await apiService.updateUser(userId, {
+        password: credentialNewPass,
+        raw_password: credentialNewPass,
+      })
+    } catch (err) {
+      console.warn('Update password failed:', err)
+    }
+
+    setUsers((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, raw_password: credentialNewPass } : u))
+    )
+    setToast(`Password updated for ${selectedCredentialUser.name} to: ${credentialNewPass}`)
+    setSelectedCredentialUser(null)
+    setTimeout(() => setToast(''), 3500)
+  }
+
+  // Copy credentials to clipboard
+  const handleCopyCredentials = (user, pass) => {
+    const text = `Bixcel Technologies Login Credentials\nPortal: https://adept-slategray-moose-59.hostingersite.com/\nUsername: ${user.username || user.email}\nEmail: ${user.email}\nPassword: ${pass}\nRole: ${user.role}`
+    navigator.clipboard.writeText(text)
+    setToast(`Credentials for "${user.name}" copied to clipboard!`)
+    setTimeout(() => setToast(''), 3000)
+  }
+
+  // Filtered users list
   const filteredUsers = users.filter((u) => {
+    const q = search.toLowerCase()
     const matchSearch =
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.emp_id.toLowerCase().includes(search.toLowerCase())
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.username && u.username.toLowerCase().includes(q)) ||
+      (u.emp_id && u.emp_id.toLowerCase().includes(q))
     const matchRole = roleFilter === 'ALL' || u.role === roleFilter
     const matchStatus = statusFilter === 'ALL' || u.status === statusFilter
     return matchSearch && matchRole && matchStatus
   })
 
-  // Role pill color styling
+  // Role badge color helper
   const getRoleBadge = (role) => {
     switch (role) {
       case 'Super Admin':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border-purple-200'
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 border-purple-300 dark:border-purple-800'
       case 'Admin':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200'
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border-blue-300 dark:border-blue-800'
       case 'Academic Dean':
-        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border-indigo-200'
+        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800'
       case 'Tutor / Faculty':
-        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200'
+        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
       case 'Admission Officer':
-        return 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200'
-      case 'Accountant':
-        return 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300 border-teal-200'
+        return 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border-amber-300 dark:border-amber-800'
       default:
         return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200'
     }
   }
 
   return (
-    <div className="flex flex-col gap-5 w-full">
-      {/* Toast */}
+    <div className="flex flex-col gap-4 w-full animate-in fade-in duration-200">
+      {/* Toast Notification */}
       {toast && (
-        <div className="p-3 rounded-md bg-success-container text-on-success-container font-label text-label-md font-semibold flex items-center justify-between shadow-sm animate-in fade-in duration-200">
+        <div className="p-3 rounded-md bg-emerald-600 text-white font-label text-xs font-semibold flex items-center justify-between shadow-md">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+            <span className="material-symbols-outlined text-[18px]">verified</span>
             <span>{toast}</span>
           </div>
-          <button type="button" onClick={() => setToast('')}>
+          <button type="button" onClick={() => setToast('')} className="opacity-80 hover:opacity-100">
             <span className="material-symbols-outlined text-[16px]">close</span>
           </button>
         </div>
       )}
 
-      {/* Top Header Card */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-start gap-2.5">
-          <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-[17px]">manage_accounts</span>
-          </span>
+      {/* Screen Header */}
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+            <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
+          </div>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
-              User Master
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-title text-base sm:text-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+                User Master &amp; Credentials Management
+              </h1>
+              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-300">
+                bixceltech.com
+              </span>
+            </div>
             <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-              Manage platform users, faculty members, administrative staff, and student accounts
+              Manage Admin, Super Admin, and Faculty accounts, generate login credentials, and delete users from the platform.
             </p>
           </div>
         </div>
@@ -311,244 +434,220 @@ export function UserMaster() {
         <button
           type="button"
           onClick={openCreateModal}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-xs font-semibold shadow-xs transition-colors duration-state-change shrink-0"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-light-primary hover:bg-light-primary-container text-light-on-primary font-label text-xs font-semibold shadow-xs transition-colors shrink-0 cursor-pointer"
         >
           <span className="material-symbols-outlined text-[16px]">person_add</span>
-          <span>Add New User</span>
+          <span>Add Admin / User</span>
         </button>
       </section>
 
-      {/* 4 Quick Stat Tiles */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
+      {/* 4 Stat Cards */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="p-3 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[10.5px] font-label text-light-on-surface-variant uppercase font-medium">Total Users</span>
-            <div className="text-[17px] font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface mt-0.5">
+            <span className="text-[11px] font-label text-light-on-surface-variant uppercase font-semibold">Total Accounts</span>
+            <div className="text-xl font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface mt-0.5">
               {users.length}
             </div>
           </div>
-          <span className="w-7 h-7 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-[16px]">group</span>
+          <span className="w-8 h-8 rounded-lg bg-light-primary-tint text-light-primary flex items-center justify-center">
+            <span className="material-symbols-outlined text-[18px]">group</span>
           </span>
         </div>
 
-        <div className="p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
+        <div className="p-3 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[10.5px] font-label text-light-on-surface-variant uppercase font-medium">Active Staff</span>
-            <div className="text-[17px] font-bold tabular-nums text-on-success-container mt-0.5">
-              {users.filter((u) => u.status === 'Active' && u.role !== 'Student / Learner').length}
+            <span className="text-[11px] font-label text-light-on-surface-variant uppercase font-semibold">Admin &amp; Super Admin</span>
+            <div className="text-xl font-bold tabular-nums text-purple-600 dark:text-purple-400 mt-0.5">
+              {users.filter((u) => u.role === 'Super Admin' || u.role === 'Admin').length}
             </div>
           </div>
-          <span className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[16px]">badge</span>
+          <span className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[18px]">shield_person</span>
           </span>
         </div>
 
-        <div className="p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
+        <div className="p-3 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[10.5px] font-label text-light-on-surface-variant uppercase font-medium">Faculty Tutors</span>
-            <div className="text-[17px] font-bold tabular-nums text-light-primary mt-0.5">
-              {users.filter((u) => u.role === 'Tutor / Faculty').length}
+            <span className="text-[11px] font-label text-light-on-surface-variant uppercase font-semibold">Active Status</span>
+            <div className="text-xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5">
+              {users.filter((u) => u.status === 'Active').length}
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-light-secondary-container text-light-on-secondary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">co_present</span>
+          <span className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[18px]">verified_user</span>
           </span>
         </div>
 
-        <div className="p-3.5 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+        <div className="p-3 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-[11px] font-label text-light-on-surface-variant uppercase">Inactive Accounts</span>
-            <div className="text-title-lg font-bold tabular-nums text-light-on-surface-variant mt-0.5">
-              {users.filter((u) => u.status === 'Inactive').length}
+            <span className="text-[11px] font-label text-light-on-surface-variant uppercase font-semibold">bixceltech.com Domain</span>
+            <div className="text-xl font-bold tabular-nums text-blue-600 dark:text-blue-400 mt-0.5">
+              {users.filter((u) => u.email.toLowerCase().includes('bixceltech.com')).length}
             </div>
           </div>
-          <span className="w-8 h-8 rounded bg-light-surface-container-low text-light-on-surface-variant flex items-center justify-center">
-            <span className="material-symbols-outlined text-[18px]">person_off</span>
+          <span className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[18px]">domain</span>
           </span>
         </div>
       </section>
 
-      {/* Filter and Search Bar */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col md:flex-row items-center gap-3">
+      {/* Filter & Search Bar */}
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
         {/* Search */}
-        <div className="relative flex-1 w-full">
-          <span className="material-symbols-outlined text-light-outline text-[18px] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+        <div className="relative min-w-[240px] flex-1 max-w-md">
+          <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-light-outline">
             search
           </span>
           <input
             type="text"
-            placeholder="Search by name, email, or employee/student ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
+            placeholder="Search by name, email (e.g. bixceltech.com), username, ID..."
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
           />
         </div>
 
-        {/* Role Filter */}
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <label className="text-label-sm font-medium text-light-on-surface-variant whitespace-nowrap">
-            Role:
-          </label>
+        {/* Role & Status Filters */}
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none"
           >
-            <option value="ALL">All Roles ({users.length})</option>
-            {ROLES_LIST.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
+            <option value="ALL">All Roles</option>
+            <option value="Super Admin">Super Admin</option>
+            <option value="Admin">Admin</option>
+            <option value="Academic Dean">Academic Dean</option>
+            <option value="Tutor / Faculty">Tutor / Faculty</option>
+            <option value="Admission Officer">Admission Officer</option>
+            <option value="Accountant">Accountant</option>
           </select>
-        </div>
 
-        {/* Status Filter */}
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <label className="text-label-sm font-medium text-light-on-surface-variant whitespace-nowrap">
-            Status:
-          </label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+            className="px-2.5 py-1.5 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none"
           >
-            <option value="ALL">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value="ALL">All Status</option>
+            <option value="Active">Active Only</option>
+            <option value="Inactive">Inactive Only</option>
           </select>
         </div>
       </section>
 
       {/* Users Table */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-sm overflow-hidden">
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[850px]">
-            <thead>
-              <tr className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant text-[11px] font-label font-bold text-light-on-surface-variant dark:text-dark-on-surface-variant uppercase tracking-wider">
-                <th scope="col" className="px-5 py-3">
-                  User / Contact
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  ID
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Assigned Role
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Department
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Status
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Last Login
-                </th>
-                <th scope="col" className="px-5 py-3 text-right">
-                  Actions
-                </th>
+          <table className="w-full text-left border-collapse text-xs">
+            <thead className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant text-[11px] font-bold text-light-on-surface-variant uppercase tracking-wider">
+              <tr>
+                <th className="px-4 py-3">User &amp; Identifiers</th>
+                <th className="px-4 py-3">Login Username / Email</th>
+                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Department</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 text-right">Credentials &amp; Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant">
+            <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-5 py-8 text-center text-light-on-surface-variant">
-                    No users matching criteria.
+                  <td colSpan="6" className="py-8 text-center text-xs text-light-on-surface-variant">
+                    No users found matching &quot;{search}&quot;.
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((u) => (
-                  <tr
-                    key={u.id}
-                    className="hover:bg-light-surface-container-low/50 dark:hover:bg-dark-surface-container transition-colors"
-                  >
-                    {/* User Profile */}
-                    <td className="px-5 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-light-primary text-white flex items-center justify-center font-bold text-label-md shrink-0">
+                  <tr key={u.id} className="hover:bg-light-surface-container-low/40 transition-colors">
+                    {/* User & Identifiers */}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-light-primary-tint text-light-primary flex items-center justify-center font-bold text-xs uppercase shrink-0">
                           {u.name.charAt(0)}
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-label text-label-md font-semibold text-light-on-surface dark:text-dark-on-surface">
+                          <span className="font-semibold text-light-on-surface dark:text-dark-on-surface">
                             {u.name}
                           </span>
-                          <span className="font-body text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                            {u.email}
+                          <span className="font-mono text-[10px] text-light-on-surface-variant">
+                            {u.emp_id}
                           </span>
                         </div>
                       </div>
                     </td>
 
-                    {/* Emp ID */}
+                    {/* Login Username & Email */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="font-mono text-mono-sm text-light-on-surface dark:text-dark-on-surface">
-                        {u.emp_id}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="font-mono text-light-primary dark:text-dark-primary font-bold">
+                          {u.email}
+                        </span>
+                        <span className="font-mono text-[10px] text-light-on-surface-variant">
+                          Username: {u.username || u.email.split('@')[0]}
+                        </span>
+                      </div>
                     </td>
 
-                    {/* Role Badge */}
+                    {/* Role */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border ${getRoleBadge(
-                          u.role
-                        )}`}
-                      >
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getRoleBadge(u.role)}`}>
                         {u.role}
                       </span>
                     </td>
 
                     {/* Department */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="font-body text-body-sm text-light-on-surface dark:text-dark-on-surface">
-                        {u.department}
-                      </span>
+                    <td className="px-4 py-3 whitespace-nowrap text-light-on-surface-variant">
+                      {u.department}
                     </td>
 
                     {/* Status */}
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 whitespace-nowrap text-center">
                       <button
                         type="button"
                         onClick={() => toggleStatus(u)}
                         title="Click to toggle status"
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold transition-all ${
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all ${
                           u.status === 'Active'
-                            ? 'bg-success-container text-on-success-container'
-                            : 'bg-light-surface-container text-light-on-surface-variant'
+                            ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
+                            : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                         }`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            u.status === 'Active' ? 'bg-success' : 'bg-light-outline'
-                          }`}
-                        />
+                        <span className={`w-1.5 h-1.5 rounded-full ${u.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                         <span>{u.status}</span>
                       </button>
                     </td>
 
-                    {/* Last Login */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="font-body text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                        {u.last_login}
-                      </span>
-                    </td>
+                    {/* Actions: View Credentials, Edit, Delete */}
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {/* 1. View / Manage Credentials */}
+                        <button
+                          type="button"
+                          onClick={() => openCredentialsModal(u)}
+                          title="View / Manage Login Credentials"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[11px] font-bold hover:bg-purple-100 transition-colors cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">key</span>
+                          <span>Credentials</span>
+                        </button>
 
-                    {/* Actions */}
-                    <td className="px-5 py-3 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end gap-1">
+                        {/* 2. Edit User */}
                         <button
                           type="button"
                           onClick={() => openEditModal(u)}
-                          title="Edit User"
-                          className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low transition-colors"
+                          title="Edit User Details"
+                          className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low transition-colors cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-[17px]">edit</span>
                         </button>
+
+                        {/* 3. Delete User */}
                         <button
                           type="button"
-                          onClick={() => handleDelete(u.id, u.name)}
-                          title="Delete User"
-                          className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-light-surface-container-low transition-colors"
+                          onClick={() => confirmDeleteUser(u)}
+                          title="Delete User Permanently"
+                          className="p-1 rounded text-light-on-surface-variant hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-[17px]">delete</span>
                         </button>
@@ -562,88 +661,120 @@ export function UserMaster() {
         </div>
       </section>
 
-      {/* Add / Edit User Modal */}
+      {/* MODAL 1: ADD / EDIT USER & CREDENTIALS */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-modal w-full max-w-md p-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-light-outline-variant dark:border-dark-outline-variant mb-4">
-              <h3 className="font-title text-[16px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                {editingUser ? 'Edit User Details' : 'Add New User'}
-              </h3>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-2xl shadow-2xl w-full max-w-lg p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b border-light-outline-variant/70">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[20px]">
+                  {editingUser ? 'manage_accounts' : 'person_add'}
+                </span>
+                <h3 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface">
+                  {editingUser ? 'Edit User Credentials & Profile' : 'Add New User with Credentials'}
+                </h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded"
+                className="text-light-on-surface-variant hover:text-light-on-surface p-1 rounded-full"
               >
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-3.5">
-              <div>
-                <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Dr. Marcus Vance"
-                  className="w-full px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="name@bixcel.edu"
-                  className="w-full px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleSave} className="space-y-3.5 text-xs">
+              {/* Full Name & Username */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Employee / Student ID
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Full Name *
                   </label>
                   <input
                     type="text"
-                    value={formData.emp_id}
-                    onChange={(e) => setFormData({ ...formData, emp_id: e.target.value })}
-                    placeholder="BX-FAC-099"
-                    className="w-full px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-mono text-mono-sm"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g. Alexander Hayes"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Contact Phone
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Username (Login ID)
                   </label>
                   <input
                     type="text"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+1 (555) 000-0000"
-                    className="w-full px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    placeholder="e.g. alexander.admin"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-mono"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Email & Password */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Role
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Official Email * (bixceltech.com)
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="name@bixceltech.com"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-mono"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-semibold text-light-on-surface dark:text-dark-on-surface">
+                      Password *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={generatePassword}
+                      className="text-[10px] text-light-primary font-bold hover:underline"
+                    >
+                      Generate Secure
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showFormPassword ? 'text' : 'password'}
+                      required
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="e.g. Admin@123"
+                      className="w-full pl-3 pr-8 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowFormPassword(!showFormPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-light-on-surface-variant hover:text-light-on-surface"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {showFormPassword ? 'visibility_off' : 'visibility'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Role & Department */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    System Role *
                   </label>
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-semibold"
                   >
                     {ROLES_LIST.map((r) => (
                       <option key={r} value={r}>
@@ -652,14 +783,15 @@ export function UserMaster() {
                     ))}
                   </select>
                 </div>
+
                 <div>
-                  <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                     Department
                   </label>
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full px-3 py-1.5 text-body-sm rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   >
                     {DEPARTMENTS.map((d) => (
                       <option key={d} value={d}>
@@ -670,12 +802,42 @@ export function UserMaster() {
                 </div>
               </div>
 
+              {/* Employee ID & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Employee / Staff ID
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.emp_id}
+                    onChange={(e) => setFormData({ ...formData, emp_id: e.target.value })}
+                    placeholder="BX-ADM-001"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full px-3 py-2 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+                  />
+                </div>
+              </div>
+
+              {/* Status Radio */}
               <div>
-                <label className="block text-label-sm font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                  Status
+                <label className="block font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Account Status
                 </label>
-                <div className="flex items-center gap-4 pt-1">
-                  <label className="inline-flex items-center gap-2 cursor-pointer text-body-sm">
+                <div className="flex items-center gap-4 pt-0.5">
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="radio"
                       name="status"
@@ -684,9 +846,9 @@ export function UserMaster() {
                       onChange={() => setFormData({ ...formData, status: 'Active' })}
                       className="accent-light-primary"
                     />
-                    <span>Active</span>
+                    <span>Active (Permit Login)</span>
                   </label>
-                  <label className="inline-flex items-center gap-2 cursor-pointer text-body-sm">
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="radio"
                       name="status"
@@ -695,27 +857,177 @@ export function UserMaster() {
                       onChange={() => setFormData({ ...formData, status: 'Inactive' })}
                       className="accent-light-primary"
                     />
-                    <span>Inactive</span>
+                    <span>Inactive (Suspended)</span>
                   </label>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant mt-4">
+              {/* Form Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-light-outline-variant/70 mt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant text-body-sm hover:bg-light-surface-container-low transition-colors"
+                  className="px-4 py-2 rounded-lg border border-light-outline-variant text-xs font-semibold hover:bg-light-surface-container-low transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded bg-light-primary hover:bg-light-primary-container text-light-on-primary font-semibold text-body-sm shadow-sm transition-colors"
+                  className="px-4 py-2 rounded-lg bg-light-primary hover:bg-light-primary-container text-light-on-primary font-bold text-xs shadow-xs transition-colors"
                 >
-                  {editingUser ? 'Save Changes' : 'Create User'}
+                  {editingUser ? 'Save User Changes' : 'Create & Issue Credentials'}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: VIEW & MANAGE CREDENTIALS */}
+      {selectedCredentialUser && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-4 relative">
+            <button
+              type="button"
+              onClick={() => setSelectedCredentialUser(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-light-on-surface-variant"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                <span className="material-symbols-outlined text-[20px]">key</span>
+              </div>
+              <div>
+                <h3 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface">
+                  Login Credentials Card
+                </h3>
+                <span className="text-xs text-light-on-surface-variant">
+                  {selectedCredentialUser.name} • {selectedCredentialUser.role}
+                </span>
+              </div>
+            </div>
+
+            {/* Credentials Card Box */}
+            <div className="p-4 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-950/20 flex flex-col gap-3 text-xs">
+              <div className="flex justify-between border-b border-purple-200/60 pb-2">
+                <span className="text-light-on-surface-variant">Portal URL:</span>
+                <span className="font-mono font-bold text-purple-700 dark:text-purple-300">
+                  bixceltech.com / Institutional Portal
+                </span>
+              </div>
+
+              <div className="flex justify-between border-b border-purple-200/60 pb-2">
+                <span className="text-light-on-surface-variant">Official Email:</span>
+                <span className="font-mono font-bold text-light-on-surface dark:text-dark-on-surface">
+                  {selectedCredentialUser.email}
+                </span>
+              </div>
+
+              <div className="flex justify-between border-b border-purple-200/60 pb-2">
+                <span className="text-light-on-surface-variant">Username (ID):</span>
+                <span className="font-mono font-bold text-light-on-surface dark:text-dark-on-surface">
+                  {selectedCredentialUser.username || selectedCredentialUser.email.split('@')[0]}
+                </span>
+              </div>
+
+              <div className="flex justify-between border-b border-purple-200/60 pb-2">
+                <span className="text-light-on-surface-variant">System Role:</span>
+                <span className="font-bold text-purple-700 dark:text-purple-400">
+                  {selectedCredentialUser.role}
+                </span>
+              </div>
+
+              {/* Password & Update */}
+              <div className="flex flex-col gap-1.5 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-light-on-surface-variant">Account Password:</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassInModal(!showPassInModal)}
+                    className="text-[10px] text-light-primary font-bold hover:underline"
+                  >
+                    {showPassInModal ? 'Hide Password' : 'Show Password'}
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type={showPassInModal ? 'text' : 'password'}
+                    value={credentialNewPass}
+                    onChange={(e) => setCredentialNewPass(e.target.value)}
+                    className="flex-1 px-3 py-1.5 rounded-lg border border-purple-300 dark:border-purple-800 bg-white dark:bg-dark-surface-bright font-mono font-bold text-xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveCredentialPass}
+                    className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs transition-colors shrink-0 cursor-pointer"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-light-outline-variant/60">
+              <button
+                type="button"
+                onClick={() => handleCopyCredentials(selectedCredentialUser, credentialNewPass)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-light-primary text-light-on-primary font-bold text-xs hover:bg-light-primary-container shadow-xs transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[15px]">content_copy</span>
+                <span>Copy Credentials</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: DELETE USER CONFIRMATION MODAL */}
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-red-300 dark:border-red-900 rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-4 relative">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center font-bold text-xl shadow-inner shrink-0">
+                <span className="material-symbols-outlined text-[24px]">person_remove</span>
+              </div>
+              <div>
+                <h3 className="font-title text-base font-bold text-red-700 dark:text-red-400">
+                  Confirm User Deletion
+                </h3>
+                <span className="text-xs text-light-on-surface-variant">
+                  Permanent removal from Bixcel LMS database
+                </span>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-xs text-red-900 dark:text-red-200 leading-relaxed">
+              Are you sure you want to delete user <strong>{userToDelete.name}</strong> (<code>{userToDelete.email}</code> • Role: <strong>{userToDelete.role}</strong>)?
+              <p className="mt-1.5 font-semibold text-red-700 dark:text-red-400">
+                ⚠️ This will permanently remove their user record and revoke all portal login permissions immediately.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-light-outline-variant/60">
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                disabled={isDeleting}
+                className="px-3.5 py-1.5 rounded-lg border border-light-outline-variant text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px]">delete_forever</span>
+                <span>{isDeleting ? 'Deleting User...' : 'Permanently Delete User'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

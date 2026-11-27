@@ -90,14 +90,19 @@ class UserController extends BaseApiController
         $userModel = new UserModel();
 
         $empId = $data['emp_id'] ?? ('BX-USER-' . str_pad((string)($userModel->countAllResults() + 10), 3, '0', STR_PAD_LEFT));
+        $rawPassword = !empty($data['password']) ? trim((string)$data['password']) : 'Admin@123';
+        $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
+        $username = !empty($data['username']) ? trim((string)$data['username']) : explode('@', trim((string)$data['email']))[0];
 
         $newUser = [
             'name'        => trim((string)$data['name']),
+            'username'    => $username,
             'email'       => trim((string)$data['email']),
+            'password'    => $hashedPassword,
             'emp_id'      => $empId,
-            'role'        => $data['role'] ?? 'Tutor / Faculty',
-            'role_code'   => $data['role_code'] ?? 'ROLE_TUTOR',
-            'department'  => $data['department'] ?? 'General Academics',
+            'role'        => $data['role'] ?? 'Admin',
+            'role_code'   => $data['role_code'] ?? ($data['role'] === 'Super Admin' ? 'ROLE_SUPER_ADMIN' : ($data['role'] === 'Admin' ? 'ROLE_ADMIN' : 'ROLE_TUTOR')),
+            'department'  => $data['department'] ?? 'Academic Operations',
             'phone'       => $data['phone'] ?? '+1 (555) 000-0000',
             'status'      => $data['status'] ?? 'Active',
             'last_login'  => $data['last_login'] ?? 'Never',
@@ -105,7 +110,7 @@ class UserController extends BaseApiController
             'bio'         => $data['bio'] ?? '',
             'office'      => $data['office'] ?? 'Main Campus',
             'timezone'    => $data['timezone'] ?? 'UTC+05:30 (Asia/Kolkata)',
-            'institution' => $data['institution'] ?? 'Bixcel Institute of Technologies',
+            'institution' => $data['institution'] ?? 'Bixcel Technologies',
         ];
 
         try {
@@ -135,12 +140,16 @@ class UserController extends BaseApiController
             return $this->failNotFound('User not found to update with ID: ' . $id);
         }
 
-        $updatable = ['name', 'email', 'role', 'role_code', 'department', 'phone', 'status', 'avatar', 'bio', 'office', 'timezone', 'institution'];
+        $updatable = ['name', 'username', 'email', 'role', 'role_code', 'department', 'phone', 'status', 'avatar', 'bio', 'office', 'timezone', 'institution'];
         $payload = [];
         foreach ($updatable as $field) {
             if (isset($data[$field])) {
                 $payload[$field] = $data[$field];
             }
+        }
+
+        if (!empty($data['password'])) {
+            $payload['password'] = password_hash(trim((string)$data['password']), PASSWORD_DEFAULT);
         }
 
         if (!empty($payload)) {
