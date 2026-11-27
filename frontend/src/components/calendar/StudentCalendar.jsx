@@ -11,9 +11,24 @@ const STUDENT_PERSONAS = [
   { id: 'all', name: 'Institution Timetable (All Cohorts)', track: 'All Tracks', batch: 'All', attendance: '94.8%' },
 ]
 
-export function StudentCalendar() {
+export function StudentCalendar({ currentUser }) {
   const [events, setEvents] = useState([])
-  const [activePersona, setActivePersona] = useState(STUDENT_PERSONAS[0])
+  const [activePersona, setActivePersona] = useState(() => {
+    if (currentUser?.email) {
+      const match = STUDENT_PERSONAS.find((p) => p.name.toLowerCase().includes(currentUser.name?.toLowerCase().split(' ')[0]))
+      if (match) return match
+    }
+    if (currentUser?.role === 'Student' || currentUser?.role_code === 'ROLE_STUDENT') {
+      return {
+        id: 'user',
+        name: currentUser.name || 'Gowtham Tamilkathir',
+        track: currentUser.track || 'Full-Stack Web Development',
+        batch: currentUser.batch || 'BIX-DEV-24A',
+        attendance: '96.4%',
+      }
+    }
+    return STUDENT_PERSONAS[0]
+  })
   const [activeView, setActiveView] = useState('month') // 'month' | 'agenda' | 'week'
   const [selectedType, setSelectedType] = useState('All')
   const [selectedEvent, setSelectedEvent] = useState(null)

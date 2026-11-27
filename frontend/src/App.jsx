@@ -23,6 +23,7 @@ import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
 import StudentCalendar from './components/calendar/StudentCalendar'
+import StudentDashboard from './components/dashboard/StudentDashboard'
 import TimetableScheduling from './components/timetable/TimetableScheduling'
 import AssignmentManagement from './components/assignments/AssignmentManagement'
 import ExamManagement from './components/exams/ExamManagement'
@@ -370,7 +371,7 @@ function Dashboard({ currentUser, onLogout }) {
           ) : currentTab === 'timetable' ? (
             <TimetableScheduling />
           ) : currentTab === 'calendar' ? (
-            <StudentCalendar />
+            <StudentCalendar currentUser={currentUser} />
           ) : ['courses', 'builder', 'curriculum'].includes(currentTab) ? (
             <CourseManagement onNavigateToModules={() => handleTabChange('modules')} />
           ) : currentTab === 'fees' ? (
@@ -402,6 +403,11 @@ function Dashboard({ currentUser, onLogout }) {
             <NotificationsScreen onNavigate={(tab) => handleTabChange(tab)} />
           ) : currentTab === 'profile' ? (
             <UserProfileScreen />
+          ) : isStudent ? (
+            <StudentDashboard
+              currentUser={currentUser}
+              onNavigate={(tab) => handleTabChange(tab)}
+            />
           ) : (
             <>
               {/* Page Header */}
