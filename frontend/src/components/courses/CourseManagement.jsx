@@ -9,7 +9,6 @@ export function CourseManagement({ onNavigateToModules }) {
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [levelFilter, setLevelFilter] = useState('all')
-  const [viewMode, setViewMode] = useState('table') // Default to 'table' (list view)
 
   // Modal / Drawer state for Create / Edit
   const [showModal, setShowModal] = useState(false)
@@ -284,7 +283,7 @@ export function CourseManagement({ onNavigateToModules }) {
   const totalFees = courses.reduce((acc, c) => acc + (Number(c.price) || 0), 0)
 
   return (
-    <div className="flex-1 flex flex-col gap-5 p-4 sm:p-6 bg-light-surface-container-lowest/40 dark:bg-dark-surface-container-lowest/30 min-h-screen">
+    <div className="flex-1 flex flex-col gap-4 p-4 sm:p-5 bg-light-surface-container-lowest/40 dark:bg-dark-surface-container-lowest/30 min-h-screen">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-5 right-5 z-50 bg-light-surface-container-highest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface px-4 py-2.5 rounded-lg shadow-lg border border-light-outline-variant dark:border-dark-outline-variant font-label text-xs font-semibold flex items-center gap-2 animate-fade-in">
@@ -295,423 +294,318 @@ export function CourseManagement({ onNavigateToModules }) {
         </div>
       )}
 
-      {/* Header & Page Title */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-title text-xl sm:text-2xl font-bold text-light-on-surface dark:text-dark-on-surface tracking-tight">
-              Course Management
-            </h1>
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-light-primary-tint/30 text-light-primary dark:text-dark-primary font-mono">
-              {courses.length} Programs
-            </span>
-          </div>
-          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5">
-            Frame courses from multiple modular units, configure tuition pricing, and automatically calculate instructional duration.
+      {/* Page Header */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
+            Course Programs &amp; Curriculum Framing
+          </h1>
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            Multi-modular program tracks with automated instructional duration calculation and tuition fee management.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-bold shadow-sm transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[18px]">add_circle</span>
-            <span>+ Create Course</span>
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            <span>Frame New Course</span>
           </button>
         </div>
       </section>
 
-      {/* Top Program Metrics Row */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="p-3.5 rounded-xl border border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider font-label">Total Programs</span>
-            <span className="w-7 h-7 rounded-lg bg-light-primary-tint/20 dark:bg-dark-primary-tint/20 text-light-primary dark:text-dark-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[16px]">school</span>
+      {/* Metric Tiles (Matching Module Library) */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Total Programs
+            </span>
+            <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+              {totalCoursesCount < 10 ? `0${totalCoursesCount}` : totalCoursesCount}
+            </span>
+            <span className="inline-flex items-center gap-1 text-light-primary text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">school</span>
+              <span>Active catalog</span>
             </span>
           </div>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-light-on-surface dark:text-dark-on-surface font-headline tabular-nums">
-              {totalCoursesCount}
-            </span>
-            <span className="text-[11px] text-light-primary font-semibold">Active Catalog</span>
+          <div className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">school</span>
           </div>
-        </div>
+        </article>
 
-        <div className="p-3.5 rounded-xl border border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider font-label">Available Modules</span>
-            <span className="w-7 h-7 rounded-lg bg-light-primary-tint/20 dark:bg-dark-primary-tint/20 text-light-primary dark:text-dark-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[16px]">view_module</span>
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Available Modules
             </span>
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-light-on-surface dark:text-dark-on-surface font-headline tabular-nums">
-              {modules.length}
+            <span className="font-headline text-[17px] font-bold text-success tabular-nums">
+              {modules.length < 10 ? `0${modules.length}` : modules.length}
             </span>
             <button
               type="button"
               onClick={onNavigateToModules}
-              className="text-[11px] text-light-primary hover:underline font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1 text-light-primary hover:underline text-[10px] font-medium cursor-pointer"
             >
-              Module Library →
+              <span className="material-symbols-outlined text-[12px]">view_module</span>
+              <span>Module Library →</span>
             </button>
           </div>
-        </div>
-
-        <div className="p-3.5 rounded-xl border border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider font-label">Avg. Program Duration</span>
-            <span className="w-7 h-7 rounded-lg bg-light-primary-tint/20 dark:bg-dark-primary-tint/20 text-light-primary dark:text-dark-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[16px]">calendar_month</span>
-            </span>
+          <div className="w-7 h-7 rounded bg-success-container text-on-success-container flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">layers</span>
           </div>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-light-on-surface dark:text-dark-on-surface font-headline tabular-nums">
+        </article>
+
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Avg. Duration
+            </span>
+            <span className="font-headline text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
               {avgCourseDays} <span className="text-xs font-normal text-light-on-surface-variant">Days</span>
             </span>
-            <span className="text-[11px] text-on-success-container bg-success-container px-1.5 py-0.5 rounded font-semibold">
-              Auto-Calculated
+            <span className="inline-flex items-center gap-1 text-on-success-container text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">timelapse</span>
+              <span>Auto-Calculated</span>
             </span>
           </div>
-        </div>
+          <div className="w-7 h-7 rounded bg-light-surface-container-high dark:bg-dark-surface-container text-light-on-surface-variant flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+          </div>
+        </article>
 
-        <div className="p-3.5 rounded-xl border border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider font-label">Total Portfolio Tuition</span>
-            <span className="w-7 h-7 rounded-lg bg-light-primary-tint/20 dark:bg-dark-primary-tint/20 text-light-primary dark:text-dark-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[16px]">payments</span>
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex items-start justify-between gap-2.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Portfolio Tuition
             </span>
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-black text-light-on-surface dark:text-dark-on-surface font-headline tabular-nums">
+            <span className="font-headline text-[17px] font-bold text-light-primary dark:text-dark-primary tabular-nums">
               ₹{totalFees.toLocaleString()}
             </span>
-            <span className="text-[11px] text-light-on-surface-variant font-medium">Standard Pricing</span>
+            <span className="inline-flex items-center gap-1 text-light-on-surface-variant text-[10px] font-medium">
+              <span className="material-symbols-outlined text-[12px]">payments</span>
+              <span>Standard fee</span>
+            </span>
           </div>
-        </div>
+          <div className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-[16px]">payments</span>
+          </div>
+        </article>
       </section>
 
-      {/* Filter and View Controls */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/70 dark:border-dark-outline-variant/70 rounded-xl p-3 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <span className="material-symbols-outlined text-[18px] text-light-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+      {/* Filter and Search Bar (Matching Module Library) */}
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded p-2.5 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
+        <div className="relative flex items-center w-full lg:w-80">
+          <span className="material-symbols-outlined text-light-outline text-[16px] absolute left-2.5 pointer-events-none">
             search
           </span>
           <input
-            type="text"
+            type="search"
+            placeholder="Search courses by title, code, or faculty lead..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title, code, or faculty lead..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
+            className="w-full pl-8 pr-2.5 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
           />
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Category */}
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-label focus:outline-none focus:ring-1 focus:ring-light-primary"
-          >
-            <option value="all">All Domains</option>
-            <option value="Engineering">Engineering</option>
-            <option value="UI/UX Design">UI/UX Design</option>
-            <option value="Programming">Programming</option>
-            <option value="Cloud Computing">Cloud Computing</option>
-            <option value="Data Science & AI">Data Science & AI</option>
-            <option value="Digital Marketing">Digital Marketing</option>
-          </select>
-
-          {/* Level */}
-          <select
-            value={levelFilter}
-            onChange={(e) => setLevelFilter(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-label focus:outline-none focus:ring-1 focus:ring-light-primary"
-          >
-            <option value="all">All Levels</option>
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
-
-          {/* View mode toggle */}
-          <div className="flex items-center rounded-lg border border-light-outline-variant/80 bg-light-surface-container-low p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`p-1 rounded ${viewMode === 'grid' ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-primary shadow-xs' : 'text-light-outline hover:text-light-on-surface'}`}
-              title="Grid View"
+          {/* Domain Filter */}
+          <div className="flex items-center gap-1">
+            <span className="text-[11px] font-medium text-light-on-surface-variant">Domain:</span>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
             >
-              <span className="material-symbols-outlined text-[16px] block">grid_view</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              className={`p-1 rounded ${viewMode === 'table' ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-primary shadow-xs' : 'text-light-outline hover:text-light-on-surface'}`}
-              title="Table View"
+              <option value="all">All Domains</option>
+              <option value="Engineering">Engineering</option>
+              <option value="UI/UX Design">UI/UX Design</option>
+              <option value="Programming">Programming</option>
+              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="Data Science & AI">Data Science & AI</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+            </select>
+          </div>
+
+          {/* Level Filter */}
+          <div className="flex items-center gap-1">
+            <span className="text-[11px] font-medium text-light-on-surface-variant">Level:</span>
+            <select
+              value={levelFilter}
+              onChange={(e) => setLevelFilter(e.target.value)}
+              className="px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
             >
-              <span className="material-symbols-outlined text-[16px] block">view_list</span>
-            </button>
+              <option value="all">All Levels</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
           </div>
         </div>
       </section>
 
-      {/* Course List / Cards Display */}
+      {/* Course Directory: Clean Table View (Matching Module Library) */}
       {loading ? (
         <div className="py-20 text-center text-light-on-surface-variant flex flex-col items-center justify-center">
           <span className="material-symbols-outlined text-[36px] animate-spin text-light-primary mb-2">progress_activity</span>
           <p className="text-xs font-semibold">Loading courses catalog...</p>
         </div>
-      ) : filteredCourses.length === 0 ? (
-        /* Empty State */
-        <div className="py-16 text-center border-2 border-dashed border-light-outline-variant/60 dark:border-dark-outline-variant/60 rounded-2xl bg-light-surface-container-lowest/50 dark:bg-dark-surface-bright/30 flex flex-col items-center justify-center p-6">
-          <div className="w-16 h-16 rounded-2xl bg-light-primary-tint/25 text-light-primary flex items-center justify-center mb-3">
-            <span className="material-symbols-outlined text-[32px]">school</span>
-          </div>
-          <h3 className="text-base font-bold text-light-on-surface dark:text-dark-on-surface">
-            {courses.length === 0 ? 'No Courses Created Yet' : 'No Courses Match Criteria'}
-          </h3>
-          <p className="text-xs text-light-on-surface-variant max-w-md mt-1 mb-4">
-            {courses.length === 0
-              ? 'Begin by assembling a multi-module course program. Select modules from your library, set the course fee, and the system will automatically calculate the total instructional days.'
-              : 'Try clearing your search query or adjusting the domain and level filters.'}
-          </p>
-          {courses.length === 0 ? (
-            <button
-              type="button"
-              onClick={handleOpenCreate}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-light-primary text-light-on-primary hover:bg-light-primary-container text-xs font-bold shadow-sm cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[18px]">add_circle</span>
-              <span>Frame Your First Course</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => { setSearch(''); setCategoryFilter('all'); setLevelFilter('all') }}
-              className="px-3 py-1.5 rounded-lg border border-light-outline-variant text-xs font-semibold text-light-primary hover:bg-light-surface-container-low cursor-pointer"
-            >
-              Reset Filters
-            </button>
-          )}
-        </div>
-      ) : viewMode === 'grid' ? (
-        /* GRID VIEW */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCourses.map((c) => {
-            const rawIds = Array.isArray(c.module_ids) ? c.module_ids.map(Number) : []
-            const selectedModules = rawIds.map((id) => moduleMap.get(id)).filter(Boolean)
-            const daysCount = c.days || selectedModules.reduce((acc, m) => acc + (Number(m.days) || 0), 0)
-
-            return (
-              <div
-                key={c.id}
-                className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/70 dark:border-dark-outline-variant/70 rounded-xl p-4 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group"
-              >
-                <div>
-                  {/* Top Bar: Code, Category, Level */}
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-[11px] font-bold text-light-primary dark:text-dark-primary px-2 py-0.5 rounded bg-light-primary-tint/20 dark:bg-dark-primary-tint/20">
-                      {c.code || `CRS-${c.id}`}
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-light-surface-container-high dark:bg-dark-surface-container-high text-light-on-surface-variant font-label">
-                        {c.level || 'Intermediate'}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.status === 'Draft' ? 'bg-pending-container text-on-pending-container' : 'bg-success-container text-on-success-container'}`}>
-                        {c.status || 'Published'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface leading-snug group-hover:text-light-primary transition-colors">
-                    {c.title}
-                  </h3>
-
-                  {/* Category & Faculty Lead */}
-                  <div className="flex items-center gap-2 mt-1.5 text-xs text-light-on-surface-variant">
-                    <span className="inline-flex items-center gap-1 text-[11px]">
-                      <span className="material-symbols-outlined text-[14px] text-light-outline">category</span>
-                      {c.category || 'General'}
-                    </span>
-                    <span>•</span>
-                    <span className="inline-flex items-center gap-1 text-[11px] truncate">
-                      <span className="material-symbols-outlined text-[14px] text-light-outline">person</span>
-                      {c.instructor || 'Faculty Lead'}
-                    </span>
-                  </div>
-
-                  {/* Description */}
-                  {c.description && (
-                    <p className="text-xs text-light-on-surface-variant/80 line-clamp-2 mt-2 leading-relaxed">
-                      {c.description}
-                    </p>
-                  )}
-
-                  {/* Assembled Modules Chips */}
-                  <div className="mt-3.5 pt-3 border-t border-light-outline-variant/40">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-light-on-surface-variant mb-1.5">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px] text-light-primary">layers</span>
-                        Assembled Modules ({rawIds.length})
-                      </span>
-                      <span className="text-light-primary font-mono text-[10px]">
-                        {daysCount} Days Total
-                      </span>
-                    </div>
-
-                    {selectedModules.length > 0 ? (
-                      <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto scrollbar-thin">
-                        {selectedModules.map((m) => (
-                          <span
-                            key={m.id}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-light-surface-container-high dark:bg-dark-surface-container-high text-light-on-surface font-medium truncate max-w-[200px]"
-                            title={`${m.title} (${m.days} days)`}
-                          >
-                            <span className="font-mono text-light-primary">{m.code || 'MOD'}</span>
-                            <span className="truncate">{m.title}</span>
-                            <span className="opacity-70 font-mono">({m.days}d)</span>
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-[11px] text-light-outline italic">No modules linked to this course.</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Bottom Bar: Price & Action Buttons */}
-                <div className="pt-3 border-t border-light-outline-variant/60 flex items-center justify-between gap-2">
-                  {/* Tuition Price Badge */}
-                  <div>
-                    <span className="text-[10px] text-light-on-surface-variant uppercase font-bold tracking-wider block">
-                      Course Tuition
-                    </span>
-                    <span className="text-base font-black text-light-on-surface dark:text-dark-on-surface font-headline tabular-nums">
-                      {Number(c.price) > 0 ? `₹${Number(c.price).toLocaleString()}` : 'Free / Open'}
-                    </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleDuplicate(c)}
-                      className="p-1.5 rounded-lg border border-light-outline-variant/60 hover:bg-light-surface-container-high text-light-on-surface-variant hover:text-light-on-surface transition-colors cursor-pointer"
-                      title="Duplicate Course"
-                    >
-                      <span className="material-symbols-outlined text-[16px] block">content_copy</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(c)}
-                      className="px-2.5 py-1.5 rounded-lg bg-light-surface-container-high hover:bg-light-primary-tint/30 text-light-primary dark:text-dark-primary font-label text-xs font-bold transition-colors cursor-pointer"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(c)}
-                      className="p-1.5 rounded-lg hover:bg-overdue-container text-light-outline hover:text-overdue transition-colors cursor-pointer"
-                      title="Delete Course"
-                    >
-                      <span className="material-symbols-outlined text-[16px] block">delete</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
       ) : (
-        /* TABLE VIEW */
-        <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/70 dark:border-dark-outline-variant/70 rounded-xl overflow-hidden shadow-xs">
+        <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant font-label text-light-on-surface-variant uppercase tracking-wider text-[11px]">
-                <tr>
-                  <th className="px-4 py-3">Course / Title</th>
-                  <th className="px-4 py-3">Domain</th>
-                  <th className="px-4 py-3">Faculty Lead</th>
-                  <th className="px-4 py-3">Modules Assembled</th>
-                  <th className="px-4 py-3 text-center">Auto-Detected Days</th>
-                  <th className="px-4 py-3">Tuition Price</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 text-light-on-surface-variant dark:text-dark-on-surface-variant font-label text-[11px] uppercase tracking-wider">
+                  <th className="py-2.5 px-3">Code</th>
+                  <th className="py-2.5 px-3">Course Title</th>
+                  <th className="py-2.5 px-3">Domain</th>
+                  <th className="py-2.5 px-3">Faculty Lead</th>
+                  <th className="py-2.5 px-3">Modules</th>
+                  <th className="py-2.5 px-3">Duration</th>
+                  <th className="py-2.5 px-3">Tuition Fee</th>
+                  <th className="py-2.5 px-3 text-center">Status</th>
+                  <th className="py-2.5 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-light-outline-variant/50 dark:divide-dark-outline-variant/50 font-body">
-                {filteredCourses.map((c) => {
-                  const rawIds = Array.isArray(c.module_ids) ? c.module_ids.map(Number) : []
-                  const selectedModules = rawIds.map((id) => moduleMap.get(id)).filter(Boolean)
-                  const daysCount = c.days || selectedModules.reduce((acc, m) => acc + (Number(m.days) || 0), 0)
+              <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 font-body">
+                {filteredCourses.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" className="py-8 text-center text-light-on-surface-variant">
+                      <span className="material-symbols-outlined text-[36px] text-light-outline mb-1 block">
+                        search_off
+                      </span>
+                      <span>No course programs found matching your query.</span>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredCourses.map((c) => {
+                    const rawIds = Array.isArray(c.module_ids) ? c.module_ids.map(Number) : []
+                    const selectedModules = rawIds.map((id) => moduleMap.get(id)).filter(Boolean)
+                    const daysCount = c.days || selectedModules.reduce((acc, m) => acc + (Number(m.days) || 0), 0)
 
-                  return (
-                    <tr key={c.id} className="hover:bg-light-surface-container-low/60 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col">
-                          <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
+                    return (
+                      <tr
+                        key={c.id}
+                        className="hover:bg-light-surface-container-low/40 dark:hover:bg-dark-surface-container/30 transition-colors"
+                      >
+                        {/* Code (Separate column, single line) */}
+                        <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                          <span className="font-mono text-xs font-bold text-light-primary dark:text-dark-primary">
+                            {c.code || `CRS-${c.id}`}
+                          </span>
+                        </td>
+
+                        {/* Clean Course Title (NO CRS-N668 • Intermediate underneath!) */}
+                        <td className="py-2.5 px-3 align-middle">
+                          <span className="font-body text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
                             {c.title}
                           </span>
-                          <span className="font-mono text-[11px] text-light-primary">
-                            {c.code || `CRS-${c.id}`} • {c.level}
+                        </td>
+
+                        {/* Domain */}
+                        <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                          <span className="px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-[11px] font-medium text-light-on-surface-variant">
+                            {c.category || 'Engineering'}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-light-on-surface-variant">
-                        {c.category || 'Engineering'}
-                      </td>
-                      <td className="px-4 py-3 text-light-on-surface-variant">
-                        {c.instructor || 'Lead Instructor'}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1 font-semibold text-light-on-surface">
-                          <span className="material-symbols-outlined text-[14px] text-light-primary">layers</span>
-                          {rawIds.length} Modules
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="px-2 py-0.5 rounded-full font-bold font-mono text-[11px] bg-light-primary-tint/25 text-light-primary">
-                          {daysCount} Days
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 font-bold font-mono text-light-on-surface tabular-nums">
-                        {Number(c.price) > 0 ? `₹${Number(c.price).toLocaleString()}` : 'Free'}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${c.status === 'Draft' ? 'bg-pending-container text-on-pending-container' : 'bg-success-container text-on-success-container'}`}>
-                          {c.status || 'Published'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEdit(c)}
-                          className="px-2 py-1 rounded bg-light-surface-container-high hover:bg-light-primary-tint/30 text-light-primary font-bold mr-1.5 cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(c)}
-                          className="p-1 rounded hover:bg-overdue-container text-light-outline hover:text-overdue cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-[16px] block">delete</span>
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
+                        </td>
+
+                        {/* Faculty Lead */}
+                        <td className="py-2.5 px-3 whitespace-nowrap align-middle text-xs text-light-on-surface">
+                          <span className="inline-flex items-center gap-1 font-medium text-light-on-surface dark:text-dark-on-surface">
+                            <span className="material-symbols-outlined text-[15px] text-light-primary">person</span>
+                            {c.instructor || 'Lead Instructor'}
+                          </span>
+                        </td>
+
+                        {/* Modules Assembled */}
+                        <td className="py-2.5 px-3 whitespace-nowrap align-middle text-xs text-light-on-surface">
+                          <span className="inline-flex items-center gap-1 font-medium">
+                            <span className="material-symbols-outlined text-[15px] text-light-primary">layers</span>
+                            {rawIds.length} Modules
+                          </span>
+                        </td>
+
+                        {/* Duration (Auto-Detected Days) */}
+                        <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                          <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+                            {daysCount} Days
+                          </span>
+                        </td>
+
+                        {/* Tuition Fee */}
+                        <td className="py-2.5 px-3 whitespace-nowrap align-middle font-mono font-bold text-xs text-light-on-surface tabular-nums">
+                          {Number(c.price) > 0 ? `₹${Number(c.price).toLocaleString()}` : 'Free / Open'}
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              c.status === 'Published'
+                                ? 'bg-success-container text-on-success-container'
+                                : 'bg-pending-container text-on-pending-container'
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                c.status === 'Published' ? 'bg-success' : 'bg-pending'
+                              }`}
+                            />
+                            <span>{c.status || 'Published'}</span>
+                          </span>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-2.5 px-3 whitespace-nowrap text-right align-middle">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(c)}
+                              title="Edit Course"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-[11px] font-semibold transition-colors cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-[14px]">edit</span>
+                              <span>Edit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDuplicate(c)}
+                              title="Duplicate Course"
+                              className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(c)}
+                              title="Delete Course"
+                              className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">delete</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
               </tbody>
             </table>
           </div>
-        </div>
+
+          {/* Table Footer */}
+          <div className="p-2.5 border-t border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/40 flex items-center justify-between text-[11px] text-light-on-surface-variant">
+            <span>Showing <strong>{filteredCourses.length}</strong> of <strong>{courses.length}</strong> programs</span>
+            <div className="flex items-center gap-2">
+              <span>Standardized academic programs composed of multi-module curricula</span>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* ========================================================================= */}
