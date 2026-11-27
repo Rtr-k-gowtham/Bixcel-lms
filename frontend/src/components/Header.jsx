@@ -120,6 +120,22 @@ export function Header({
           </span>
         </button>
 
+        {/* Role Portal Indicator Pill */}
+        <div className="hidden md:flex items-center">
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider border shadow-2xs ${
+              userRole === 'Student'
+                ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                : userRole.includes('Tutor') || userRole.includes('Faculty')
+                ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30'
+                : 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+            <span>{userRole === 'Student' ? 'Student Portal' : userRole.includes('Tutor') ? 'Faculty Portal' : 'Admin Portal'}</span>
+          </span>
+        </div>
+
         {/* User Profile */}
         <div className="relative shrink-0">
           <button

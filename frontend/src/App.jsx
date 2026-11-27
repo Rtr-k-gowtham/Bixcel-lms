@@ -82,6 +82,22 @@ function Dashboard({ currentUser, onLogout }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [matrixPreselectedRole, setMatrixPreselectedRole] = useState('Super Admin')
 
+  const userRole = currentUser?.role || 'Super Admin'
+  const isStudent = userRole === 'Student' || currentUser?.role_code === 'ROLE_STUDENT'
+  const isTutor = userRole.includes('Tutor') || userRole.includes('Faculty') || currentUser?.role_code === 'ROLE_TUTOR'
+
+  const STUDENT_FORBIDDEN_TABS = new Set([
+    'users', 'roles', 'permissions', 'audit', 'settings',
+    'tutors', 'students', 'onboarding', 'batches', 'builder', 'attendance', 'analytics'
+  ])
+
+  const TUTOR_FORBIDDEN_TABS = new Set([
+    'users', 'roles', 'permissions', 'audit', 'settings',
+    'fees', 'balance', 'analytics', 'tutors', 'onboarding'
+  ])
+
+  const isAccessForbidden = (isStudent && STUDENT_FORBIDDEN_TABS.has(currentTab)) || (isTutor && TUTOR_FORBIDDEN_TABS.has(currentTab))
+
   // Keep URL Hash and localStorage synchronized whenever currentTab changes
   useEffect(() => {
     if (!currentTab) return
@@ -229,6 +245,8 @@ function Dashboard({ currentUser, onLogout }) {
         onSelectTab={handleTabChange}
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}
+        currentUser={currentUser}
+        onLogout={onLogout}
       />
 
       {/* Main Workspace Column */}
@@ -324,7 +342,26 @@ function Dashboard({ currentUser, onLogout }) {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'assignments' ? (
+          {isAccessForbidden ? (
+            <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-8 rounded-lg text-center flex flex-col items-center justify-center gap-3 animate-fade-in shadow-xs my-4">
+              <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center shadow-inner">
+                <span className="material-symbols-outlined text-[28px]">shield_lock</span>
+              </div>
+              <h2 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface">
+                Access Restricted • {isStudent ? 'Student Portal' : 'Faculty Workspace'}
+              </h2>
+              <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant max-w-md">
+                Your current account ({currentUser?.name || 'User'} • {currentUser?.role || 'Member'}) does not have administrative privileges to access this operational screen.
+              </p>
+              <button
+                type="button"
+                onClick={() => handleTabChange('dashboard')}
+                className="mt-2 px-4 py-1.5 bg-light-primary text-light-on-primary rounded text-xs font-semibold shadow-xs hover:bg-light-primary-container transition-colors cursor-pointer"
+              >
+                Return to {isStudent ? 'Student Dashboard' : 'Faculty Dashboard'}
+              </button>
+            </div>
+          ) : currentTab === 'assignments' ? (
             <AssignmentManagement />
           ) : currentTab === 'exams' ? (
             <ExamManagement />
@@ -860,6 +897,9 @@ export default function App() {
   const handleLogout = async () => {
     await apiService.logout()
     try {
+      localStorage.setItem('bx_logged_out', 'true')
+      localStorage.removeItem('bx_auth_user')
+      localStorage.removeItem('bx_auth_token')
       localStorage.removeItem('bx_active_tab')
       window.history.replaceState(null, '', window.location.pathname)
     } catch {
@@ -868,10 +908,20 @@ export default function App() {
     setCurrentUser(null)
   }
 
+  const handleLoginSuccess = (user) => {
+    try {
+      localStorage.removeItem('bx_logged_out')
+      localStorage.setItem('bx_active_tab', 'dashboard')
+    } catch {
+      // ignore
+    }
+    setCurrentUser(user)
+  }
+
   return (
     <ThemeProvider>
       {!currentUser ? (
-        <LoginScreen onLoginSuccess={(user) => setCurrentUser(user)} />
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
       ) : (
         <Dashboard currentUser={currentUser} onLogout={handleLogout} />
       )}
