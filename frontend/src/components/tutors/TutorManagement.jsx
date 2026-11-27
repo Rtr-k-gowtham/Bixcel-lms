@@ -369,37 +369,12 @@ export function TutorManagement({ initialTab = 'directory' }) {
       }
       return true
     }
-    if (step === 3) {
-      if (wizardCourseMode === 'standard') {
-        if (!selectedCourseId && coursesList.length > 0) {
-          alert('Please select a Course Program')
-          return false
-        }
-      } else {
-        if (!wizardTrack.trim()) {
-          alert('Please select or enter an allocated track domain')
-          return false
-        }
-      }
-      if (!wizardForm.batch.trim()) {
-        alert('Please enter an assigned batch cohort')
-        return false
-      }
-      return true
-    }
-    if (step === 4) {
-      if (wizardCourseMode === 'custom' && selectedCustomModules.length === 0) {
-        alert('Please select at least one module from the Module Library for this tutor to teach')
-        return false
-      }
-      return true
-    }
     return true
   }
 
   const handleNextStep = () => {
     if (validateStep(wizardStep)) {
-      setWizardStep((prev) => Math.min(prev + 1, 5))
+      setWizardStep((prev) => Math.min(prev + 1, 2))
     }
   }
 
@@ -410,7 +385,7 @@ export function TutorManagement({ initialTab = 'directory' }) {
   // Complete Step Wizard Onboarding
   const handleCompleteWizard = async (e) => {
     e.preventDefault()
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) return
+    if (!validateStep(1) || !validateStep(2)) return
 
     setIsSubmitting(true)
     const nextNum = 120 + tutors.length
@@ -440,25 +415,21 @@ export function TutorManagement({ initialTab = 'directory' }) {
       bio: wizardForm.bio.trim(),
       id_proof_type: wizardForm.idProofType,
       id_proof_number: wizardForm.idProofNumber.trim() || `ID-${Date.now().toString().slice(-6)}`,
-      role: wizardForm.role,
-      status: wizardForm.status,
-      availability: wizardForm.status === 'Active' ? 'Available' : 'Partial',
-      courses: wizardTrack,
-      assigned_track: wizardTrack,
-      batch: wizardForm.batch,
-      assigned_batches: [wizardForm.batch],
-      course_mode: wizardCourseMode,
+      role: wizardForm.role || 'Senior Faculty Lead',
+      status: wizardForm.status || 'Active',
+      availability: (wizardForm.status || 'Active') === 'Active' ? 'Available' : 'Partial',
+      courses: wizardForm.specialization || 'General Faculty',
+      assigned_track: wizardForm.specialization || 'General Faculty',
+      batch: 'FACULTY-2026',
+      assigned_batches: ['FACULTY-2026'],
+      course_mode: 'standard',
       total_hours: Number(wizardForm.weeklyHours) || 16,
       hours: Number(wizardForm.weeklyHours) || 16,
       max_hours: Number(wizardForm.maxHours) || 24,
-      pay_model: wizardForm.payModel,
+      pay_model: wizardForm.payModel || 'Monthly Retainer',
       compensation_amount: Number(wizardForm.compensationAmount) || 85000,
       rating: 5.0,
-      module_chunks: effectiveModules.map((m) => ({
-        title: m.title,
-        days: Number(m.days) || 1,
-        code: m.code || m.id,
-      })),
+      module_chunks: [],
       created_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
     }
 
@@ -942,14 +913,11 @@ export function TutorManagement({ initialTab = 'directory' }) {
             <div className="flex items-center justify-between">
               <div>
                 <span className="font-label text-[11px] text-light-primary font-bold uppercase tracking-wider">
-                  Step {wizardStep} of 5
+                  Step {wizardStep} of 2
                 </span>
                 <h2 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
                   {wizardStep === 1 && 'Personal Information & Faculty Identification'}
-                  {wizardStep === 2 && 'Academic Credentials & Industry Experience'}
-                  {wizardStep === 3 && (wizardCourseMode === 'standard' ? 'Course Program & Batch Allocation' : 'Custom Modular Track & Batch Allocation')}
-                  {wizardStep === 4 && (wizardCourseMode === 'standard' ? 'Course Program Curriculum & Modules' : 'Module Library & Teaching Scope Allocation')}
-                  {wizardStep === 5 && 'Compensation Plan, Review & Confirm Appointment'}
+                  {wizardStep === 2 && 'Academic Credentials, Specialization & Role'}
                 </h2>
               </div>
               <span className="text-xs text-light-on-surface-variant font-medium">
@@ -961,13 +929,10 @@ export function TutorManagement({ initialTab = 'directory' }) {
             </div>
 
             {/* Step Indicators */}
-            <div className="grid grid-cols-5 gap-1.5 pt-1">
+            <div className="grid grid-cols-2 gap-2 pt-1">
               {[
-                { s: 1, label: '1. Personal' },
-                { s: 2, label: '2. Academic' },
-                { s: 3, label: '3. Course' },
-                { s: 4, label: '4. Modules' },
-                { s: 5, label: '5. Review' },
+                { s: 1, label: '1. Personal Information' },
+                { s: 2, label: '2. Academic Credentials & Role' },
               ].map(({ s, label }) => {
                 const isPassed = wizardStep > s
                 const isCurrent = wizardStep === s
@@ -991,7 +956,7 @@ export function TutorManagement({ initialTab = 'directory' }) {
                     ) : (
                       <span>{s}</span>
                     )}
-                    <span className="hidden sm:inline truncate">{label}</span>
+                    <span className="truncate">{label}</span>
                   </button>
                 )
               })}
@@ -1152,7 +1117,7 @@ export function TutorManagement({ initialTab = 'directory' }) {
             )}
 
             {/* ------------------------------------------------------------- */}
-            {/* STEP 2: ACADEMIC CREDENTIALS & INDUSTRY EXPERIENCE            */}
+            {/* STEP 2: ACADEMIC CREDENTIALS, SPECIALIZATION & ROLE           */}
             {/* ------------------------------------------------------------- */}
             {wizardStep === 2 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in duration-150">
@@ -1185,6 +1150,22 @@ export function TutorManagement({ initialTab = 'directory' }) {
                     placeholder="e.g. Full-Stack Web Development"
                     className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Faculty Designation Role *
+                  </label>
+                  <select
+                    value={wizardForm.role || 'Senior Faculty Lead'}
+                    onChange={(e) => setWizardForm({ ...wizardForm, role: e.target.value })}
+                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                  >
+                    <option value="Senior Faculty Lead">Senior Faculty Lead</option>
+                    <option value="Associate Tutor">Associate Tutor</option>
+                    <option value="Visiting Specialist">Visiting Specialist</option>
+                    <option value="Lab Instructor">Lab Instructor</option>
+                  </select>
                 </div>
 
                 <div>
@@ -1241,6 +1222,22 @@ export function TutorManagement({ initialTab = 'directory' }) {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Initial Faculty Status
+                  </label>
+                  <select
+                    value={wizardForm.status || 'Active'}
+                    onChange={(e) => setWizardForm({ ...wizardForm, status: e.target.value })}
+                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                  >
+                    <option value="Active">Active Faculty</option>
+                    <option value="On Probation">On Probation</option>
+                    <option value="Visiting">Visiting Faculty</option>
+                    <option value="On Leave">On Leave</option>
+                  </select>
+                </div>
+
                 <div className="md:col-span-3">
                   <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                     Faculty Bio &amp; Pedagogical Overview
@@ -1252,464 +1249,6 @@ export function TutorManagement({ initialTab = 'directory' }) {
                     placeholder="Brief overview of research papers, corporate engineering experience, and mentoring style..."
                     className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
-                </div>
-              </div>
-            )}
-
-            {/* ------------------------------------------------------------- */}
-            {/* STEP 3: COURSE TRACK & COHORT ALLOCATION                      */}
-            {/* ------------------------------------------------------------- */}
-            {wizardStep === 3 && (
-              <div className="flex flex-col gap-3 animate-in fade-in duration-150">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div
-                    onClick={() => {
-                      setWizardCourseMode('standard')
-                      if (coursesList.length > 0) {
-                        const first = coursesList.find((c) => String(c.id) === String(selectedCourseId)) || coursesList[0]
-                        setWizardTrack(first.title)
-                        if (first.code) setWizardForm((prev) => ({ ...prev, batch: `${first.code}-26A` }))
-                      }
-                    }}
-                    className={`p-3 rounded border cursor-pointer transition-all ${
-                      wizardCourseMode === 'standard'
-                        ? 'border-light-primary bg-light-primary-tint/30 dark:bg-dark-primary-tint/30 shadow-xs'
-                        : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:bg-light-surface-container'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-light-primary text-[18px]">
-                        {wizardCourseMode === 'standard' ? 'radio_button_checked' : 'radio_button_unchecked'}
-                      </span>
-                      <strong className="text-xs text-light-on-surface dark:text-dark-on-surface">Course</strong>
-                    </div>
-                    <p className="text-[11px] text-light-on-surface-variant mt-1 pl-6">
-                      Assign faculty lead to a pre-framed course program created in Course Management.
-                    </p>
-                  </div>
-
-                  <div
-                    onClick={() => setWizardCourseMode('custom')}
-                    className={`p-3 rounded border cursor-pointer transition-all ${
-                      wizardCourseMode === 'custom'
-                        ? 'border-light-primary bg-light-primary-tint/30 dark:bg-dark-primary-tint/30 shadow-xs'
-                        : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:bg-light-surface-container'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-light-primary text-[18px]">
-                        {wizardCourseMode === 'custom' ? 'radio_button_checked' : 'radio_button_unchecked'}
-                      </span>
-                      <strong className="text-xs text-light-on-surface dark:text-dark-on-surface">Custom Modular</strong>
-                    </div>
-                    <p className="text-[11px] text-light-on-surface-variant mt-1 pl-6">
-                      Allocate faculty teaching scope across specific modules from the Module Library.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-2">
-                  {wizardCourseMode === 'standard' ? (
-                    <div className="md:col-span-2">
-                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                        Select Course Program *
-                      </label>
-                      <select
-                        value={selectedCourseId}
-                        onChange={(e) => handleSelectCourse(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                      >
-                        {coursesList.length === 0 ? (
-                          <option value="">No courses created yet in Course Management</option>
-                        ) : (
-                          coursesList.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.title} ({c.code || `CRS-${c.id}`}) — {c.days || 0} Days • {c.category || 'General'}
-                            </option>
-                          ))
-                        )}
-                      </select>
-                    </div>
-                  ) : (
-                    <div className="md:col-span-2">
-                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                        Target Course Track Domain *
-                      </label>
-                      <select
-                        value={wizardTrack}
-                        onChange={(e) => handleWizardTrackChange(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                      >
-                        {Object.keys(tracks).map((t) => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Assigned Batch Cohort *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={wizardForm.batch}
-                      onChange={(e) => setWizardForm({ ...wizardForm, batch: e.target.value })}
-                      placeholder="e.g. BIX-DEV-24A"
-                      className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Faculty Designation Role
-                    </label>
-                    <select
-                      value={wizardForm.role}
-                      onChange={(e) => setWizardForm({ ...wizardForm, role: e.target.value })}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    >
-                      <option value="Senior Faculty Lead">Senior Faculty Lead</option>
-                      <option value="Associate Tutor">Associate Tutor</option>
-                      <option value="Visiting Specialist">Visiting Specialist</option>
-                      <option value="Lab Instructor">Lab Instructor</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Course Mode Details Preview Card */}
-                {wizardCourseMode === 'standard' && selectedCourse && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded bg-light-surface-container dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] font-bold text-light-primary bg-light-primary-tint/40 px-1.5 py-0.5 rounded">
-                        {selectedCourse.code || `CRS-${selectedCourse.id}`}
-                      </span>
-                      <strong className="text-light-on-surface dark:text-dark-on-surface">
-                        {selectedCourse.title}
-                      </strong>
-                      <span className="text-[11px] text-light-on-surface-variant">
-                        • {selectedCourse.category} • {selectedCourse.level}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-light-primary dark:text-dark-primary">
-                        {cumulativeDays} Total Days
-                      </span>
-                      <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
-                        ₹{Number(selectedCourse.price || 0).toLocaleString('en-IN')}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* ------------------------------------------------------------- */}
-            {/* STEP 4: MODULAR CURRICULUM & CHUNK SELECTION                  */}
-            {/* ------------------------------------------------------------- */}
-            {wizardStep === 4 && (
-              <div className="flex flex-col gap-3 animate-in fade-in duration-150">
-                {/* Header Banner */}
-                <div className="flex flex-wrap items-center justify-between gap-2 bg-light-surface-container-low dark:bg-dark-surface-container p-3 rounded border border-light-outline-variant dark:border-dark-outline-variant">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
-                        {wizardCourseMode === 'standard' ? (selectedCourse?.title || wizardTrack) : 'Frame Teaching Scope from Module Library'}
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint">
-                        {wizardCourseMode === 'standard' ? 'Course Mode' : 'Custom Modular'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-light-on-surface-variant mt-0.5">
-                      {wizardCourseMode === 'standard'
-                        ? 'Standard pre-framed course program curriculum and its allocated module components.'
-                        : 'Select individual modules from the Module Library that this faculty member is certified to instruct.'}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-label text-sm font-bold text-light-primary dark:text-dark-primary block">
-                      {cumulativeDays} Teaching Days
-                    </span>
-                    <span className="text-[10px] text-light-on-surface-variant">
-                      {wizardCourseMode === 'standard'
-                        ? `${effectiveModules.length} Modules in Course`
-                        : `${selectedCustomModules.length} Modules Assigned`}
-                    </span>
-                  </div>
-                </div>
-
-                {/* COURSE MODE: Display Course Program Modules */}
-                {wizardCourseMode === 'standard' && (
-                  <div className="flex flex-col gap-2">
-                    {effectiveModules.length === 0 ? (
-                      <div className="p-4 rounded border border-dashed border-light-outline-variant dark:border-dark-outline-variant text-center text-xs text-light-on-surface-variant">
-                        No linked modules found for this course program. Total duration is set to {cumulativeDays} days.
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {effectiveModules.map((mod, idx) => (
-                          <div
-                            key={mod.id || mod.code || idx}
-                            className="p-2.5 rounded border border-light-primary/40 bg-light-primary-tint/15 dark:bg-dark-primary-tint/15 flex items-start gap-2.5"
-                          >
-                            <span className="material-symbols-outlined text-light-primary text-[18px] mt-0.5">
-                              check_circle
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="font-mono text-[10px] text-light-primary font-bold">
-                                  {mod.code || mod.id}
-                                </span>
-                                <span className="font-label text-[10px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                                  {mod.days} Days
-                                </span>
-                              </div>
-                              <span className="font-title text-xs font-semibold text-light-on-surface dark:text-dark-on-surface block mt-0.5">
-                                {mod.title}
-                              </span>
-                              {mod.description && (
-                                <p className="text-[10px] text-light-on-surface-variant line-clamp-1 mt-0.5">
-                                  {mod.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* CUSTOM MODULAR MODE: Module Library Browser & Selection */}
-                {wizardCourseMode === 'custom' && (
-                  <div className="flex flex-col gap-2.5">
-                    {/* Search & Domain Filter Toolbar */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant">
-                      <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-                        <div className="relative flex items-center flex-1">
-                          <span className="material-symbols-outlined text-[15px] text-light-outline absolute left-2 pointer-events-none">
-                            search
-                          </span>
-                          <input
-                            type="search"
-                            value={moduleSearch}
-                            onChange={(e) => setModuleSearch(e.target.value)}
-                            placeholder="Search Module Library by code, title, topic..."
-                            className="w-full pl-7 pr-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
-                          />
-                        </div>
-
-                        <select
-                          value={moduleCategoryFilter}
-                          onChange={(e) => setModuleCategoryFilter(e.target.value)}
-                          className="px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                        >
-                          {moduleCategories.map((cat) => (
-                            <option key={cat} value={cat}>
-                              {cat === 'All' ? 'All Domains' : cat}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const ids = filteredModulesForCustom.map((m) => m.id ?? m.code)
-                            setSelectedModuleIds((prev) => Array.from(new Set([...prev, ...ids])))
-                          }}
-                          className="px-2 py-1 text-[11px] font-semibold rounded bg-light-surface-container hover:bg-light-surface-container-high border border-light-outline-variant text-light-on-surface dark:text-dark-on-surface"
-                        >
-                          Select All
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const rem = new Set(filteredModulesForCustom.map((m) => m.id ?? m.code))
-                            setSelectedModuleIds((prev) => prev.filter((id) => !rem.has(id)))
-                          }}
-                          className="px-2 py-1 text-[11px] font-semibold rounded bg-light-surface-container hover:bg-light-surface-container-high border border-light-outline-variant text-light-on-surface-variant"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Modules Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[420px] overflow-y-auto pr-1">
-                      {filteredModulesForCustom.length === 0 ? (
-                        <div className="col-span-2 p-6 text-center text-xs text-light-on-surface-variant">
-                          No modules found matching "{moduleSearch}". Try adjusting your search or domain filter.
-                        </div>
-                      ) : (
-                        filteredModulesForCustom.map((mod) => {
-                          const isChecked = selectedModuleIds.includes(mod.id) || (mod.code && selectedModuleIds.includes(mod.code))
-                          return (
-                            <div
-                              key={mod.id || mod.code}
-                              onClick={() => handleToggleModule(mod)}
-                              className={`p-2.5 rounded border transition-all cursor-pointer flex items-start gap-2.5 ${
-                                isChecked
-                                  ? 'border-light-primary bg-light-primary-tint/25 dark:bg-dark-primary-tint/25 shadow-xs'
-                                  : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:border-light-primary/60'
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleToggleModule(mod)}
-                                className="mt-0.5 rounded text-light-primary focus:ring-0 cursor-pointer"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-1">
-                                  <div className="flex items-center gap-1.5 truncate">
-                                    <span className="font-mono text-[10px] text-light-primary font-bold">
-                                      {mod.code || `MOD-${mod.id}`}
-                                    </span>
-                                    {mod.category && (
-                                      <span className="px-1.5 py-0.2 rounded bg-light-surface-container-high text-[9px] text-light-on-surface-variant truncate">
-                                        {mod.category}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="font-label text-[10px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums shrink-0">
-                                    {mod.days} Days
-                                  </span>
-                                </div>
-                                <span className="font-title text-xs font-semibold text-light-on-surface dark:text-dark-on-surface block mt-0.5 truncate">
-                                  {mod.title}
-                                </span>
-                                {mod.description && (
-                                  <p className="text-[10px] text-light-on-surface-variant line-clamp-1 mt-0.5">
-                                    {mod.description}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          )
-                        })
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* ------------------------------------------------------------- */}
-            {/* STEP 5: COMPENSATION PLAN, REVIEW & CONFIRM                   */}
-            {/* ------------------------------------------------------------- */}
-            {wizardStep === 5 && (
-              <div className="flex flex-col gap-3 animate-in fade-in duration-150">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Compensation Model
-                    </label>
-                    <select
-                      value={wizardForm.payModel}
-                      onChange={(e) => setWizardForm({ ...wizardForm, payModel: e.target.value })}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    >
-                      <option value="Monthly Retainer">Monthly Retainer (₹ Fixed)</option>
-                      <option value="Hourly Teaching Rate">Hourly Teaching Rate (₹ / Hr)</option>
-                      <option value="Per-Module Contract">Per-Module Completion (₹ Contract)</option>
-                      <option value="Honorarium / Visiting">Honorarium / Visiting Specialist</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Compensation Amount (₹)
-                    </label>
-                    <input
-                      type="number"
-                      value={wizardForm.compensationAmount}
-                      onChange={(e) => setWizardForm({ ...wizardForm, compensationAmount: e.target.value })}
-                      placeholder="85000"
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Weekly Workload Cap (Hrs)
-                    </label>
-                    <input
-                      type="number"
-                      min="4"
-                      max="40"
-                      value={wizardForm.weeklyHours}
-                      onChange={(e) => setWizardForm({ ...wizardForm, weeklyHours: e.target.value })}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Initial Faculty Status
-                    </label>
-                    <select
-                      value={wizardForm.status}
-                      onChange={(e) => setWizardForm({ ...wizardForm, status: e.target.value })}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    >
-                      <option value="Active">Active Faculty</option>
-                      <option value="On Probation">On Probation</option>
-                      <option value="Visiting">Visiting Faculty</option>
-                      <option value="On Leave">On Leave</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Final Review Summary Card */}
-                <div className="p-3 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 flex flex-col gap-2 mt-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-label text-xs font-bold text-light-primary dark:text-dark-primary">
-                      Faculty Appointment Verification Summary
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint">
-                      {wizardCourseMode === 'standard' ? 'Course Program Lead' : 'Modular Teaching Scope'}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div>
-                      <span className="text-[10px] text-light-on-surface-variant block">Faculty Name:</span>
-                      <strong className="text-light-on-surface dark:text-dark-on-surface truncate block">{wizardForm.fullName}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-light-on-surface-variant block">Staff ID:</span>
-                      <strong className="font-mono text-light-on-surface dark:text-dark-on-surface">{wizardForm.staffId || `TUT-2026-0${120 + tutors.length}`}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-light-on-surface-variant block">Specialization / Track:</span>
-                      <strong className="text-light-on-surface dark:text-dark-on-surface">{wizardTrack}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-light-on-surface-variant block">Batch / Compensation:</span>
-                      <strong className="text-light-on-surface dark:text-dark-on-surface">{wizardForm.batch} • ₹{Number(wizardForm.compensationAmount || 0).toLocaleString('en-IN')}</strong>
-                    </div>
-                  </div>
-
-                  {/* Modules framed overview */}
-                  <div className="mt-1 pt-2 border-t border-light-outline-variant/60">
-                    <span className="text-[10px] font-semibold text-light-on-surface-variant block mb-1">
-                      Assigned Teaching Scope ({effectiveModules.length} Modules • {cumulativeDays} Teaching Days):
-                    </span>
-                    <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
-                      {effectiveModules.map((m, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-light-surface-container dark:bg-dark-surface-container text-[10px] border border-light-outline-variant"
-                        >
-                          <span className="font-mono text-light-primary font-bold">{m.code || `M${idx + 1}`}</span>
-                          <span className="truncate max-w-[150px]">{m.title}</span>
-                          <span className="font-mono font-bold text-light-on-surface-variant">({m.days}d)</span>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
@@ -1735,13 +1274,13 @@ export function TutorManagement({ initialTab = 'directory' }) {
                   Cancel
                 </button>
 
-                {wizardStep < 5 ? (
+                {wizardStep === 1 ? (
                   <button
                     type="button"
                     onClick={handleNextStep}
                     className="inline-flex items-center gap-1 px-4 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-semibold shadow-xs transition-colors"
                   >
-                    <span>Next: Step {wizardStep + 1}</span>
+                    <span>Next: Academic &amp; Role (Step 2)</span>
                     <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
                   </button>
                 ) : (

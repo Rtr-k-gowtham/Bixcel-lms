@@ -18,6 +18,7 @@ class StudentModel extends Model
         'email',
         'password',
         'raw_password',
+        'avatar',
         'phone',
         'dob',
         'gender',

@@ -165,6 +165,7 @@ class StudentController extends BaseApiController
                 'full_name' => $s['full_name'],
                 'username' => !empty($s['username']) ? $s['username'] : (!empty($s['full_name']) ? strtolower(str_replace(' ', '.', trim((string) $s['full_name']))) : $s['student_id']),
                 'raw_password' => $s['raw_password'] ?? 'Student@123',
+                'avatar' => $s['avatar'] ?? null,
                 'guardian_name' => $s['guardian_name'] ?? 'Guardian',
                 'guardian_relation' => $s['guardian_relation'] ?? 'Parent',
                 'guardian_phone' => $s['guardian_phone'] ?? $s['phone'],
@@ -292,6 +293,7 @@ class StudentController extends BaseApiController
             'full_name' => $student['full_name'],
             'username' => !empty($student['username']) ? $student['username'] : (!empty($student['full_name']) ? strtolower(str_replace(' ', '.', trim((string) $student['full_name']))) : $student['student_id']),
             'raw_password' => $student['raw_password'] ?? 'Student@123',
+            'avatar' => $student['avatar'] ?? null,
             'guardian_name' => $student['guardian_name'] ?? 'Guardian',
             'guardian_relation' => $student['guardian_relation'] ?? 'Parent',
             'guardian_phone' => $student['guardian_phone'] ?? $student['phone'],
@@ -365,6 +367,7 @@ class StudentController extends BaseApiController
             'username' => $rawUsername,
             'password' => $hashedPassword,
             'raw_password' => $rawPassword,
+            'avatar' => $input['avatar'] ?? null,
             'guardian_name' => trim((string) $input['guardian_name']),
             'guardian_relation' => $input['guardian_relation'] ?? 'Guardian',
             'guardian_phone' => !empty($input['guardian_phone']) ? trim((string) $input['guardian_phone']) : trim((string) $input['phone']),
@@ -396,7 +399,7 @@ class StudentController extends BaseApiController
                 'department' => $input['track'] ?? 'Academic Student Portal',
                 'phone' => $studentData['phone'],
                 'status' => $studentData['status'] ?? 'Active',
-                'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+                'avatar' => !empty($studentData['avatar']) ? $studentData['avatar'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
             ];
             if ($existingUser) {
                 $userModel->update($existingUser['id'], $userData);
@@ -530,7 +533,7 @@ class StudentController extends BaseApiController
         }
 
         $updateData = [];
-        foreach (['full_name', 'username', 'guardian_name', 'guardian_relation', 'guardian_phone', 'guardian_email', 'phone', 'email', 'dob', 'gender', 'blood_group', 'address', 'status'] as $field) {
+        foreach (['full_name', 'username', 'avatar', 'guardian_name', 'guardian_relation', 'guardian_phone', 'guardian_email', 'phone', 'email', 'dob', 'gender', 'blood_group', 'address', 'status'] as $field) {
             if (isset($input[$field])) {
                 $updateData[$field] = $input[$field];
             }

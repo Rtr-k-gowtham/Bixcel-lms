@@ -96,6 +96,7 @@ const INITIAL_WIZARD_FORM = {
   // Step 1: Personal
   studentId: '',
   fullName: '',
+  avatar: '',
   phone: '',
   email: '',
   username: '',
@@ -125,6 +126,27 @@ const INITIAL_WIZARD_FORM = {
   // Step 5: Fee & Plan
   feePlan: 'Full Payment',
   feeStatus: 'Paid',
+}
+
+const handleAvatarUpload = (e, callback) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  if (!file.type.startsWith('image/')) {
+    alert('Please select a valid image file (PNG, JPG, WebP, etc.)')
+    return
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Image size exceeds 2MB limit. Please choose a smaller image.')
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (uploadEvent) => {
+    const base64Url = uploadEvent.target?.result
+    if (base64Url && callback) {
+      callback(base64Url)
+    }
+  }
+  reader.readAsDataURL(file)
 }
 
 export function StudentManagement({ initialTab = 'directory' }) {
@@ -444,6 +466,7 @@ export function StudentManagement({ initialTab = 'directory' }) {
     const payload = {
       student_id: autoId,
       full_name: wizardForm.fullName.trim(),
+      avatar: wizardForm.avatar || null,
       username: rawUsername,
       password: rawPassword,
       raw_password: rawPassword,
@@ -854,9 +877,17 @@ export function StudentManagement({ initialTab = 'directory' }) {
                           {/* Student Name */}
                           <td className="py-2.5 px-3 whitespace-nowrap align-middle">
                             <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-full bg-light-primary text-light-on-primary font-bold text-[10px] flex items-center justify-center shrink-0">
-                                {initials}
-                              </div>
+                              {s.avatar ? (
+                                <img
+                                  src={s.avatar}
+                                  alt={s.full_name}
+                                  className="w-6 h-6 rounded-full object-cover shrink-0 border border-light-outline-variant/60 shadow-2xs"
+                                />
+                              ) : (
+                                <div className="w-6 h-6 rounded-full bg-light-primary text-light-on-primary font-bold text-[10px] flex items-center justify-center shrink-0">
+                                  {initials}
+                                </div>
+                              )}
                               <span className="font-body text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
                                 {s.full_name}
                               </span>
@@ -1072,6 +1103,60 @@ export function StudentManagement({ initialTab = 'directory' }) {
             {/* ------------------------------------------------------------- */}
             {wizardStep === 1 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in duration-150">
+                {/* Student Photo Upload Card */}
+                <div className="md:col-span-3 p-3 rounded-md bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-full border-2 border-dashed border-light-outline-variant flex items-center justify-center overflow-hidden bg-light-surface-container-lowest dark:bg-dark-surface-bright shrink-0 relative group">
+                      {wizardForm.avatar ? (
+                        <img
+                          src={wizardForm.avatar}
+                          alt="Student Avatar Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="material-symbols-outlined text-[32px] text-light-on-surface-variant/50">
+                          account_circle
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="block text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                        Student Profile Photo
+                      </span>
+                      <span className="block text-[11px] text-light-on-surface-variant">
+                        Upload official passport-style student photograph (PNG, JPG, WebP up to 2MB).
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary font-semibold text-xs cursor-pointer hover:bg-light-primary-container transition-colors shadow-xs">
+                      <span className="material-symbols-outlined text-[15px]">add_a_photo</span>
+                      <span>{wizardForm.avatar ? 'Change Photo' : 'Upload Photo'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleAvatarUpload(e, (data) =>
+                            setWizardForm((prev) => ({ ...prev, avatar: data }))
+                          )
+                        }
+                      />
+                    </label>
+                    {wizardForm.avatar && (
+                      <button
+                        type="button"
+                        onClick={() => setWizardForm((prev) => ({ ...prev, avatar: '' }))}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded border border-overdue/40 text-overdue hover:bg-overdue-container/20 text-xs font-semibold transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[15px]">delete</span>
+                        <span>Remove</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <div className="md:col-span-2">
                   <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                     Student Full Name *
@@ -1929,9 +2014,17 @@ export function StudentManagement({ initialTab = 'directory' }) {
             {/* Header */}
             <div className="flex items-start justify-between border-b border-light-outline-variant dark:border-dark-outline-variant pb-2.5">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center">
-                  {getInitials(selectedStudent?.full_name)}
-                </div>
+                {selectedStudent.avatar ? (
+                  <img
+                    src={selectedStudent.avatar}
+                    alt={selectedStudent.full_name}
+                    className="w-10 h-10 rounded-full object-cover border border-light-outline-variant shadow-2xs shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center shrink-0">
+                    {getInitials(selectedStudent?.full_name)}
+                  </div>
+                )}
                 <div>
                   <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
                     {selectedStudent.full_name}
@@ -1941,6 +2034,29 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     <span>•</span>
                     <span className="text-light-primary font-semibold">{selectedStudent.track}</span>
                   </div>
+                  <label className="text-[10px] text-light-primary hover:underline font-semibold cursor-pointer inline-flex items-center gap-1 mt-0.5">
+                    <span className="material-symbols-outlined text-[13px]">photo_camera</span>
+                    <span>{selectedStudent.avatar ? 'Change photo' : 'Upload photo'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        handleAvatarUpload(e, async (data) => {
+                          const updated = { ...selectedStudent, avatar: data }
+                          setSelectedStudent(updated)
+                          setStudents((prev) => prev.map((s) => (s.id === selectedStudent.id ? updated : s)))
+                          try {
+                            await apiService.updateStudent(selectedStudent.id, { avatar: data })
+                            setToast(`Updated profile photo for ${selectedStudent.full_name}`)
+                            setTimeout(() => setToast(''), 3000)
+                          } catch (err) {
+                            console.warn('Failed to update photo:', err)
+                          }
+                        })
+                      }}
+                    />
+                  </label>
                 </div>
               </div>
 
@@ -2115,6 +2231,46 @@ export function StudentManagement({ initialTab = 'directory' }) {
             </div>
 
             <form onSubmit={handleSaveEdit} className="space-y-2.5 text-xs">
+              {/* Photo Upload in Edit Modal */}
+              <div className="flex items-center gap-3 p-2 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant">
+                {editingStudent.avatar ? (
+                  <img
+                    src={editingStudent.avatar}
+                    alt={editingStudent.full_name}
+                    className="w-11 h-11 rounded-full object-cover border border-light-outline-variant shrink-0"
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center shrink-0">
+                    {getInitials(editingStudent.full_name)}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 flex-1">
+                  <label className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-light-surface-container hover:bg-light-surface-container-high border border-light-outline-variant text-[11px] font-semibold cursor-pointer">
+                    <span className="material-symbols-outlined text-[14px]">add_a_photo</span>
+                    <span>{editingStudent.avatar ? 'Change Photo' : 'Upload Photo'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) =>
+                        handleAvatarUpload(e, (data) =>
+                          setEditingStudent((prev) => ({ ...prev, avatar: data }))
+                        )
+                      }
+                    />
+                  </label>
+                  {editingStudent.avatar && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingStudent((prev) => ({ ...prev, avatar: '' }))}
+                      className="text-[11px] text-overdue hover:underline font-semibold"
+                    >
+                      Remove Photo
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
@@ -2260,9 +2416,17 @@ export function StudentManagement({ initialTab = 'directory' }) {
             <div className="border border-light-primary/30 rounded p-3 bg-light-surface-container-low/50 dark:bg-dark-surface-container/50 flex flex-col gap-2.5">
               <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center">
-                    {getInitials(viewingPass?.full_name)}
-                  </div>
+                  {viewingPass.avatar ? (
+                    <img
+                      src={viewingPass.avatar}
+                      alt={viewingPass.full_name}
+                      className="w-9 h-9 rounded-full object-cover border border-light-primary shrink-0 shadow-2xs"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-light-primary text-light-on-primary font-bold text-xs flex items-center justify-center shrink-0">
+                      {getInitials(viewingPass?.full_name)}
+                    </div>
+                  )}
                   <div>
                     <h4 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
                       {viewingPass.full_name}
