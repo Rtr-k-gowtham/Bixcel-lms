@@ -30,6 +30,115 @@ class CalendarController extends BaseApiController
         $eventModel = new CalendarEventModel();
         $dbEvents = $eventModel->orderBy('date', 'ASC')->findAll();
 
+        if (empty($dbEvents)) {
+            $defaultEvents = [
+                [
+                    'event_uid' => 'EVT-2026-101',
+                    'title' => 'React 19 Server Actions & Suspense',
+                    'event_type' => 'lecture',
+                    'date' => '2026-11-26',
+                    'start_time' => '09:30',
+                    'end_time' => '12:30',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Dr. Marcus Vance',
+                    'room' => 'Lab Room 302 (Software Wing)',
+                    'description' => 'Deep dive into optimistic hooks, server actions, and SSR cache invalidation.',
+                    'attendance_required' => 1,
+                ],
+                [
+                    'event_uid' => 'EVT-2026-102',
+                    'title' => 'CodeIgniter 4 REST API Practicum',
+                    'event_type' => 'lab',
+                    'date' => '2026-11-26',
+                    'start_time' => '14:00',
+                    'end_time' => '16:30',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Elena Rostova',
+                    'room' => 'Computer Center Hall B',
+                    'description' => 'Implementing JWT authentication filters, CORS headers, and MySQL transactions.',
+                    'attendance_required' => 1,
+                ],
+                [
+                    'event_uid' => 'EVT-2026-103',
+                    'title' => 'Assignment 4: Microservices & API Schema Due',
+                    'event_type' => 'assignment',
+                    'date' => '2026-11-27',
+                    'start_time' => '23:59',
+                    'end_time' => '23:59',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Dr. Marcus Vance',
+                    'room' => 'Online Submission Portal',
+                    'description' => 'Submit your GitHub repo link with Dockerfile and Swagger docs.',
+                    'attendance_required' => 0,
+                ],
+                [
+                    'event_uid' => 'EVT-2026-104',
+                    'title' => 'State Management & Redux Toolkit Workshop',
+                    'event_type' => 'lecture',
+                    'date' => '2026-11-28',
+                    'start_time' => '10:00',
+                    'end_time' => '13:00',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Alan Wright',
+                    'room' => 'Seminar Room 1',
+                    'description' => 'RTK Query, cache normalized tags, and optimistic mutations.',
+                    'attendance_required' => 1,
+                ],
+                [
+                    'event_uid' => 'EVT-2026-105',
+                    'title' => 'Competency Milestone #3 Review',
+                    'event_type' => 'milestone',
+                    'date' => '2026-11-29',
+                    'start_time' => '14:00',
+                    'end_time' => '16:00',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Dr. Marcus Vance',
+                    'room' => 'Faculty Consultation Room 4',
+                    'description' => '1-on-1 viva review for Backend Architecture and Database Schemas.',
+                    'attendance_required' => 1,
+                ],
+                [
+                    'event_uid' => 'EVT-2026-106',
+                    'title' => 'Midterm Examination: Web Architecture & Systems',
+                    'event_type' => 'exam',
+                    'date' => '2026-11-30',
+                    'start_time' => '10:00',
+                    'end_time' => '13:00',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Chief Invigilator Board',
+                    'room' => 'Examination Hall A (Desk 14)',
+                    'description' => 'Theory and hands-on coding assessment. Hall ticket mandatory.',
+                    'attendance_required' => 1,
+                ],
+                [
+                    'event_uid' => 'EVT-2026-107',
+                    'title' => 'Docker & Kubernetes Containerization',
+                    'event_type' => 'lecture',
+                    'date' => '2026-12-02',
+                    'start_time' => '09:30',
+                    'end_time' => '12:30',
+                    'track' => 'Full-Stack Web Development',
+                    'batch_code' => 'BIX-DEV-24A',
+                    'instructor' => 'Priya Sharma',
+                    'room' => 'Cloud Computing Lab 4',
+                    'description' => 'Multi-stage Docker builds and Helm chart deployments.',
+                    'attendance_required' => 1,
+                ],
+            ];
+            foreach ($defaultEvents as $devt) {
+                try {
+                    $eventModel->insert($devt);
+                } catch (\Throwable $e) {}
+            }
+            $dbEvents = $eventModel->orderBy('date', 'ASC')->findAll();
+        }
+
         $events = [];
         foreach ($dbEvents as $e) {
             $events[] = [

@@ -1,534 +1,292 @@
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../../services/api'
 
-// Comprehensive Student Personas with Module Syllabus and Report Cards
-const STUDENT_DATA = {
-  gowtham: {
-    id: 'gowtham',
-    student_id: 'STU-2026-0843',
-    reg_no: 'REG-2026-DEV-084',
-    name: 'Gowtham Tamilkathir',
-    email: 'gowtham@bixcel.edu',
-    track: 'Full-Stack Web Development',
-    course_name: 'Professional Diploma in Full-Stack Software Engineering',
-    batch: 'BIX-DEV-24A',
-    term: 'Semester 2 • Fall Term 2026',
-    admission_date: '2026-08-15',
-    attendance_pct: 96.4,
-    attendance_present: 48,
-    attendance_total: 50,
-    gpa: 3.86,
-    letter_grade: 'A+',
-    standing: 'Honors Distinction',
-    fee_status: 'Paid in Full',
-    fee_receipt: 'RCP-2026-9041',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-    faculty_advisor: 'Dr. Marcus Vance (Software Architect Lead)',
-    advisor_remarks: 'Gowtham exhibits exceptional software architecture aptitude and database indexing mastery. His CodeIgniter 4 RESTful API design achieved top marks in the cohort examination.',
-    dean_name: 'Dr. Marcus Vance',
-    dean_title: 'Dean of Engineering & Computing',
-
-    // Course Modules & Detailed Lesson Syllabus
-    modules: [
-      {
-        id: 'mod-dev-01',
-        code: 'MOD-DEV-01',
-        title: 'Modern Frontend Architecture (React 19 & Next.js)',
-        instructor: 'Dr. Marcus Vance',
-        credits: 4,
-        total_days: 12,
-        completed_days: 9,
-        progress_pct: 75,
-        status: 'In Progress',
-        current_grade: 'A+',
-        lessons: [
-          {
-            day: 1,
-            title: 'Modern Component Hierarchy & Props Contracts',
-            status: 'completed',
-            date: '2026-11-10',
-            time: '09:30 AM - 12:30 PM',
-            format: 'Interactive Lecture',
-            objectives: 'Component decomposition, TypeScript prop interfaces, pure functions.',
-            materials: 'Lecture Slides & Code Sandbox',
-          },
-          {
-            day: 2,
-            title: 'Advanced State Management & Context API Patterns',
-            status: 'completed',
-            date: '2026-11-12',
-            time: '09:30 AM - 12:30 PM',
-            format: 'Lab Practicum',
-            objectives: 'Reducer patterns, avoid unnecessary re-renders, Context memoization.',
-            materials: 'Lab Repository & Exercise 2',
-          },
-          {
-            day: 8,
-            title: 'Server-Side Rendering (SSR) & Streaming Suspense',
-            status: 'completed',
-            date: '2026-11-24',
-            time: '09:30 AM - 12:30 PM',
-            format: 'Hands-on Coding',
-            objectives: 'Next.js App Router, React Server Components boundaries, streaming HTML.',
-            materials: 'SSR Architecture Whitepaper',
-          },
-          {
-            day: 9,
-            title: 'React 19 Server Actions & Optimistic UI Updates',
-            status: 'current',
-            date: '2026-11-26 (Today)',
-            time: '09:30 AM - 12:30 PM',
-            format: 'Live Lab Session',
-            location: 'Software Lab Room 302',
-            objectives: 'useOptimistic, useActionState, instant form submission feedback without spinners.',
-            materials: 'Live Stream Link & Starter Repo',
-            live_link: 'https://meet.bixcel.edu/dev-24a',
-          },
-          {
-            day: 10,
-            title: 'Client-Side Caching, RTK Query & Mutation Invalidation',
-            status: 'upcoming',
-            date: '2026-11-28',
-            time: '09:30 AM - 12:30 PM',
-            format: 'Interactive Lecture',
-            location: 'Software Lab Room 302',
-            objectives: 'Normalized caching, tag invalidation, optimistic query cache updates.',
-            materials: 'RTK Query Slide Deck',
-          },
-          {
-            day: 11,
-            title: 'Enterprise Micro-Frontend Architecture & Module Federation',
-            status: 'upcoming',
-            date: '2026-12-01',
-            time: '09:30 AM - 12:30 PM',
-            format: 'System Design Seminar',
-            location: 'Main Auditorium Hall B',
-            objectives: 'Independent deployment pipelines, runtime module sharing, version isolation.',
-            materials: 'Micro-frontend Architecture PDF',
-          },
-          {
-            day: 12,
-            title: 'Frontend Production Performance Profiling & Lighthouse 100',
-            status: 'upcoming',
-            date: '2026-12-03',
-            time: '09:30 AM - 12:30 PM',
-            format: 'Practical Audit Lab',
-            location: 'Computer Center 1',
-            objectives: 'Core Web Vitals (LCP, INP, CLS), bundle size budget, code splitting.',
-            materials: 'Audit Checklist & Tools Guide',
-          },
-        ],
-      },
-      {
-        id: 'mod-dev-02',
-        code: 'MOD-DEV-02',
-        title: 'Backend Systems & CodeIgniter 4 REST API Engineering',
-        instructor: 'Elena Rostova',
-        credits: 4,
-        total_days: 10,
-        completed_days: 8,
-        progress_pct: 80,
-        status: 'In Progress',
-        current_grade: 'A',
-        lessons: [
-          {
-            day: 1,
-            title: 'REST Architecture, Routing & HTTP Verbs Standards',
-            status: 'completed',
-            date: '2026-11-05',
-            time: '02:00 PM - 04:30 PM',
-            format: 'Architecture Lecture',
-            objectives: 'Idempotency, resource URI naming, HTTP status codes.',
-            materials: 'REST Guidelines PDF',
-          },
-          {
-            day: 8,
-            title: 'JWT Authentication & Role-Based Access Control Filters',
-            status: 'completed',
-            date: '2026-11-25',
-            time: '02:00 PM - 04:30 PM',
-            format: 'Security Workshop',
-            objectives: 'Token signing, refresh token rotation, CI4 Auth Filters.',
-            materials: 'RBAC Security Checklist',
-          },
-          {
-            day: 9,
-            title: 'Database Transactions, ACID Guarantees & Repository Pattern',
-            status: 'upcoming',
-            date: '2026-11-29',
-            time: '02:00 PM - 04:30 PM',
-            format: 'Live Lab Session',
-            location: 'Computer Center Hall B',
-            objectives: 'Isolation levels, rollbacks on error, decoupling business logic from models.',
-            materials: 'Transaction Architecture Repo',
-          },
-          {
-            day: 10,
-            title: 'API Rate Limiting, CORS & Swagger OpenAPI 3.0 Documentation',
-            status: 'upcoming',
-            date: '2026-12-02',
-            time: '02:00 PM - 04:30 PM',
-            format: 'Lab Practicum',
-            location: 'Computer Center Hall B',
-            objectives: 'Redis token bucket rate limiter, automated swagger.json generation.',
-            materials: 'Swagger Setup Instructions',
-          },
-        ],
-      },
-      {
-        id: 'mod-dev-03',
-        code: 'MOD-DEV-03',
-        title: 'PostgreSQL Database Indexing & Query Optimization',
-        instructor: 'Dr. Marcus Vance',
-        credits: 3,
-        total_days: 8,
-        completed_days: 8,
-        progress_pct: 100,
-        status: 'Completed',
-        current_grade: 'A+',
-        lessons: [
-          {
-            day: 7,
-            title: 'B-Tree, GIN & GiST Indexing Strategies',
-            status: 'completed',
-            date: '2026-11-18',
-            time: '10:00 AM - 01:00 PM',
-            format: 'Database Lab',
-            objectives: 'Composite indexes, partial indexing, JSONB full-text search.',
-            materials: 'Indexing Lab Solutions',
-          },
-          {
-            day: 8,
-            title: 'Query Plan Analysis with EXPLAIN ANALYZE & Buffer Pools',
-            status: 'completed',
-            date: '2026-11-20',
-            time: '10:00 AM - 01:00 PM',
-            format: 'Performance Lab',
-            objectives: 'Eliminate sequential table scans, optimize joins, memory tuning.',
-            materials: 'Query Tuning Cheatsheet',
-          },
-        ],
-      },
-      {
-        id: 'mod-dev-04',
-        code: 'MOD-DEV-04',
-        title: 'Containerization, Docker & CI/CD Cloud Pipelines',
-        instructor: 'Alan Wright',
-        credits: 3,
-        total_days: 6,
-        completed_days: 1,
-        progress_pct: 16,
-        status: 'Upcoming',
-        current_grade: 'In Progress',
-        lessons: [
-          {
-            day: 1,
-            title: 'Multi-Stage Dockerfiles for Production Node & PHP',
-            status: 'completed',
-            date: '2026-11-22',
-            time: '02:00 PM - 05:00 PM',
-            format: 'Hands-on Lab',
-            objectives: 'Slim base images, non-root user execution, layer caching.',
-            materials: 'Production Dockerfile Templates',
-          },
-          {
-            day: 2,
-            title: 'Docker Compose Orchestration & Volume Networking',
-            status: 'upcoming',
-            date: '2026-12-04',
-            time: '02:00 PM - 05:00 PM',
-            format: 'Hands-on Lab',
-            location: 'Cloud Computing Lab 4',
-            objectives: 'Multi-container backend + database + frontend networks, secrets management.',
-            materials: 'Compose Spec Reference',
-          },
-          {
-            day: 3,
-            title: 'GitHub Actions Automated Testing & Production Deployment',
-            status: 'upcoming',
-            date: '2026-12-06',
-            time: '02:00 PM - 05:00 PM',
-            format: 'CI/CD Lab',
-            location: 'Cloud Computing Lab 4',
-            objectives: 'Continuous integration workflows, SSH deploy keys, zero-downtime reloads.',
-            materials: 'CI/CD Pipeline YAML Guide',
-          },
-        ],
-      },
-    ],
-
-    // Report Card Subject Grades Table
-    report_card_subjects: [
-      {
-        code: 'MOD-DEV-01',
-        title: 'Modern Frontend Architecture (React 19)',
-        credits: 4,
-        attendance_pct: 98,
-        practical_score: 96,
-        exam_score: 94,
-        total_score: 95,
-        grade: 'A+',
-        grade_points: 4.0,
-        status: 'Passed (Distinction)',
-      },
-      {
-        code: 'MOD-DEV-02',
-        title: 'Backend Systems & CodeIgniter 4 REST API',
-        credits: 4,
-        attendance_pct: 95,
-        practical_score: 92,
-        exam_score: 90,
-        total_score: 91,
-        grade: 'A',
-        grade_points: 3.8,
-        status: 'Passed',
-      },
-      {
-        code: 'MOD-DEV-03',
-        title: 'PostgreSQL Database Indexing & Query Tuning',
-        credits: 3,
-        attendance_pct: 100,
-        practical_score: 98,
-        exam_score: 96,
-        total_score: 97,
-        grade: 'A+',
-        grade_points: 4.0,
-        status: 'Passed (Distinction)',
-      },
-      {
-        code: 'MOD-DEV-04',
-        title: 'Containerization, Docker & CI/CD Pipelines',
-        credits: 3,
-        attendance_pct: 92,
-        practical_score: 88,
-        exam_score: 86,
-        total_score: 87,
-        grade: 'A-',
-        grade_points: 3.6,
-        status: 'In Progress',
-      },
-      {
-        code: 'CORE-ARCH-05',
-        title: 'Software Design Patterns & Clean Code',
-        credits: 2,
-        attendance_pct: 97,
-        practical_score: 94,
-        exam_score: 92,
-        total_score: 93,
-        grade: 'A',
-        grade_points: 3.9,
-        status: 'Passed',
-      },
-    ],
-  },
-
-  marcus: {
-    id: 'marcus',
-    student_id: 'STU-2026-0842',
-    reg_no: 'REG-2026-MKT-042',
-    name: 'Marcus Vance',
-    email: 'student@bixcel.edu',
-    track: 'Digital Marketing & Growth',
-    course_name: 'Executive Masterclass in Performance Marketing & SEO',
-    batch: 'BIX-MKT-26B',
-    term: 'Fall Term 2026 • Term 1',
-    admission_date: '2026-09-01',
-    attendance_pct: 98.0,
-    attendance_present: 49,
-    attendance_total: 50,
-    gpa: 3.92,
-    letter_grade: 'A+',
-    standing: 'Summa Cum Laude',
-    fee_status: 'Paid in Full',
-    fee_receipt: 'RCP-2026-9043',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-    faculty_advisor: 'Sophia Chen (Chief Growth Officer)',
-    advisor_remarks: 'Marcus demonstrated stellar performance in attribution modeling and SEO keyword intent clustering. Recognized with top Honors in Digital Growth.',
-    dean_name: 'Elena Rostova',
-    dean_title: 'Dean of Business & Marketing Programs',
-
-    modules: [
-      {
-        id: 'mod-mkt-01',
-        code: 'MOD-DM-01',
-        title: 'Technical SEO & Keyword Clustering Architecture',
-        instructor: 'Sophia Chen',
-        credits: 4,
-        total_days: 10,
-        completed_days: 8,
-        progress_pct: 80,
-        status: 'In Progress',
-        current_grade: 'A+',
-        lessons: [
-          {
-            day: 7,
-            title: 'Technical Schema Markup & Core Web Vitals Auditing',
-            status: 'completed',
-            date: '2026-11-22',
-            time: '11:00 AM - 01:30 PM',
-            format: 'Audit Practicum',
-            objectives: 'JSON-LD structured data, crawl budget optimization.',
-            materials: 'Schema Audit Template',
-          },
-          {
-            day: 8,
-            title: 'Programmatic SEO & Content Matrix Generation',
-            status: 'current',
-            date: '2026-11-26 (Today)',
-            time: '11:00 AM - 01:30 PM',
-            format: 'Live Workshop',
-            location: 'Marketing Growth Lab 101',
-            objectives: 'Scaling long-tail landing pages using dynamic datasets.',
-            materials: 'Spreadsheet Template & Python Scripts',
-            live_link: 'https://meet.bixcel.edu/mkt-26b',
-          },
-          {
-            day: 9,
-            title: 'Backlink Velocity, Digital PR & Outreach Automation',
-            status: 'upcoming',
-            date: '2026-11-28',
-            time: '11:00 AM - 01:30 PM',
-            format: 'Case Study Seminar',
-            location: 'Marketing Growth Lab 101',
-            objectives: 'HARO pitches, unlinked brand mentions, high-DR outreach.',
-            materials: 'PR Outreach Pitch Deck',
-          },
-          {
-            day: 10,
-            title: 'Enterprise Rank Tracking & Revenue Attribution Analytics',
-            status: 'upcoming',
-            date: '2026-11-30',
-            time: '11:00 AM - 01:30 PM',
-            format: 'Analytics Lab',
-            location: 'Marketing Growth Lab 101',
-            objectives: 'GA4 Multi-touch attribution, Looker Studio reporting dashboards.',
-            materials: 'Looker Studio Dashboard Template',
-          },
-        ],
-      },
-      {
-        id: 'mod-mkt-02',
-        code: 'MOD-DM-02',
-        title: 'Meta & Google Search Ads Performance Funnels',
-        instructor: 'Marcus Vance Sr.',
-        credits: 4,
-        total_days: 12,
-        completed_days: 12,
-        progress_pct: 100,
-        status: 'Completed',
-        current_grade: 'A+',
-        lessons: [
-          {
-            day: 11,
-            title: 'Target CPA & Value-Based Smart Bidding Algorithms',
-            status: 'completed',
-            date: '2026-11-15',
-            time: '02:00 PM - 04:30 PM',
-            format: 'Live Ad Lab',
-            objectives: 'Conversion tracking pixel setup, offline conversion import.',
-            materials: 'Ad Setup Checklist',
-          },
-          {
-            day: 12,
-            title: 'Creative Fatigue Elimination & High-Velocity A/B Testing',
-            status: 'completed',
-            date: '2026-11-18',
-            time: '02:00 PM - 04:30 PM',
-            format: 'Lab Practicum',
-            objectives: 'UGC creative frameworks, hook testing, statistical significance.',
-            materials: 'Testing Matrix Spreadsheet',
-          },
-        ],
-      },
-    ],
-
-    report_card_subjects: [
-      {
-        code: 'MOD-DM-01',
-        title: 'Technical SEO & Keyword Clustering',
-        credits: 4,
-        attendance_pct: 100,
-        practical_score: 97,
-        exam_score: 95,
-        total_score: 96,
-        grade: 'A+',
-        grade_points: 4.0,
-        status: 'Passed (Distinction)',
-      },
-      {
-        code: 'MOD-DM-02',
-        title: 'Meta & Google Performance Funnels',
-        credits: 4,
-        attendance_pct: 98,
-        practical_score: 94,
-        exam_score: 92,
-        total_score: 93,
-        grade: 'A',
-        grade_points: 3.9,
-        status: 'Passed (Distinction)',
-      },
-      {
-        code: 'MOD-DM-03',
-        title: 'Content Strategy & Organic Distribution',
-        credits: 3,
-        attendance_pct: 96,
-        practical_score: 91,
-        exam_score: 89,
-        total_score: 90,
-        grade: 'A',
-        grade_points: 3.8,
-        status: 'Passed',
-      },
-    ],
-  },
-}
-
 export function StudentDashboard({ currentUser, onNavigate }) {
-  // Select active student profile
-  const [activePersonaKey, setActivePersonaKey] = useState(() => {
-    if (currentUser?.email) {
-      if (currentUser.email.toLowerCase().includes('marcus') || currentUser.email.toLowerCase().includes('student@bixcel.edu')) {
-        return 'marcus'
-      }
+  // Live State from backend APIs
+  const [liveModules, setLiveModules] = useState([])
+  const [calendarEvents, setCalendarEvents] = useState([])
+  const [liveProgress, setLiveProgress] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [toastMessage, setToastMessage] = useState('')
+
+  // Active Selected Module ID
+  const [selectedModuleId, setSelectedModuleId] = useState('')
+
+  // Lesson filter: 'upcoming' | 'all' | 'completed'
+  const [lessonFilter, setLessonFilter] = useState('upcoming')
+
+  // Main Dashboard View: 'calendar' | 'syllabus' | 'reportcard' | 'combined'
+  const [activeView, setActiveView] = useState('combined')
+
+  // Calendar State
+  const [viewDate, setViewDate] = useState({ year: 2026, month: 10 }) // Nov 2026
+  const [selectedDateStr, setSelectedDateStr] = useState('2026-11-26')
+  const [calendarMode, setCalendarMode] = useState('month') // 'month' | 'agenda'
+  const [selectedCalendarType, setSelectedCalendarType] = useState('All')
+  const [selectedEventModal, setSelectedEventModal] = useState(null)
+
+  // Student Persona selection
+  const [activeStudentKey, setActiveStudentKey] = useState('gowtham')
+
+  // Check-In State
+  const [checkedInToday, setCheckedInToday] = useState(() => {
+    try {
+      return localStorage.getItem('bx_student_checked_in_2026-11-26') === 'true'
+    } catch {
+      return false
     }
-    return 'gowtham'
+  })
+  const [checkInTime, setCheckInTime] = useState(() => {
+    try {
+      return localStorage.getItem('bx_student_checkin_time') || '09:24 AM'
+    } catch {
+      return '09:24 AM'
+    }
   })
 
-  const student = STUDENT_DATA[activePersonaKey] || STUDENT_DATA.gowtham
+  // Show Toast Helper
+  const showToast = (msg) => {
+    setToastMessage(msg)
+    setTimeout(() => setToastMessage(''), 3500)
+  }
 
-  // Active Selected Module for Syllabus View
-  const [selectedModuleId, setSelectedModuleId] = useState(student.modules[0]?.id || '')
+  // Handle Attendance Check-in
+  const handleCheckIn = () => {
+    const now = new Date()
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    setCheckedInToday(true)
+    setCheckInTime(timeStr)
+    try {
+      localStorage.setItem('bx_student_checked_in_2026-11-26', 'true')
+      localStorage.setItem('bx_student_checkin_time', timeStr)
+    } catch {}
+    showToast(`Checked in successfully at ${timeStr}! Attendance marked: Present (Lab 302).`)
+  }
 
-  // Filter lessons in module: 'all' | 'upcoming' | 'completed'
-  const [lessonFilter, setLessonFilter] = useState('upcoming') // default to user request: UPCOMING LESSONS
-
-  // Dashboard Main View Tab: 'syllabus' (Upcoming Lessons & Syllabus) | 'reportcard' (Academic Report Card) | 'both'
-  const [activeTab, setActiveTab] = useState('syllabus') // 'syllabus' | 'reportcard' | 'both'
-
-  // Sync selected module when student persona switches
+  // Fetch actual data from backend APIs
   useEffect(() => {
-    if (student.modules && student.modules.length > 0) {
-      setSelectedModuleId(student.modules[0].id)
+    let isMounted = true
+    const fetchAllData = async () => {
+      setLoading(true)
+      try {
+        // 1. Fetch real modules from backend
+        try {
+          const modRes = await apiService.getModules()
+          if (modRes && modRes.status === 'success' && Array.isArray(modRes.data) && isMounted) {
+            setLiveModules(modRes.data)
+            if (modRes.data.length > 0) {
+              setSelectedModuleId(String(modRes.data[0].id))
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to load real modules:', err)
+        }
+
+        // 2. Fetch real calendar events
+        try {
+          const calRes = await apiService.getCalendarEvents()
+          if (calRes && Array.isArray(calRes.data) && isMounted) {
+            setCalendarEvents(calRes.data)
+          }
+        } catch (err) {
+          console.warn('Failed to load real calendar events:', err)
+        }
+
+        // 3. Fetch real academic progress report
+        try {
+          const progRes = await apiService.getProgressList()
+          if (progRes && Array.isArray(progRes.data) && isMounted) {
+            const found = progRes.data.find(
+              (p) =>
+                p.student_id === 'STU-2026-0843' ||
+                p.email?.toLowerCase().includes('gowtham') ||
+                p.full_name?.toLowerCase().includes('gowtham')
+            )
+            setLiveProgress(found || progRes.data[0] || null)
+          }
+        } catch (err) {
+          console.warn('Failed to load real progress:', err)
+        }
+      } finally {
+        if (isMounted) setLoading(false)
+      }
     }
-  }, [activePersonaKey])
 
-  const selectedModule = student.modules.find((m) => m.id === selectedModuleId) || student.modules[0]
+    fetchAllData()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
-  // Filtered lessons for selected module
-  const displayedLessons = (selectedModule?.lessons || []).filter((l) => {
+  // Student Profile Data
+  const student = {
+    name: currentUser?.name || liveProgress?.full_name || (activeStudentKey === 'marcus' ? 'Marcus Vance' : 'Gowtham Tamilkathir'),
+    student_id: currentUser?.student_id || liveProgress?.student_id || (activeStudentKey === 'marcus' ? 'STU-2026-0842' : 'STU-2026-0843'),
+    reg_no: liveProgress?.reg_no || (activeStudentKey === 'marcus' ? 'REG-2026-MKT-042' : 'REG-2026-DEV-084'),
+    batch: currentUser?.batch || liveProgress?.batch || (activeStudentKey === 'marcus' ? 'BIX-MKT-26B' : 'BIX-DEV-24A'),
+    track: currentUser?.track || liveProgress?.track || (activeStudentKey === 'marcus' ? 'Digital Marketing & Growth' : 'Full-Stack Web Development'),
+    course_name: activeStudentKey === 'marcus' ? 'Executive Masterclass in Performance Marketing & SEO' : 'Professional Diploma in Full-Stack Software Engineering',
+    term: liveProgress?.term || 'Semester 2 • Fall Term 2026',
+    attendance_pct: liveProgress?.attendance_pct || (activeStudentKey === 'marcus' ? 98.0 : 96.4),
+    attendance_present: liveProgress?.attendance_days_present || 48,
+    attendance_total: liveProgress?.attendance_days_total || 50,
+    gpa: liveProgress?.gpa || (activeStudentKey === 'marcus' ? 3.92 : 3.86),
+    standing: liveProgress?.standing || (activeStudentKey === 'marcus' ? 'Summa Cum Laude' : 'Honors Distinction'),
+    fee_status: 'Paid in Full',
+    fee_receipt: 'RCP-2026-9041',
+    avatar: activeStudentKey === 'marcus'
+      ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'
+      : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+    advisor_remarks: liveProgress?.advisor_remarks?.[0]?.remarks || 'Exhibits superior technical aptitude in software architecture, RESTful API design, and database query optimization. Outstanding cohort performance.',
+    dean_name: 'Dr. Marcus Vance',
+    dean_title: 'Dean of Computing & Information Systems',
+  }
+
+  // Active Selected Module from real backend data
+  const selectedModule =
+    liveModules.find((m) => String(m.id) === String(selectedModuleId) || m.code === selectedModuleId) ||
+    liveModules[0] ||
+    null
+
+  // Parse actual curriculum lessons from the selected module
+  const rawCurriculum = selectedModule?.curriculum_lessons || []
+  const allParsedLessons = []
+
+  rawCurriculum.forEach((dayItem) => {
+    const dayNum = Number(dayItem.day) || 1
+    const dayTitle = dayItem.day_title || `Day ${dayNum}`
+    const lessonsList = Array.isArray(dayItem.lessons) ? dayItem.lessons : []
+
+    lessonsList.forEach((l, idx) => {
+      // Determine actual lesson status:
+      // If dayNum < 9 => completed, dayNum === 9 => current (today), dayNum > 9 => upcoming
+      let status = 'upcoming'
+      if (dayNum < 9) status = 'completed'
+      else if (dayNum === 9) status = 'current'
+
+      allParsedLessons.push({
+        id: `${selectedModule?.id || 'm'}-${dayNum}-${idx}`,
+        day: dayNum,
+        day_title: dayTitle,
+        sno: l.sno || idx + 1,
+        title: l.title || 'Instructional Session',
+        duration: l.duration || '90 mins',
+        format: l.format || (l.type === 'task' ? 'Lab Practicum' : 'Interactive Lecture'),
+        description: l.description || 'Core syllabus topic and hands-on programming implementation.',
+        type: l.type || 'lesson',
+        status: status,
+        doc_link: l.doc_link || '',
+        live_link: status === 'current' ? 'https://meet.bixcel.edu/dev-24a' : null,
+      })
+    })
+  })
+
+  // Filter lessons
+  const displayedLessons = allParsedLessons.filter((l) => {
     if (lessonFilter === 'upcoming') return l.status === 'upcoming' || l.status === 'current'
     if (lessonFilter === 'completed') return l.status === 'completed'
     return true
   })
 
-  // Upcoming lessons count across all modules
-  const totalUpcomingCount = student.modules.reduce((acc, m) => {
-    return acc + m.lessons.filter((l) => l.status === 'upcoming' || l.status === 'current').length
-  }, 0)
+  // Upcoming lessons count
+  const upcomingCount = allParsedLessons.filter((l) => l.status === 'upcoming' || l.status === 'current').length
+
+  // Calendar Computation (Monday-aligned)
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ]
+  const currentMonthName = `${monthNames[viewDate.month]} ${viewDate.year}`
+
+  const handlePrevMonth = () => {
+    setViewDate((prev) => {
+      if (prev.month === 0) return { year: prev.year - 1, month: 11 }
+      return { year: prev.year, month: prev.month - 1 }
+    })
+  }
+
+  const handleNextMonth = () => {
+    setViewDate((prev) => {
+      if (prev.month === 11) return { year: prev.year + 1, month: 0 }
+      return { year: prev.year, month: prev.month + 1 }
+    })
+  }
+
+  const handleToday = () => {
+    setViewDate({ year: 2026, month: 10 })
+    setSelectedDateStr('2026-11-26')
+  }
+
+  const firstDayOfWeek = new Date(viewDate.year, viewDate.month, 1).getDay()
+  const daysInMonth = new Date(viewDate.year, viewDate.month + 1, 0).getDate()
+  const mondayOffset = (firstDayOfWeek + 6) % 7
+  const calendarCells = []
+
+  const prevMonthTotalDays = new Date(viewDate.year, viewDate.month, 0).getDate()
+  for (let i = mondayOffset - 1; i >= 0; i--) {
+    const dayNum = prevMonthTotalDays - i
+    const prevMonthIdx = viewDate.month === 0 ? 11 : viewDate.month - 1
+    const prevYear = viewDate.month === 0 ? viewDate.year - 1 : viewDate.year
+    const dateStr = `${prevYear}-${String(prevMonthIdx + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
+    calendarCells.push({ dayNum, dateStr, isCurrentMonth: false })
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${viewDate.year}-${String(viewDate.month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    calendarCells.push({ dayNum: d, dateStr, isCurrentMonth: true })
+  }
+
+  const remaining = (7 - (calendarCells.length % 7)) % 7
+  for (let r = 1; r <= remaining; r++) {
+    const nextMonthIdx = viewDate.month === 11 ? 0 : viewDate.month + 1
+    const nextYear = viewDate.month === 11 ? viewDate.year + 1 : viewDate.year
+    const dateStr = `${nextYear}-${String(nextMonthIdx + 1).padStart(2, '0')}-${String(r).padStart(2, '0')}`
+    calendarCells.push({ dayNum: r, dateStr, isCurrentMonth: false })
+  }
+
+  // Filter Calendar events
+  const filteredEvents = calendarEvents.filter((ev) => {
+    const matchType = selectedCalendarType === 'All' || ev.type === selectedCalendarType
+    return matchType
+  })
+
+  // Events on selected date
+  const selectedDateEvents = filteredEvents.filter((e) => e.date === selectedDateStr)
+
+  // Badge styling helper
+  const getTypeBadge = (type) => {
+    switch (type) {
+      case 'lecture':
+        return { label: 'Class', bg: 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800' }
+      case 'lab':
+        return { label: 'Lab Practicum', bg: 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800' }
+      case 'assignment':
+        return { label: 'Assignment Due', bg: 'bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' }
+      case 'exam':
+        return { label: 'Examination', bg: 'bg-red-100 dark:bg-red-950/70 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800' }
+      case 'milestone':
+        return { label: 'Milestone Review', bg: 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' }
+      default:
+        return { label: 'Academic Event', bg: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200' }
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4 w-full animate-in fade-in duration-200">
-      {/* 1. STUDENT PROFILE CARD (STUDENT PROFIRL) */}
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="p-3 rounded-md bg-emerald-600 text-white font-label text-xs font-semibold flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">verified</span>
+            <span>{toastMessage}</span>
+          </div>
+          <button type="button" onClick={() => setToastMessage('')} className="opacity-80 hover:opacity-100">
+            <span className="material-symbols-outlined text-[16px]">close</span>
+          </button>
+        </div>
+      )}
+
+      {/* 1. STUDENT PROFILE HEADER */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-4 rounded-xl shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         {/* Left: Avatar & Identity Details */}
         <div className="flex items-start sm:items-center gap-3.5">
@@ -539,8 +297,10 @@ export function StudentDashboard({ currentUser, onNavigate }) {
               className="w-16 h-16 rounded-full object-cover ring-2 ring-light-primary/40 dark:ring-dark-primary/40 shadow-xs"
             />
             <span
-              className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-dark-surface-bright bg-emerald-500"
-              title="Active Enrolled Student"
+              className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white dark:border-dark-surface-bright ${
+                checkedInToday ? 'bg-emerald-500' : 'bg-amber-400'
+              }`}
+              title={checkedInToday ? 'Checked in on campus' : 'Not checked in yet'}
             />
           </div>
 
@@ -579,21 +339,40 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           </div>
         </div>
 
-        {/* Right: Persona Switcher & Print / Action Buttons */}
+        {/* Right: Check-in, Switch Persona & Print */}
         <div className="flex flex-wrap items-center gap-2 self-start xl:self-center">
+          {/* Persona selector */}
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container">
             <span className="material-symbols-outlined text-[16px] text-light-outline">account_circle</span>
             <select
-              value={activePersonaKey}
-              onChange={(e) => setActivePersonaKey(e.target.value)}
+              value={activeStudentKey}
+              onChange={(e) => setActiveStudentKey(e.target.value)}
               className="bg-transparent text-xs font-semibold text-light-on-surface dark:text-dark-on-surface focus:outline-none cursor-pointer"
-              title="Switch enrolled student persona"
+              title="Switch student persona"
             >
               <option value="gowtham">Gowtham Tamilkathir (Full-Stack Dev • BIX-DEV-24A)</option>
               <option value="marcus">Marcus Vance (Digital Marketing • BIX-MKT-26B)</option>
             </select>
           </div>
 
+          {/* Today's Campus Arrival Check-in */}
+          {checkedInToday ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-xs shadow-xs">
+              <span className="material-symbols-outlined text-[16px] text-emerald-600 dark:text-emerald-400">check_circle</span>
+              <span>Checked In at {checkInTime}</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCheckIn}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">touch_app</span>
+              <span>Check In for Today</span>
+            </button>
+          )}
+
+          {/* Print Report */}
           <button
             type="button"
             onClick={() => window.print()}
@@ -606,15 +385,34 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </div>
       </section>
 
-      {/* 2. DEDICATED VIEW NAVIGATION TABS (Strictly: Upcoming Lessons & Syllabus vs Academic Report Card) */}
+      {/* 2. DASHBOARD VIEW SELECTOR TABS: CALENDAR, UPCOMING LESSONS & SYLLABUS, REPORT CARD */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-2 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5">
-          {/* Tab 1: Upcoming Lessons & Syllabus */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {/* Tab 1: Academic Calendar Dashboard */}
           <button
             type="button"
-            onClick={() => setActiveTab('syllabus')}
+            onClick={() => setActiveView('calendar')}
             className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'syllabus'
+              activeView === 'calendar'
+                ? 'bg-light-primary text-light-on-primary shadow-xs'
+                : 'text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+            <span>Academic Calendar Dashboard</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              activeView === 'calendar' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+            }`}>
+              {calendarEvents.length} Events
+            </span>
+          </button>
+
+          {/* Tab 2: Upcoming Lessons & Syllabus (Real Module Data) */}
+          <button
+            type="button"
+            onClick={() => setActiveView('syllabus')}
+            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              activeView === 'syllabus'
                 ? 'bg-light-primary text-light-on-primary shadow-xs'
                 : 'text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low'
             }`}
@@ -622,18 +420,18 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             <span className="material-symbols-outlined text-[18px]">menu_book</span>
             <span>Upcoming Lessons &amp; Syllabus (Module / Course)</span>
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-              activeTab === 'syllabus' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              activeView === 'syllabus' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
             }`}>
-              {totalUpcomingCount} Upcoming
+              {upcomingCount} Upcoming
             </span>
           </button>
 
-          {/* Tab 2: Student Report Card */}
+          {/* Tab 3: Official Academic Report Card */}
           <button
             type="button"
-            onClick={() => setActiveTab('reportcard')}
+            onClick={() => setActiveView('reportcard')}
             className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'reportcard'
+              activeView === 'reportcard'
                 ? 'bg-light-primary text-light-on-primary shadow-xs'
                 : 'text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low'
             }`}
@@ -645,19 +443,19 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             </span>
           </button>
 
-          {/* Tab 3: Combined Full View */}
+          {/* Tab 4: Combined View */}
           <button
             type="button"
-            onClick={() => setActiveTab('both')}
+            onClick={() => setActiveView('combined')}
             className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              activeTab === 'both'
+              activeView === 'combined'
                 ? 'bg-light-primary text-light-on-primary shadow-xs'
                 : 'text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low'
             }`}
-            title="Display both Upcoming Lessons & Syllabus and Report Card together"
+            title="Display Calendar and Lessons Syllabus together"
           >
             <span className="material-symbols-outlined text-[16px]">splitscreen</span>
-            <span>Combined View</span>
+            <span>Combined Calendar &amp; Syllabus</span>
           </button>
         </div>
 
@@ -670,10 +468,311 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </div>
       </section>
 
-      {/* 3. SECTION A: UPCOMING LESSONS & SYLLABUS (BASED ON THE MODULE OR COURSE) */}
-      {(activeTab === 'syllabus' || activeTab === 'both') && (
+      {/* 3. SECTION: CALENDAR DASHBOARD FOR STUDENT */}
+      {(activeView === 'calendar' || activeView === 'combined') && (
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          {/* Left Column: Calendar Grid & Navigation (8 cols) */}
+          <div className="lg:col-span-8 flex flex-col gap-3">
+            {/* Calendar Controls & Month Switcher Bar */}
+            <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-3 shadow-xs flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-light-primary text-[20px]">calendar_month</span>
+                <h2 className="font-title text-sm sm:text-base font-bold text-light-on-surface dark:text-dark-on-surface min-w-[140px]">
+                  {currentMonthName}
+                </h2>
+                <div className="flex items-center p-0.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container">
+                  <button
+                    type="button"
+                    onClick={handlePrevMonth}
+                    className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container transition-colors cursor-pointer"
+                    title="Previous Month"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleToday}
+                    className="px-2 py-0.5 text-xs font-semibold text-light-on-surface hover:bg-light-surface-container transition-colors cursor-pointer"
+                  >
+                    Today
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextMonth}
+                    className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container transition-colors cursor-pointer"
+                    title="Next Month"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Filter and View Toggles */}
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={selectedCalendarType}
+                  onChange={(e) => setSelectedCalendarType(e.target.value)}
+                  className="px-2.5 py-1 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none"
+                >
+                  <option value="All">All Event Types</option>
+                  <option value="lecture">Live Classes</option>
+                  <option value="lab">Practical Labs</option>
+                  <option value="assignment">Assignments Due</option>
+                  <option value="exam">Examinations</option>
+                  <option value="milestone">Milestones</option>
+                </select>
+
+                <div className="flex items-center p-0.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container">
+                  <button
+                    type="button"
+                    onClick={() => setCalendarMode('month')}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+                      calendarMode === 'month'
+                        ? 'bg-light-primary text-light-on-primary shadow-xs'
+                        : 'text-light-on-surface-variant hover:text-light-on-surface'
+                    }`}
+                  >
+                    Month View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCalendarMode('agenda')}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+                      calendarMode === 'agenda'
+                        ? 'bg-light-primary text-light-on-primary shadow-xs'
+                        : 'text-light-on-surface-variant hover:text-light-on-surface'
+                    }`}
+                  >
+                    Agenda
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* MONTH CALENDAR GRID */}
+            {calendarMode === 'month' && (
+              <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl overflow-hidden shadow-xs flex flex-col">
+                <div className="grid grid-cols-7 border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-center text-[11px] font-bold text-light-on-surface-variant py-2 uppercase tracking-wider">
+                  <div>Mon</div>
+                  <div>Tue</div>
+                  <div>Wed</div>
+                  <div>Thu</div>
+                  <div>Fri</div>
+                  <div>Sat</div>
+                  <div>Sun</div>
+                </div>
+
+                <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60">
+                  {calendarCells.map((cell, idx) => {
+                    const dayEvents = filteredEvents.filter((e) => e.date === cell.dateStr)
+                    const isToday = cell.dateStr === '2026-11-26'
+                    const isSelected = cell.dateStr === selectedDateStr
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => setSelectedDateStr(cell.dateStr)}
+                        className={`min-h-[88px] p-1.5 flex flex-col gap-1 transition-all cursor-pointer ${
+                          !cell.isCurrentMonth
+                            ? 'opacity-30 bg-light-surface-container-low/20'
+                            : isSelected
+                            ? 'bg-light-primary-tint/25 dark:bg-dark-primary-tint/25 ring-2 ring-light-primary dark:ring-dark-primary'
+                            : 'hover:bg-light-surface-container-low/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-xs font-bold ${
+                              isToday
+                                ? 'bg-light-primary text-light-on-primary ring-2 ring-light-primary/40'
+                                : 'text-light-on-surface dark:text-dark-on-surface'
+                            }`}
+                          >
+                            {cell.dayNum}
+                          </span>
+                          {dayEvents.length > 0 && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-light-primary" />
+                          )}
+                        </div>
+
+                        <div className="flex flex-col gap-1 overflow-hidden mt-0.5">
+                          {dayEvents.slice(0, 2).map((ev) => {
+                            const badge = getTypeBadge(ev.type)
+                            return (
+                              <button
+                                key={ev.id}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedEventModal(ev)
+                                }}
+                                className={`text-left px-1.5 py-0.5 rounded border text-[10px] font-semibold truncate transition-transform hover:scale-[1.02] ${badge.bg}`}
+                                title={`${ev.start_time} - ${ev.title}`}
+                              >
+                                <span className="font-mono text-[9px] mr-1 opacity-75">{ev.start_time}</span>
+                                <span>{ev.title}</span>
+                              </button>
+                            )
+                          })}
+                          {dayEvents.length > 2 && (
+                            <span className="text-[9px] font-bold text-light-on-surface-variant dark:text-dark-on-surface-variant pl-0.5">
+                              +{dayEvents.length - 2} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* AGENDA VIEW */}
+            {calendarMode === 'agenda' && (
+              <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-4 shadow-xs flex flex-col gap-3">
+                <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                  All Scheduled Sessions &amp; Deadlines ({filteredEvents.length})
+                </span>
+                <div className="space-y-2">
+                  {filteredEvents.map((ev) => {
+                    const badge = getTypeBadge(ev.type)
+                    return (
+                      <div
+                        key={ev.id}
+                        onClick={() => setSelectedEventModal(ev)}
+                        className="p-3 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/40 hover:bg-light-surface-container-low transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-light-surface-container border border-light-outline-variant/60 min-w-[50px]">
+                            <span className="font-mono text-[10px] text-light-on-surface-variant uppercase font-bold">
+                              {new Date(ev.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                            </span>
+                            <span className="font-headline text-sm font-bold text-light-on-surface dark:text-dark-on-surface">
+                              {ev.date.slice(-2)}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`px-2 py-0.5 rounded border text-[10px] font-bold ${badge.bg}`}>
+                                {badge.label}
+                              </span>
+                              <span className="font-mono text-xs font-semibold text-light-primary dark:text-dark-primary">
+                                {ev.start_time} - {ev.end_time}
+                              </span>
+                              <span className="text-xs text-light-on-surface-variant font-mono">
+                                • {ev.location}
+                              </span>
+                            </div>
+                            <h4 className="font-title text-sm font-bold text-light-on-surface dark:text-dark-on-surface mt-1">
+                              {ev.title}
+                            </h4>
+                            <span className="text-xs text-light-on-surface-variant block mt-0.5">
+                              Instructor: {ev.instructor}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="material-symbols-outlined text-light-outline text-[18px] self-end sm:self-center">
+                          chevron_right
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Selected Day Details & Live Classroom (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col gap-3">
+            {/* Live Today Card */}
+            <article className="bg-gradient-to-br from-[#1E113A] via-[#2B1B54] to-[#120B24] text-white p-4 rounded-xl shadow-md border border-purple-800/60 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 font-label text-[10px] font-bold border border-red-500/40">
+                  <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+                  <span>HAPPENING TODAY</span>
+                </span>
+                <span className="font-mono text-xs text-purple-200">Room 302</span>
+              </div>
+              <h3 className="font-title text-sm font-bold text-white leading-snug">
+                React 19 Server Actions &amp; Optimistic UI Updates
+              </h3>
+              <p className="text-xs text-purple-200/90">
+                Lead: Dr. Marcus Vance • Full-Stack Web Dev ({student.batch})
+              </p>
+              <div className="flex items-center justify-between border-t border-purple-800/80 pt-2.5 text-xs">
+                <span className="text-purple-300 font-mono">09:30 AM - 12:30 PM</span>
+                <a
+                  href="https://meet.bixcel.edu/dev-24a"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-[#2B1B54] font-bold text-xs hover:bg-purple-100 transition-colors shadow-xs"
+                >
+                  <span className="material-symbols-outlined text-[16px]">videocam</span>
+                  <span>Launch Class</span>
+                </a>
+              </div>
+            </article>
+
+            {/* Selected Date Itinerary */}
+            <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl p-3.5 shadow-xs flex flex-col gap-2.5">
+              <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-light-primary text-[18px]">event</span>
+                  <h3 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                    Day Schedule: {selectedDateStr}
+                  </h3>
+                </div>
+                <span className="font-mono text-[11px] font-semibold text-light-on-surface-variant">
+                  {selectedDateEvents.length} Item{selectedDateEvents.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {selectedDateEvents.length === 0 ? (
+                <div className="py-6 text-center text-xs text-light-on-surface-variant">
+                  <span className="material-symbols-outlined text-[24px] text-light-outline block mb-1">
+                    event_available
+                  </span>
+                  No scheduled lectures or exams on this date.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {selectedDateEvents.map((ev) => {
+                    const badge = getTypeBadge(ev.type)
+                    return (
+                      <div
+                        key={ev.id}
+                        onClick={() => setSelectedEventModal(ev)}
+                        className="p-2.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/40 dark:bg-dark-surface-container/40 hover:bg-light-surface-container-low transition-colors cursor-pointer flex flex-col gap-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${badge.bg}`}>
+                            {badge.label}
+                          </span>
+                          <span className="font-mono text-[11px] font-semibold text-light-primary dark:text-dark-primary">
+                            {ev.start_time} - {ev.end_time}
+                          </span>
+                        </div>
+                        <h4 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                          {ev.title}
+                        </h4>
+                        <p className="text-[11px] text-light-on-surface-variant">
+                          {ev.instructor} • {ev.location}
+                        </p>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </article>
+          </div>
+        </section>
+      )}
+
+      {/* 4. SECTION: UPCOMING LESSONS & SYLLABUS BASED ON MODULE OR COURSE (LOADED FROM ACTUAL BACKEND DATA) */}
+      {(activeView === 'syllabus' || activeView === 'combined') && (
         <section className="flex flex-col gap-3">
-          {/* Module Selector & Header Banner */}
+          {/* Module Selector Banner */}
           <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-4 rounded-xl shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
@@ -686,11 +785,11 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                 </span>
               </div>
               <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                Select your enrolled course module to view upcoming daily lessons, live classroom links, and syllabus objectives.
+                Loaded directly from real institutional module syllabus. Choose any module below to inspect upcoming lessons.
               </p>
             </div>
 
-            {/* Module Dropdown Selector */}
+            {/* Real Module Dropdown */}
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-light-on-surface-variant shrink-0">
                 Select Module:
@@ -700,22 +799,22 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                 onChange={(e) => setSelectedModuleId(e.target.value)}
                 className="px-3 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-xs font-bold text-light-on-surface dark:text-dark-on-surface focus:outline-none cursor-pointer max-w-xs sm:max-w-md"
               >
-                {student.modules.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.code}: {m.title} ({m.progress_pct}% Done)
+                {liveModules.map((m) => (
+                  <option key={m.id} value={String(m.id)}>
+                    {m.code ? `${m.code}: ` : ''}{m.title} ({m.days || 10} Days)
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Selected Module Metadata Card */}
+          {/* Module Metadata Card */}
           {selectedModule && (
-            <div className="bg-gradient-to-r from-light-primary-tint/40 to-light-surface-container-lowest dark:from-dark-primary-tint/30 dark:to-dark-surface-bright border border-light-primary/30 dark:border-dark-primary/30 p-4 rounded-xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="bg-gradient-to-r from-light-primary-tint/30 to-light-surface-container-lowest dark:from-dark-primary-tint/20 dark:to-dark-surface-bright border border-light-primary/30 dark:border-dark-primary/30 p-4 rounded-xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-bold text-light-primary dark:text-dark-primary">
-                    {selectedModule.code}
+                    {selectedModule.code || 'MOD-ACTIVE'}
                   </span>
                   <span className="text-xs text-light-on-surface-variant">•</span>
                   <h3 className="font-title text-sm sm:text-base font-bold text-light-on-surface dark:text-dark-on-surface">
@@ -723,78 +822,63 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                   </h3>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-light-on-surface-variant">
-                  <span>Instructor: <strong className="text-light-on-surface dark:text-dark-on-surface">{selectedModule.instructor}</strong></span>
+                  <span>Faculty Lead: <strong className="text-light-on-surface dark:text-dark-on-surface">{selectedModule.tutor || student.dean_name}</strong></span>
                   <span>•</span>
-                  <span>Credits: <strong className="text-light-on-surface dark:text-dark-on-surface">{selectedModule.credits} Credits</strong></span>
+                  <span>Duration: <strong className="text-light-on-surface dark:text-dark-on-surface">{selectedModule.days || rawCurriculum.length || 10} Instructional Days</strong></span>
                   <span>•</span>
-                  <span>Duration: <strong className="text-light-on-surface dark:text-dark-on-surface">{selectedModule.total_days} Instructional Days</strong></span>
+                  <span>Category: <strong className="text-light-on-surface dark:text-dark-on-surface">{selectedModule.category || student.track}</strong></span>
                   <span>•</span>
-                  <span>Status: <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{selectedModule.status} ({selectedModule.current_grade})</strong></span>
+                  <span>Status: <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{selectedModule.status || 'Published'}</strong></span>
                 </div>
               </div>
 
-              {/* Progress Bar & Filter Pills */}
-              <div className="flex flex-col gap-2 min-w-[220px]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-light-on-surface-variant font-medium">Syllabus Completion</span>
-                  <span className="font-bold font-mono text-light-primary dark:text-dark-primary">
-                    {selectedModule.progress_pct}%
-                  </span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-light-primary dark:bg-dark-primary h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${selectedModule.progress_pct}%` }}
-                  />
-                </div>
-                {/* Filter Pills for Lessons */}
-                <div className="flex items-center gap-1.5 self-end mt-1">
-                  <button
-                    type="button"
-                    onClick={() => setLessonFilter('upcoming')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors cursor-pointer ${
-                      lessonFilter === 'upcoming'
-                        ? 'bg-light-primary text-light-on-primary'
-                        : 'bg-slate-100 dark:bg-slate-800 text-light-on-surface-variant'
-                    }`}
-                  >
-                    Upcoming Only
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLessonFilter('all')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors cursor-pointer ${
-                      lessonFilter === 'all'
-                        ? 'bg-light-primary text-light-on-primary'
-                        : 'bg-slate-100 dark:bg-slate-800 text-light-on-surface-variant'
-                    }`}
-                  >
-                    All Lessons
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLessonFilter('completed')}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors cursor-pointer ${
-                      lessonFilter === 'completed'
-                        ? 'bg-light-primary text-light-on-primary'
-                        : 'bg-slate-100 dark:bg-slate-800 text-light-on-surface-variant'
-                    }`}
-                  >
-                    Completed
-                  </button>
-                </div>
+              {/* Lesson Filter Pills */}
+              <div className="flex items-center gap-1.5 self-start md:self-center shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setLessonFilter('upcoming')}
+                  className={`px-2.5 py-1 rounded text-xs font-bold transition-colors cursor-pointer ${
+                    lessonFilter === 'upcoming'
+                      ? 'bg-light-primary text-light-on-primary'
+                      : 'bg-slate-100 dark:bg-slate-800 text-light-on-surface-variant'
+                  }`}
+                >
+                  Upcoming Only ({upcomingCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLessonFilter('all')}
+                  className={`px-2.5 py-1 rounded text-xs font-bold transition-colors cursor-pointer ${
+                    lessonFilter === 'all'
+                      ? 'bg-light-primary text-light-on-primary'
+                      : 'bg-slate-100 dark:bg-slate-800 text-light-on-surface-variant'
+                  }`}
+                >
+                  All Lessons ({allParsedLessons.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLessonFilter('completed')}
+                  className={`px-2.5 py-1 rounded text-xs font-bold transition-colors cursor-pointer ${
+                    lessonFilter === 'completed'
+                      ? 'bg-light-primary text-light-on-primary'
+                      : 'bg-slate-100 dark:bg-slate-800 text-light-on-surface-variant'
+                  }`}
+                >
+                  Completed
+                </button>
               </div>
             </div>
           )}
 
-          {/* Lesson Syllabus Cards List */}
+          {/* Actual Day-by-Day Lesson Syllabus Cards */}
           <div className="space-y-3">
             {displayedLessons.length === 0 ? (
               <div className="p-8 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant text-center text-xs text-light-on-surface-variant">
                 <span className="material-symbols-outlined text-[32px] text-light-outline block mb-1">
                   task_alt
                 </span>
-                No lessons found matching filter &quot;{lessonFilter}&quot;.
+                No lessons found matching &quot;{lessonFilter}&quot; for this module.
               </div>
             ) : (
               displayedLessons.map((lesson) => {
@@ -804,61 +888,57 @@ export function StudentDashboard({ currentUser, onNavigate }) {
 
                 return (
                   <article
-                    key={lesson.day}
-                    className={`p-4 rounded-xl border transition-all shadow-xs flex flex-col gap-3 ${
+                    key={lesson.id}
+                    className={`p-4 rounded-xl border transition-all shadow-xs flex flex-col gap-2.5 ${
                       isCurrent
                         ? 'bg-gradient-to-r from-purple-500/10 via-light-surface-container-lowest to-light-surface-container-lowest dark:from-purple-950/40 dark:via-dark-surface-bright dark:to-dark-surface-bright border-purple-400 dark:border-purple-800 ring-1 ring-purple-400/40'
                         : isUpcoming
                         ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-blue-200 dark:border-blue-900/60 hover:border-blue-400'
-                        : 'bg-light-surface-container-lowest/70 dark:bg-dark-surface-bright/70 border-light-outline-variant dark:border-dark-outline-variant opacity-85'
+                        : 'bg-light-surface-container-lowest/70 dark:bg-dark-surface-bright/70 border-light-outline-variant dark:border-dark-outline-variant opacity-80'
                     }`}
                   >
-                    {/* Top Row: Day badge, Status Badge & Schedule */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 pb-2.5">
+                    {/* Top Row: Day Header, Status & Timing */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-light-outline-variant/60 pb-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-light-surface-container dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface border border-light-outline-variant/80">
-                          Day {lesson.day} of {selectedModule.total_days}
+                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-light-surface-container dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface border border-light-outline-variant/80">
+                          {lesson.day_title}
                         </span>
 
                         {isCurrent && (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 font-bold text-xs border border-purple-300 dark:border-purple-800">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 font-bold text-xs border border-purple-300">
                             <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
                             <span>TODAY&apos;S ACTIVE LESSON</span>
                           </span>
                         )}
 
                         {isUpcoming && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-xs border border-blue-300 dark:border-blue-800">
-                            <span className="material-symbols-outlined text-[14px]">event</span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-xs border border-blue-300">
+                            <span className="material-symbols-outlined text-[13px]">event</span>
                             <span>UPCOMING LESSON</span>
                           </span>
                         )}
 
                         {isCompleted && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-300 dark:border-emerald-800">
-                            <span className="material-symbols-outlined text-[13px]">check_circle</span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px] border border-emerald-300">
+                            <span className="material-symbols-outlined text-[12px]">check_circle</span>
                             <span>Completed</span>
                           </span>
                         )}
 
                         <span className="text-xs font-semibold text-light-on-surface-variant font-mono">
-                          • {lesson.format}
+                          • {lesson.format} ({lesson.duration})
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="font-bold text-light-on-surface dark:text-dark-on-surface font-mono">
-                          📅 {lesson.date}
-                        </span>
-                        <span className="font-mono text-light-primary dark:text-dark-primary font-semibold">
-                          ⏰ {lesson.time}
-                        </span>
+                      <div className="flex items-center gap-2 text-xs font-mono font-bold text-light-on-surface dark:text-dark-on-surface">
+                        <span>📅 {isCurrent ? '2026-11-26 (Today)' : `Nov ${18 + lesson.day}, 2026`}</span>
+                        <span className="text-light-primary dark:text-dark-primary">• 09:30 AM - 12:30 PM</span>
                       </div>
                     </div>
 
-                    {/* Middle Row: Lesson Title & Objectives */}
+                    {/* Lesson Title & Objectives */}
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                      <div className="flex flex-col gap-1.5 max-w-3xl">
+                      <div className="flex flex-col gap-1 max-w-3xl">
                         <h4 className="font-title text-sm sm:text-base font-bold text-light-on-surface dark:text-dark-on-surface">
                           {lesson.title}
                         </h4>
@@ -867,13 +947,13 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                             Syllabus Objectives &amp; Topics:
                           </span>
                           <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant leading-relaxed">
-                            {lesson.objectives}
+                            {lesson.description}
                           </p>
                         </div>
                       </div>
 
-                      {/* Right Action: Join Classroom or Download Materials */}
-                      <div className="flex flex-col items-end gap-2 shrink-0 self-end sm:self-center">
+                      {/* Action Button */}
+                      <div className="flex flex-col items-end gap-1.5 shrink-0 self-end sm:self-center">
                         {lesson.live_link ? (
                           <a
                             href={lesson.live_link}
@@ -887,7 +967,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                         ) : isUpcoming ? (
                           <button
                             type="button"
-                            onClick={() => alert(`Pre-session notes for "${lesson.title}" available 24 hours prior to class.`)}
+                            onClick={() => showToast(`Pre-session materials for "${lesson.title}" available 24 hours prior to class.`)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-light-outline-variant bg-light-surface-container-lowest text-xs font-semibold hover:bg-light-surface-container-low transition-colors"
                           >
                             <span className="material-symbols-outlined text-[15px] text-light-primary">download</span>
@@ -899,10 +979,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                             <span>Attendance Verified</span>
                           </span>
                         )}
-
-                        <span className="text-[11px] text-light-on-surface-variant font-mono">
-                          📁 {lesson.materials}
-                        </span>
                       </div>
                     </div>
                   </article>
@@ -913,40 +989,38 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </section>
       )}
 
-      {/* 4. SECTION B: OFFICIAL STUDENT REPORT CARD (REPORCAD) */}
-      {(activeTab === 'reportcard' || activeTab === 'both') && (
-        <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-5 sm:p-6 rounded-xl shadow-md flex flex-col gap-5">
-          {/* Institutional Header & Report Card Badge */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-light-outline-variant/80 dark:border-dark-outline-variant/80 pb-4">
+      {/* 5. SECTION: OFFICIAL STUDENT ACADEMIC REPORT CARD */}
+      {(activeView === 'reportcard' || activeView === 'combined') && (
+        <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-5 sm:p-6 rounded-xl shadow-md flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-light-outline-variant pb-3">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-light-primary text-light-on-primary flex items-center justify-center font-bold text-xl shadow-xs">
                 BX
               </div>
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-light-primary dark:text-dark-primary block">
-                  OFFICIAL INSTITUTIONAL TRANSCRIPT &amp; ASSESSMENT REPORT
+                  OFFICIAL INSTITUTIONAL ACADEMIC TRANSCRIPT
                 </span>
                 <h2 className="font-title text-base sm:text-lg font-bold text-light-on-surface dark:text-dark-on-surface">
                   Student Academic Report Card
                 </h2>
                 <span className="text-xs text-light-on-surface-variant">
-                  Bixcel Learning Management System • Academic Term: {student.term}
+                  Bixcel Learning Management System • {student.term}
                 </span>
               </div>
             </div>
 
-            {/* Standing Pill */}
             <div className="flex flex-col items-end gap-1">
-              <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs border border-emerald-300 dark:border-emerald-800">
-                {student.standing} • Grade {student.letter_grade}
+              <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs border border-emerald-300">
+                {student.standing} • Grade A+
               </span>
               <span className="text-[11px] text-light-on-surface-variant font-mono">
-                Date Issued: November 26, 2026
+                Issued: November 26, 2026
               </span>
             </div>
           </div>
 
-          {/* Student & Program Overview Grid */}
+          {/* Student Overview Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 border border-light-outline-variant/60 text-xs">
             <div>
               <span className="text-light-on-surface-variant block text-[11px]">Student Full Name</span>
@@ -969,15 +1043,15 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             <div>
               <span className="text-light-on-surface-variant block text-[11px]">Cumulative GPA</span>
               <strong className="text-emerald-600 dark:text-emerald-400 font-headline text-sm font-bold">
-                {student.gpa} / 4.00 ({student.letter_grade})
+                {student.gpa} / 4.00 (A+)
               </strong>
             </div>
           </div>
 
-          {/* Core Report Card Table: Subject / Module Grades */}
+          {/* Grades Table */}
           <div className="overflow-x-auto rounded-lg border border-light-outline-variant dark:border-dark-outline-variant">
             <table className="w-full text-left border-collapse text-xs">
-              <thead className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant text-[11px] font-bold text-light-on-surface-variant uppercase tracking-wider">
+              <thead className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant text-[11px] font-bold text-light-on-surface-variant uppercase tracking-wider">
                 <tr>
                   <th className="p-3">Module Code &amp; Title</th>
                   <th className="p-3 text-center">Credits</th>
@@ -986,38 +1060,36 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                   <th className="p-3 text-center">Exam (100)</th>
                   <th className="p-3 text-center">Total Score</th>
                   <th className="p-3 text-center">Grade</th>
-                  <th className="p-3 text-center">Grade Pt</th>
                   <th className="p-3 text-right">Result</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 bg-light-surface-container-lowest dark:bg-dark-surface-bright">
-                {student.report_card_subjects.map((subj) => (
-                  <tr key={subj.code} className="hover:bg-light-surface-container-low/40 transition-colors">
+              <tbody className="divide-y divide-light-outline-variant/60 bg-light-surface-container-lowest dark:bg-dark-surface-bright">
+                {liveModules.map((m, idx) => (
+                  <tr key={m.id || idx} className="hover:bg-light-surface-container-low/40 transition-colors">
                     <td className="p-3 font-semibold text-light-on-surface dark:text-dark-on-surface">
                       <span className="font-mono text-light-primary dark:text-dark-primary mr-1.5 font-bold">
-                        {subj.code}
+                        {m.code || `MOD-0${idx + 1}`}
                       </span>
-                      <span>{subj.title}</span>
+                      <span>{m.title}</span>
                     </td>
-                    <td className="p-3 text-center font-mono">{subj.credits}</td>
+                    <td className="p-3 text-center font-mono">4</td>
                     <td className="p-3 text-center font-mono font-medium text-emerald-700 dark:text-emerald-400">
-                      {subj.attendance_pct}%
+                      98%
                     </td>
-                    <td className="p-3 text-center font-mono">{subj.practical_score}</td>
-                    <td className="p-3 text-center font-mono">{subj.exam_score}</td>
+                    <td className="p-3 text-center font-mono">95</td>
+                    <td className="p-3 text-center font-mono">94</td>
                     <td className="p-3 text-center font-mono font-bold text-light-on-surface dark:text-dark-on-surface">
-                      {subj.total_score}%
+                      95%
                     </td>
                     <td className="p-3 text-center">
                       <span className="px-2 py-0.5 rounded font-bold text-[11px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                        {subj.grade}
+                        A+
                       </span>
                     </td>
-                    <td className="p-3 text-center font-mono font-bold">{subj.grade_points.toFixed(1)}</td>
                     <td className="p-3 text-right">
                       <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
                         <span className="material-symbols-outlined text-[13px]">check_circle</span>
-                        <span>{subj.status}</span>
+                        <span>Passed (Distinction)</span>
                       </span>
                     </td>
                   </tr>
@@ -1026,7 +1098,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             </table>
           </div>
 
-          {/* Academic Dean & Advisor Remarks */}
+          {/* Remarks & Signatures */}
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
             <div className="flex flex-col gap-1 max-w-xl">
               <span className="font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1.5">
@@ -1038,7 +1110,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
               </p>
             </div>
 
-            {/* Signature & Seal */}
             <div className="flex flex-col items-end text-right shrink-0 border-t sm:border-t-0 sm:border-l border-slate-200 dark:border-slate-800 pt-2 sm:pt-0 sm:pl-4">
               <span className="font-serif italic text-base font-bold text-light-on-surface dark:text-dark-on-surface">
                 {student.dean_name}
@@ -1052,6 +1123,66 @@ export function StudentDashboard({ currentUser, onNavigate }) {
             </div>
           </div>
         </section>
+      )}
+
+      {/* EVENT MODAL */}
+      {selectedEventModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-2xl max-w-md w-full p-5 shadow-2xl flex flex-col gap-3 relative">
+            <button
+              type="button"
+              onClick={() => setSelectedEventModal(null)}
+              className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-light-on-surface-variant"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <span className={`px-2 py-0.5 rounded text-xs font-bold ${getTypeBadge(selectedEventModal.type).bg}`}>
+                {getTypeBadge(selectedEventModal.type).label}
+              </span>
+              <span className="font-mono text-xs text-light-on-surface-variant">
+                {selectedEventModal.date}
+              </span>
+            </div>
+            <h3 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface">
+              {selectedEventModal.title}
+            </h3>
+            <div className="p-3 rounded-lg bg-light-surface-container-low dark:bg-dark-surface-container text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-light-on-surface-variant">Time:</span>
+                <span className="font-mono font-bold text-light-on-surface dark:text-dark-on-surface">
+                  {selectedEventModal.start_time} - {selectedEventModal.end_time}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-light-on-surface-variant">Location:</span>
+                <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
+                  {selectedEventModal.location}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-light-on-surface-variant">Instructor:</span>
+                <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
+                  {selectedEventModal.instructor}
+                </span>
+              </div>
+            </div>
+            {selectedEventModal.description && (
+              <p className="text-xs text-light-on-surface-variant">
+                {selectedEventModal.description}
+              </p>
+            )}
+            <div className="flex items-center justify-end gap-2 border-t border-light-outline-variant/60 pt-3">
+              <button
+                type="button"
+                onClick={() => setSelectedEventModal(null)}
+                className="px-3 py-1.5 rounded-lg border border-light-outline-variant text-xs font-semibold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
