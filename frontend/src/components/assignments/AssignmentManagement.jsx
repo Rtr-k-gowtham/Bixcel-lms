@@ -12,7 +12,7 @@ const FALLBACK_ASSIGNMENTS = [
     description: 'Build secure JWT auth endpoints, role-based access middleware, and PostgreSQL relational schema migrations with connection pooling.',
     total_marks: 100,
     passing_marks: 50,
-    due_date: '2026-12-05',
+    due_date: '2026-12-10',
     status: 'Assigned',
     sent_to_count: 6,
     submitted_count: 5,
@@ -56,7 +56,7 @@ const FALLBACK_ASSIGNMENTS = [
     description: 'Design a full-funnel acquisition campaign with audience segmentation, lookalike models, ROAS targets, and Klaviyo lifecycle retention flows.',
     total_marks: 100,
     passing_marks: 50,
-    due_date: '2026-12-10',
+    due_date: '2026-12-20',
     status: 'Draft',
     sent_to_count: 0,
     submitted_count: 0,
@@ -75,11 +75,15 @@ export function AssignmentManagement() {
   // Filters
   const [selectedBatch, setSelectedBatch] = useState('All')
   const [selectedStatus, setSelectedStatus] = useState('All') // 'All' | 'Draft' | 'Assigned' | 'Completed'
+  const [selectedTrack, setSelectedTrack] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [evaluatingAssignment, setEvaluatingAssignment] = useState(null)
+  const [viewingAssignment, setViewingAssignment] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const [newAssignmentForm, setNewAssignmentForm] = useState({
     title: '',
     batch_code: 'BIX-DEV-24A',
@@ -90,7 +94,6 @@ export function AssignmentManagement() {
     due_date: '2026-12-15',
     status: 'Draft',
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Load Data
   useEffect(() => {
@@ -98,72 +101,139 @@ export function AssignmentManagement() {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const [assignRes, batchesRes, studentsRes] = await Promise.allSettled([
+        const [assignRes, batchRes, stuRes] = await Promise.allSettled([
           apiService.getAssignments(),
-          apiService.getBatches(),
-          apiService.getStudents(),
+          apiService.getBatches ? apiService.getBatches() : Promise.resolve([]),
+          apiService.getStudents ? apiService.getStudents() : Promise.resolve([]),
         ])
 
         if (!isMounted) return
 
-        if (batchesRes.status === 'fulfilled' && batchesRes.value?.data) {
-          setBatchesList(Array.isArray(batchesRes.value.data) ? batchesRes.value.data : [])
-        }
-        if (studentsRes.status === 'fulfilled' && studentsRes.value?.data) {
-          setStudentsList(Array.isArray(studentsRes.value.data) ? studentsRes.value.data : [])
-        }
-
-        if (assignRes.status === 'fulfilled' && assignRes.value?.data && Array.isArray(assignRes.value.data) && assignRes.value.data.length > 0) {
-          setAssignments(assignRes.value.data)
+        if (assignRes.status === 'fulfilled' && assignRes.value && assignRes.value.data) {
+          const list = Array.isArray(assignRes.value.data) ? assignRes.value.data : []
+          if (list.length > 0) {
+            setAssignments(list)
+          } else {
+            setAssignments(FALLBACK_ASSIGNMENTS)
+          }
         } else {
           setAssignments(FALLBACK_ASSIGNMENTS)
         }
+
+        if (batchRes.status === 'fulfilled' && batchRes.value) {
+          const bList = Array.isArray(batchRes.value) ? batchRes.value : (batchRes.value.data || [])
+          setBatchesList(bList)
+        }
+
+        if (stuRes.status === 'fulfilled' && stuRes.value) {
+          const sList = Array.isArray(stuRes.value) ? stuRes.value : (stuRes.value.data || [])
+          setStudentsList(sList)
+        }
       } catch (err) {
         console.warn('Using fallback assignments:', err)
-        setAssignments(FALLBACK_ASSIGNMENTS)
+        if (isMounted) setAssignments(FALLBACK_ASSIGNMENTS)
       } finally {
         if (isMounted) setIsLoading(false)
       }
     }
+
     fetchData()
-    return () => { isMounted = false }
+    return () => {
+      isMounted = false
+    }
   }, [])
+
+  const showNotification = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(''), 4000)
+  }
+
+  // Calculate KPIs
+  const kpis = useMemo(() => {
+    const total = assignments.length
+    const drafts = assignments.filter((a) => a.status === 'Draft').length
+    const assigned = assignments.filter((a) => a.status === 'Assigned').length
+    const completed = assignments.filter((a) => a.status === 'Completed').length
+
+    let totalSubmissions = 0
+    let evaluatedCount = 0
+
+    assignments.forEach((a) => {
+      const submissions = Array.isArray(a.student_submissions) ? a.student_submissions : []
+      totalSubmissions += submissions.filter((s) => s.status === 'Submitted' || s.status === 'Evaluated').length
+      evaluatedCount += submissions.filter((s) => s.status === 'Evaluated' && typeof s.score === 'number').length
+    })
+
+    return { total, drafts, assigned, completed, totalSubmissions, evaluatedCount }
+  }, [assignments])
 
   // Filtered Assignments
   const filteredAssignments = useMemo(() => {
     return assignments.filter((a) => {
       const matchBatch = selectedBatch === 'All' || a.batch_code === selectedBatch
       const matchStatus = selectedStatus === 'All' || a.status === selectedStatus
+      const matchTrack = selectedTrack === 'All' || a.track === selectedTrack
       const q = searchQuery.toLowerCase().trim()
-      const matchQuery =
+      const matchSearch =
         !q ||
-        a.title.toLowerCase().includes(q) ||
-        a.assignment_uid.toLowerCase().includes(q) ||
+        (a.title && a.title.toLowerCase().includes(q)) ||
+        (a.assignment_uid && a.assignment_uid.toLowerCase().includes(q)) ||
+        (a.batch_code && a.batch_code.toLowerCase().includes(q)) ||
         (a.track && a.track.toLowerCase().includes(q))
-      return matchBatch && matchStatus && matchQuery
+      return matchBatch && matchStatus && matchTrack && matchSearch
     })
-  }, [assignments, selectedBatch, selectedStatus, searchQuery])
+  }, [assignments, selectedBatch, selectedStatus, selectedTrack, searchQuery])
 
-  // Aggregate Metrics
-  const metrics = useMemo(() => {
-    const total = assignments.length
-    const drafts = assignments.filter((a) => a.status === 'Draft').length
-    const assigned = assignments.filter((a) => a.status === 'Assigned').length
-    const completed = assignments.filter((a) => a.status === 'Completed').length
-    const totalSubmissions = assignments.reduce((acc, a) => acc + (Number(a.submitted_count) || 0), 0)
-    return { total, drafts, assigned, completed, totalSubmissions }
+  // Distinct batches
+  const batchOptions = useMemo(() => {
+    const set = new Set(['BIX-DEV-24A', 'BIX-UX-26D', 'BIX-CLD-26C', 'BIX-MKT-26B'])
+    assignments.forEach((a) => a.batch_code && set.add(a.batch_code))
+    batchesList.forEach((b) => (b.batch_code || b.name) && set.add(b.batch_code || b.name))
+    return Array.from(set)
+  }, [assignments, batchesList])
+
+  // Distinct tracks
+  const trackOptions = useMemo(() => {
+    const set = new Set(['Full-Stack Web Development', 'UI/UX Product Design', 'Digital Marketing', 'Data Science & AI', 'Cloud Computing & DevOps'])
+    assignments.forEach((a) => a.track && set.add(a.track))
+    return Array.from(set)
   }, [assignments])
 
-  // 1. CREATE ASSIGNMENT
+  // Helper to get cohort students
+  const getBatchStudents = (batchCode) => {
+    const matched = studentsList.filter((s) => {
+      const b = s.batch_code || s.cohort || s.batch
+      return b && b.toLowerCase() === (batchCode || '').toLowerCase()
+    })
+    if (matched.length > 0) return matched
+
+    return [
+      { student_id: 'STU-2026-0843', full_name: 'Marcus Vance' },
+      { student_id: 'STU-2026-0844', full_name: 'Priya Sharma' },
+      { student_id: 'STU-2026-0845', full_name: 'David Kim' },
+      { student_id: 'STU-2026-0846', full_name: 'Ananya Verma' },
+      { student_id: 'STU-2026-0847', full_name: 'Rohan Mehta' },
+      { student_id: 'STU-2026-0848', full_name: 'Sophia Patel' },
+    ]
+  }
+
+  // =========================================================================
+  // STAGE 1: CREATE ASSIGNMENT
+  // =========================================================================
   const handleCreateAssignment = async (e) => {
     e.preventDefault()
-    if (!newAssignmentForm.title.trim()) return
+    if (!newAssignmentForm.title.trim()) {
+      alert('Please enter an assignment title.')
+      return
+    }
 
     setIsSubmitting(true)
     const uid = `ASN-2026-${String(100 + assignments.length + 1).padStart(3, '0')}`
     const payload = {
       ...newAssignmentForm,
       assignment_uid: uid,
+      total_marks: parseInt(newAssignmentForm.total_marks, 10) || 100,
+      passing_marks: parseInt(newAssignmentForm.passing_marks, 10) || 50,
       sent_to_count: 0,
       submitted_count: 0,
       evaluated_count: 0,
@@ -172,16 +242,9 @@ export function AssignmentManagement() {
 
     try {
       const res = await apiService.createAssignment(payload)
-      const created = res?.data || { id: Date.now(), ...payload }
+      const created = res && res.data ? res.data : { ...payload, id: Date.now() }
       setAssignments((prev) => [created, ...prev])
-      setToast(`Assignment "${created.title}" created successfully!`)
-    } catch (err) {
-      console.warn('API create failed, saving locally:', err)
-      const mock = { id: Date.now(), ...payload }
-      setAssignments((prev) => [mock, ...prev])
-      setToast(`Assignment "${mock.title}" created locally!`)
-    } finally {
-      setIsSubmitting(false)
+      showNotification(`Assignment "${payload.title}" created successfully!`)
       setShowCreateModal(false)
       setNewAssignmentForm({
         title: '',
@@ -193,28 +256,30 @@ export function AssignmentManagement() {
         due_date: '2026-12-15',
         status: 'Draft',
       })
-      setTimeout(() => setToast(''), 3000)
+    } catch (err) {
+      console.warn('API create failed, saving locally:', err)
+      const mock = { ...payload, id: Date.now() }
+      setAssignments((prev) => [mock, ...prev])
+      showNotification(`Assignment created locally as draft.`)
+      setShowCreateModal(false)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  // 2. SEND ASSIGNMENT TO STUDENTS
+  // =========================================================================
+  // STAGE 2: SEND TO STUDENTS (DISPATCH TASK TO COHORT)
+  // =========================================================================
   const handleSendToStudents = async (assignment) => {
-    // Determine target students from matching batch
-    const batchStudents = studentsList.filter((s) => s.batch === assignment.batch_code)
-    const roster = batchStudents.length > 0
-      ? batchStudents.map((s) => ({
-          student_id: s.student_id || `STU-${s.id}`,
-          full_name: s.full_name,
-          status: 'Pending',
-          score: null,
-          submitted_at: null,
-          remarks: 'Assigned to student portal.',
-        }))
-      : [
-          { student_id: 'STU-2026-0843', full_name: 'Marcus Vance', status: 'Pending', score: null, submitted_at: null, remarks: 'Assigned.' },
-          { student_id: 'STU-2026-0844', full_name: 'Priya Sharma', status: 'Pending', score: null, submitted_at: null, remarks: 'Assigned.' },
-          { student_id: 'STU-2026-0845', full_name: 'David Kim', status: 'Pending', score: null, submitted_at: null, remarks: 'Assigned.' },
-        ]
+    const batchStudents = getBatchStudents(assignment.batch_code)
+    const roster = batchStudents.map((s, idx) => ({
+      student_id: s.student_id || `STU-2026-08${40 + idx}`,
+      full_name: s.full_name || s.name || `Student ${idx + 1}`,
+      status: 'Pending',
+      score: null,
+      submitted_at: null,
+      remarks: 'Task dispatched to student workspace. Awaiting submission.',
+    }))
 
     const updated = {
       ...assignment,
@@ -223,409 +288,519 @@ export function AssignmentManagement() {
       student_submissions: roster,
     }
 
-    setAssignments((prev) => prev.map((a) => (a.id === assignment.id ? updated : a)))
-
     try {
-      await apiService.updateAssignment(assignment.id, {
-        status: 'Assigned',
-        sent_to_count: roster.length,
-        student_submissions: roster,
-      })
+      await apiService.updateAssignment(assignment.id, updated)
+      setAssignments((prev) => prev.map((a) => (a.id === assignment.id ? updated : a)))
+      showNotification(
+        `Assignment dispatched & sent to ${roster.length} students in cohort ${assignment.batch_code}!`
+      )
     } catch (err) {
-      console.warn('Backend update failed:', err)
+      console.warn('Backend update failed, updating locally:', err)
+      setAssignments((prev) => prev.map((a) => (a.id === assignment.id ? updated : a)))
+      showNotification(`Assignment dispatched to ${roster.length} students (saved locally).`)
     }
-
-    setToast(`Assignment "${assignment.title}" dispatched & sent to ${roster.length} students in cohort ${assignment.batch_code}!`)
-    setTimeout(() => setToast(''), 4000)
   }
 
-  // 3. COMPLETE ASSIGNMENT
-  const handleCompleteAssignment = async (assignment) => {
-    // Mark all pending as evaluated with passing mark or keep existing
-    const existing = assignment.student_submissions || []
-    const updatedSubmissions = existing.map((st) => ({
-      ...st,
-      status: 'Evaluated',
-      score: st.score !== null ? st.score : Math.floor(Math.random() * 20) + 75,
-      submitted_at: st.submitted_at || '2026-11-27',
-      remarks: st.remarks || 'Completed and certified by faculty advisor.',
-    }))
+  // =========================================================================
+  // STAGE 3: COMPLETE IT (EVALUATE, GRADE & COMPLETE)
+  // =========================================================================
+  const openEvaluationModal = (assignment) => {
+    let currentSubmissions = Array.isArray(assignment.student_submissions) && assignment.student_submissions.length > 0
+      ? [...assignment.student_submissions]
+      : []
 
-    const updated = {
+    if (currentSubmissions.length === 0) {
+      const batchStudents = getBatchStudents(assignment.batch_code)
+      currentSubmissions = batchStudents.map((s, idx) => ({
+        student_id: s.student_id || `STU-2026-08${40 + idx}`,
+        full_name: s.full_name || s.name || `Student ${idx + 1}`,
+        status: 'Submitted',
+        score: null,
+        submitted_at: new Date().toISOString().split('T')[0],
+        remarks: 'Project deliverables submitted for review.',
+      }))
+    }
+
+    setEvaluatingAssignment({
       ...assignment,
-      status: 'Completed',
-      submitted_count: updatedSubmissions.length,
-      evaluated_count: updatedSubmissions.length,
-      student_submissions: updatedSubmissions,
-    }
-
-    setAssignments((prev) => prev.map((a) => (a.id === assignment.id ? updated : a)))
-
-    try {
-      await apiService.updateAssignment(assignment.id, {
-        status: 'Completed',
-        submitted_count: updatedSubmissions.length,
-        evaluated_count: updatedSubmissions.length,
-        student_submissions: updatedSubmissions,
-      })
-    } catch (err) {
-      console.warn('Backend complete failed:', err)
-    }
-
-    setToast(`Assignment "${assignment.title}" marked as Fully Completed & Evaluated!`)
-    setTimeout(() => setToast(''), 4000)
+      student_submissions: currentSubmissions,
+    })
   }
 
-  // Save specific evaluation modal changes
-  const handleSaveEvaluation = async (updatedRoster) => {
+  const handleStudentScoreChange = (idx, scoreVal) => {
     if (!evaluatingAssignment) return
-
-    const evaluatedCount = updatedRoster.filter((st) => st.status === 'Evaluated' && st.score !== null).length
-    const submittedCount = updatedRoster.filter((st) => st.status !== 'Pending').length
-    const isAllEvaluated = evaluatedCount > 0 && evaluatedCount === updatedRoster.length
-
-    const updated = {
-      ...evaluatingAssignment,
-      student_submissions: updatedRoster,
-      submitted_count: submittedCount,
-      evaluated_count: evaluatedCount,
-      status: isAllEvaluated ? 'Completed' : 'Assigned',
+    const updated = [...evaluatingAssignment.student_submissions]
+    const maxMarks = Number(evaluatingAssignment.total_marks) || 100
+    const score = scoreVal === '' ? null : Math.min(maxMarks, Math.max(0, Number(scoreVal)))
+    updated[idx] = {
+      ...updated[idx],
+      score,
+      status: score !== null ? 'Evaluated' : updated[idx].status,
+      submitted_at: updated[idx].submitted_at || new Date().toISOString().split('T')[0],
+      remarks: score !== null
+        ? (score >= (Number(evaluatingAssignment.passing_marks) || 50)
+            ? `Competency confirmed with ${score}/${maxMarks} marks.`
+            : `Needs revision. Scored ${score}/${maxMarks}.`)
+        : updated[idx].remarks,
     }
+    setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
+  }
 
-    setAssignments((prev) => prev.map((a) => (a.id === evaluatingAssignment.id ? updated : a)))
+  const handleStudentStatusChange = (idx, statusVal) => {
+    if (!evaluatingAssignment) return
+    const updated = [...evaluatingAssignment.student_submissions]
+    updated[idx] = { ...updated[idx], status: statusVal }
+    setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
+  }
+
+  const handleStudentRemarkChange = (idx, remarksVal) => {
+    if (!evaluatingAssignment) return
+    const updated = [...evaluatingAssignment.student_submissions]
+    updated[idx] = { ...updated[idx], remarks: remarksVal }
+    setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
+  }
+
+  // Quick helper: auto-fill passing marks
+  const handleAutoFillPassingScores = () => {
+    if (!evaluatingAssignment) return
+    const sampleScores = [94, 88, 92, 85, 90, 84]
+    const maxMarks = Number(evaluatingAssignment.total_marks) || 100
+    const passMarks = Number(evaluatingAssignment.passing_marks) || 50
+
+    const updated = evaluatingAssignment.student_submissions.map((st, i) => {
+      const score = Math.min(maxMarks, Math.max(passMarks, sampleScores[i % sampleScores.length]))
+      return {
+        ...st,
+        status: 'Evaluated',
+        score: score,
+        submitted_at: st.submitted_at || new Date().toISOString().split('T')[0],
+        remarks: `Demonstrated solid competency. Scored ${score}/${maxMarks}.`,
+      }
+    })
+    setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
+  }
+
+  // Complete assignment and save
+  const handleCompleteAssignmentAndPublish = async () => {
+    if (!evaluatingAssignment) return
+    setIsSubmitting(true)
+
+    const submissions = Array.isArray(evaluatingAssignment.student_submissions)
+      ? evaluatingAssignment.student_submissions
+      : []
+
+    const evaluatedCount = submissions.filter((st) => st.status === 'Evaluated' && typeof st.score === 'number').length
+    const submittedCount = submissions.filter((st) => st.status !== 'Pending').length
+
+    const finalAssignment = {
+      ...evaluatingAssignment,
+      status: 'Completed',
+      sent_to_count: submissions.length,
+      submitted_count: submittedCount || submissions.length,
+      evaluated_count: evaluatedCount || submissions.length,
+      student_submissions: submissions,
+    }
 
     try {
-      await apiService.updateAssignment(evaluatingAssignment.id, {
-        student_submissions: updatedRoster,
-        submitted_count: submittedCount,
-        evaluated_count: evaluatedCount,
-        status: isAllEvaluated ? 'Completed' : 'Assigned',
-      })
+      await apiService.updateAssignment(finalAssignment.id, finalAssignment)
+      setAssignments((prev) => prev.map((a) => (a.id === finalAssignment.id ? finalAssignment : a)))
+      showNotification(`Assignment marked Completed and evaluated for ${finalAssignment.batch_code}!`)
+      setEvaluatingAssignment(null)
     } catch (err) {
-      console.warn('Backend evaluation save failed:', err)
+      console.warn('API update failed, updating state locally:', err)
+      setAssignments((prev) => prev.map((a) => (a.id === finalAssignment.id ? finalAssignment : a)))
+      showNotification(`Assignment completed & saved locally.`)
+      setEvaluatingAssignment(null)
+    } finally {
+      setIsSubmitting(false)
     }
+  }
 
-    setToast(`Evaluation updated for "${evaluatingAssignment.title}".`)
-    setEvaluatingAssignment(null)
-    setTimeout(() => setToast(''), 3000)
+  // Delete Assignment
+  const handleDeleteAssignment = async (id, title) => {
+    if (!window.confirm(`Are you sure you want to delete assignment "${title}"?`)) return
+    try {
+      await apiService.deleteAssignment(id)
+      setAssignments((prev) => prev.filter((a) => a.id !== id))
+      showNotification(`Assignment deleted successfully.`)
+    } catch (e) {
+      console.warn('API delete failed, removing locally:', e)
+      setAssignments((prev) => prev.filter((a) => a.id !== id))
+      showNotification(`Assignment removed.`)
+    }
   }
 
   return (
-    <div className="flex flex-col gap-3.5 w-full">
-      {/* Toast Feedback */}
+    <div className="flex flex-col gap-4">
+      {/* Toast Notification */}
       {toast && (
-        <div className="p-2.5 rounded bg-success-container text-on-success-container font-label text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in duration-200">
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[16px]">check_circle</span>
-            <span>{toast}</span>
-          </div>
-          <button type="button" onClick={() => setToast('')} className="p-0.5 opacity-70 hover:opacity-100">
-            <span className="material-symbols-outlined text-[14px]">close</span>
-          </button>
+        <div className="fixed top-20 right-6 z-50 bg-[#2B1B54] text-white px-4 py-2.5 rounded-md shadow-lg border border-purple-400/30 flex items-center gap-2.5 text-sm animate-fade-in font-body">
+          <span className="material-symbols-outlined text-[18px] text-green-300">check_circle</span>
+          <span className="font-medium">{toast}</span>
         </div>
       )}
 
-      {/* Screen Header */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-3.5 rounded-md shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex flex-col gap-0.5">
+      {/* Header Bar */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-4 rounded-md shadow-xs">
+        <div>
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-light-primary text-[20px]">assignment</span>
-            <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
+            <span className="w-8 h-8 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[20px]">assignment</span>
+            </span>
+            <h1 className="font-title text-[18px] font-bold text-light-on-surface dark:text-dark-on-surface">
               Assignment Management
             </h1>
-            <span className="px-2 py-0.5 rounded-full bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary font-mono text-[10px] font-bold">
-              3-Stage Lifecycle
-            </span>
           </div>
-          <p className="font-body text-xs text-light-on-surface-variant">
+          <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
             Create academic tasks, dispatch/send to enrolled cohort students, track submissions, and complete evaluation.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-xs font-semibold shadow-xs transition-colors shrink-0"
-        >
-          <span className="material-symbols-outlined text-[15px]">add_task</span>
-          <span>Create Assignment</span>
-        </button>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary font-label text-xs font-semibold shadow-xs hover:bg-light-primary-container transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span>Create Assignment</span>
+          </button>
+        </div>
       </section>
 
-      {/* 4 KPI Telemetry Cards */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 items-stretch">
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md p-3 shadow-2xs flex flex-col justify-between gap-1.5">
+      {/* 4 KPI Cards Grid */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between">
-            <span className="font-label text-[11px] font-semibold text-light-on-surface-variant uppercase tracking-wider">
+            <span className="font-label text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Total Assignments
             </span>
-            <span className="w-6 h-6 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
+            <span className="w-6 h-6 rounded bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 inline-flex items-center justify-center text-xs">
               <span className="material-symbols-outlined text-[15px]">assignment</span>
             </span>
           </div>
-          <span className="font-headline text-lg font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-            {metrics.total} Tasks
-          </span>
+          <div className="flex items-baseline justify-between">
+            <span className="font-headline text-2xl font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              {kpis.total}
+            </span>
+            <span className="font-label text-[11px] text-purple-600 bg-purple-50 dark:bg-purple-900/30 px-1.5 py-0.5 rounded font-semibold">
+              {kpis.drafts} Drafts
+            </span>
+          </div>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md p-3 shadow-2xs flex flex-col justify-between gap-1.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between">
-            <span className="font-label text-[11px] font-semibold text-light-on-surface-variant uppercase tracking-wider">
-              Active / In-Progress
+            <span className="font-label text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Active / Dispatched
             </span>
-            <span className="w-6 h-6 rounded bg-pending-container text-on-pending-container flex items-center justify-center">
+            <span className="w-6 h-6 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 inline-flex items-center justify-center text-xs">
               <span className="material-symbols-outlined text-[15px]">pending_actions</span>
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-headline text-lg font-bold text-pending tabular-nums">
-              {metrics.assigned} Dispatched
+            <span className="font-headline text-2xl font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              {kpis.assigned}
             </span>
-            <span className="text-[10px] text-light-on-surface-variant">
-              {metrics.drafts} in Draft
+            <span className="font-label text-[11px] text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded font-semibold">
+              Sent to Students
             </span>
           </div>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md p-3 shadow-2xs flex flex-col justify-between gap-1.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between">
-            <span className="font-label text-[11px] font-semibold text-light-on-surface-variant uppercase tracking-wider">
+            <span className="font-label text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
               Student Submissions
             </span>
-            <span className="w-6 h-6 rounded bg-light-primary-tint text-light-primary flex items-center justify-center">
+            <span className="w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 inline-flex items-center justify-center text-xs">
               <span className="material-symbols-outlined text-[15px]">upload_file</span>
             </span>
           </div>
-          <span className="font-headline text-lg font-bold text-light-primary tabular-nums">
-            {metrics.totalSubmissions} Submitted
-          </span>
+          <div className="flex items-baseline justify-between">
+            <span className="font-headline text-2xl font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              {kpis.totalSubmissions}
+            </span>
+            <span className="font-label text-[11px] text-amber-700 bg-amber-50 dark:bg-amber-900/30 px-1.5 py-0.5 rounded font-semibold">
+              In Review
+            </span>
+          </div>
         </article>
 
-        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md p-3 shadow-2xs flex flex-col justify-between gap-1.5">
+        <article className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-3.5 shadow-sm flex flex-col justify-between gap-2">
           <div className="flex items-center justify-between">
-            <span className="font-label text-[11px] font-semibold text-light-on-surface-variant uppercase tracking-wider">
-              Completed &amp; Graded
+            <span className="font-label text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant font-medium">
+              Completed & Graded
             </span>
-            <span className="w-6 h-6 rounded bg-success-container text-on-success-container flex items-center justify-center">
+            <span className="w-6 h-6 rounded bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 inline-flex items-center justify-center text-xs">
               <span className="material-symbols-outlined text-[15px]">verified</span>
             </span>
           </div>
-          <span className="font-headline text-lg font-bold text-success tabular-nums">
-            {metrics.completed} Completed
-          </span>
+          <div className="flex items-baseline justify-between">
+            <span className="font-headline text-2xl font-bold tabular-nums text-light-on-surface dark:text-dark-on-surface">
+              {kpis.completed}
+            </span>
+            <span className="font-label text-[11px] text-green-600 bg-green-50 dark:bg-green-900/30 px-1.5 py-0.5 rounded font-semibold">
+              Evaluated
+            </span>
+          </div>
         </article>
       </section>
 
-      {/* Filter Toolbar */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant p-2.5 rounded-md shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
-        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
-          <div className="relative flex items-center flex-1 max-w-xs">
-            <span className="material-symbols-outlined text-[15px] text-light-outline absolute left-2 pointer-events-none">
-              search
-            </span>
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search assignment title, UID, track..."
-              className="w-full pl-7 pr-2.5 py-1 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-            />
+      {/* Filter and Search Bar */}
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-3 rounded-md shadow-xs flex flex-wrap items-center justify-between gap-3">
+        {/* Left Filter Group */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Status Tabs */}
+          <div className="flex items-center border border-light-outline-variant dark:border-dark-outline-variant rounded p-0.5 bg-light-surface-container-low dark:bg-dark-surface-container text-xs">
+            {['All', 'Draft', 'Assigned', 'Completed'].map((st) => (
+              <button
+                key={st}
+                type="button"
+                onClick={() => setSelectedStatus(st)}
+                className={`px-2.5 py-1 rounded font-medium transition-colors ${
+                  selectedStatus === st
+                    ? 'bg-light-primary text-light-on-primary shadow-xs font-semibold'
+                    : 'text-light-on-surface-variant hover:text-light-on-surface'
+                }`}
+              >
+                {st}
+              </button>
+            ))}
           </div>
 
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-light-on-surface-variant text-[11px] font-medium hidden sm:inline">Cohort:</span>
+          {/* Batch Selector */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-light-on-surface-variant font-medium">Cohort:</span>
             <select
               value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
-              className="px-2 py-1 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+              className="px-2.5 py-1 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface text-xs focus:outline-none focus:ring-1 focus:ring-light-primary"
             >
               <option value="All">All Batches</option>
-              {batchesList.map((b) => (
-                <option key={b.id || b.batch_code} value={b.batch_code || b.title}>
-                  {b.batch_code || b.title}
+              {batchOptions.map((b) => (
+                <option key={b} value={b}>
+                  {b}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-light-on-surface-variant text-[11px] font-medium hidden sm:inline">Status:</span>
+          {/* Track Selector */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-light-on-surface-variant font-medium">Track:</span>
             <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-2 py-1 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+              value={selectedTrack}
+              onChange={(e) => setSelectedTrack(e.target.value)}
+              className="px-2.5 py-1 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface text-xs focus:outline-none focus:ring-1 focus:ring-light-primary"
             >
-              <option value="All">All Lifecycle Status</option>
-              <option value="Draft">Draft (Not Sent)</option>
-              <option value="Assigned">Assigned (Sent to Students)</option>
-              <option value="Completed">Completed &amp; Evaluated</option>
+              <option value="All">All Tracks</option>
+              {trackOptions.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        {(searchQuery || selectedBatch !== 'All' || selectedStatus !== 'All') && (
-          <button
-            type="button"
-            onClick={() => {
-              setSearchQuery('')
-              setSelectedBatch('All')
-              setSelectedStatus('All')
-            }}
-            className="text-xs text-light-primary hover:underline font-semibold"
-          >
-            Reset
-          </button>
-        )}
+        {/* Right Search Input */}
+        <div className="relative min-w-[240px]">
+          <span className="material-symbols-outlined absolute left-2.5 top-2 text-[17px] text-light-outline">
+            search
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search assignment, UID, cohort..."
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
+          />
+        </div>
       </section>
 
-      {/* High Density Assignments Table */}
-      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md shadow-xs overflow-hidden">
+      {/* Main Assignments Table */}
+      <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-light-outline-variant bg-light-surface-container-low/60 text-[11px] font-semibold text-light-on-surface-variant uppercase tracking-wider">
-                <th className="py-2.5 px-3">UID</th>
-                <th className="py-2.5 px-3">Assignment Title &amp; Track</th>
-                <th className="py-2.5 px-3">Cohort</th>
-                <th className="py-2.5 px-3">Due Date</th>
-                <th className="py-2.5 px-3 text-center">Marks</th>
-                <th className="py-2.5 px-3 text-center">Students / Submissions</th>
-                <th className="py-2.5 px-3 text-center">Status</th>
-                <th className="py-2.5 px-3 text-right">Lifecycle Actions</th>
+              <tr className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant font-semibold">
+                <th className="px-4 py-2.5">Assignment Details</th>
+                <th className="px-3 py-2.5">Batch & Track</th>
+                <th className="px-3 py-2.5">Deadline</th>
+                <th className="px-3 py-2.5">Marks</th>
+                <th className="px-3 py-2.5">Students / Progress</th>
+                <th className="px-3 py-2.5">Status</th>
+                <th className="px-4 py-2.5 text-right">3-Stage Lifecycle Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-light-outline-variant/60">
-              {filteredAssignments.length === 0 ? (
+            <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 font-body">
+              {isLoading ? (
                 <tr>
-                  <td colSpan="8" className="py-10 text-center text-light-on-surface-variant">
-                    <span className="material-symbols-outlined text-[32px] opacity-40 block mb-1">assignment_late</span>
-                    <span className="font-semibold text-xs">No assignments match your criteria</span>
+                  <td colSpan="7" className="px-4 py-8 text-center text-light-on-surface-variant">
+                    <span className="material-symbols-outlined animate-spin text-[24px]">progress_activity</span>
+                    <p className="mt-1">Loading assignments...</p>
+                  </td>
+                </tr>
+              ) : filteredAssignments.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-4 py-8 text-center text-light-on-surface-variant">
+                    <span className="material-symbols-outlined text-[32px] text-light-outline">assignment_late</span>
+                    <p className="mt-1 font-medium">No assignments found matching your filter criteria.</p>
                   </td>
                 </tr>
               ) : (
                 filteredAssignments.map((a) => {
-                  const isDraft = a.status === 'Draft'
-                  const isAssigned = a.status === 'Assigned'
-                  const isCompleted = a.status === 'Completed'
-                  const submissions = a.student_submissions || []
+                  const submissions = Array.isArray(a.student_submissions) ? a.student_submissions : []
+                  const studentCount = Number(a.sent_to_count) || submissions.length
+                  const evaluatedCount = submissions.filter((s) => s.status === 'Evaluated' && typeof s.score === 'number').length
 
                   return (
-                    <tr key={a.id} className="hover:bg-light-surface-container-low/40 transition-colors">
-                      {/* UID */}
-                      <td className="py-2.5 px-3 whitespace-nowrap font-mono text-xs font-bold text-light-primary">
-                        {a.assignment_uid}
-                      </td>
-
-                      {/* Title & Track */}
-                      <td className="py-2.5 px-3 max-w-[280px]">
-                        <span className="font-semibold text-light-on-surface dark:text-dark-on-surface block truncate">
+                    <tr
+                      key={a.id}
+                      className="hover:bg-light-surface-container-low/50 dark:hover:bg-dark-surface-container/50 transition-colors"
+                    >
+                      {/* UID & Title */}
+                      <td className="px-4 py-3 align-top max-w-[280px]">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[11px] font-bold text-light-primary dark:text-dark-primary bg-light-primary-tint/60 dark:bg-dark-primary-tint/40 px-1.5 py-0.5 rounded">
+                            {a.assignment_uid || `ASN-${a.id}`}
+                          </span>
+                        </div>
+                        <h3 className="font-title text-[13px] font-semibold text-light-on-surface dark:text-dark-on-surface mt-1 line-clamp-2">
                           {a.title}
-                        </span>
-                        <span className="text-[10px] text-light-on-surface-variant block truncate">
-                          {a.track}
-                        </span>
+                        </h3>
+                        <p className="font-body text-[11px] text-light-on-surface-variant mt-0.5 line-clamp-1">
+                          {a.description || 'Institutional academic assignment'}
+                        </p>
                       </td>
 
-                      {/* Batch */}
-                      <td className="py-2.5 px-3 whitespace-nowrap">
-                        <span className="font-mono text-xs font-semibold px-1.5 py-0.5 rounded bg-light-surface-container text-light-on-surface">
+                      {/* Batch & Track */}
+                      <td className="px-3 py-3 align-top whitespace-nowrap">
+                        <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300">
                           {a.batch_code}
                         </span>
-                      </td>
-
-                      {/* Due Date */}
-                      <td className="py-2.5 px-3 whitespace-nowrap font-mono text-xs tabular-nums text-light-on-surface">
-                        {a.due_date}
-                      </td>
-
-                      {/* Marks */}
-                      <td className="py-2.5 px-3 whitespace-nowrap text-center font-mono text-xs tabular-nums font-bold">
-                        {a.total_marks} pts
-                      </td>
-
-                      {/* Submissions Progress */}
-                      <td className="py-2.5 px-3 whitespace-nowrap text-center">
-                        <div className="flex flex-col items-center">
-                          <span className="font-mono text-xs font-bold tabular-nums">
-                            {a.submitted_count} / {a.sent_to_count || submissions.length}
-                          </span>
-                          <span className="text-[10px] text-light-on-surface-variant">
-                            {a.evaluated_count} Evaluated
-                          </span>
+                        <div className="text-[11px] text-light-on-surface-variant mt-1 max-w-[150px] truncate">
+                          {a.track}
                         </div>
                       </td>
 
-                      {/* Lifecycle Status Pill */}
-                      <td className="py-2.5 px-3 whitespace-nowrap text-center">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            isCompleted
-                              ? 'bg-success-container text-on-success-container'
-                              : isAssigned
-                              ? 'bg-pending-container text-on-pending-container'
-                              : 'bg-light-surface-container text-light-on-surface-variant'
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              isCompleted ? 'bg-success' : isAssigned ? 'bg-pending' : 'bg-light-outline'
-                            }`}
-                          />
-                          <span>{a.status}</span>
-                        </span>
+                      {/* Due Date */}
+                      <td className="px-3 py-3 align-top whitespace-nowrap">
+                        <div className="flex items-center gap-1 text-xs font-semibold text-light-on-surface dark:text-dark-on-surface">
+                          <span className="material-symbols-outlined text-[14px] text-light-primary">calendar_today</span>
+                          <span>{a.due_date}</span>
+                        </div>
                       </td>
 
-                      {/* Lifecycle Action Buttons */}
-                      <td className="py-2.5 px-3 whitespace-nowrap text-right">
+                      {/* Marks */}
+                      <td className="px-3 py-3 align-top whitespace-nowrap">
+                        <div className="text-xs">
+                          <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
+                            {a.total_marks || 100} pts
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-light-on-surface-variant mt-0.5">
+                          Pass: <span className="font-semibold text-green-600 dark:text-green-400">{a.passing_marks || 50} pts</span>
+                        </div>
+                      </td>
+
+                      {/* Students / Progress */}
+                      <td className="px-3 py-3 align-top whitespace-nowrap">
+                        <div className="text-xs">
+                          {studentCount > 0 ? (
+                            <>
+                              <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
+                                {evaluatedCount}/{studentCount}
+                              </span>{' '}
+                              <span className="text-light-on-surface-variant">Evaluated</span>
+                              <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1 overflow-hidden">
+                                <div
+                                  className="bg-green-600 h-1.5 rounded-full"
+                                  style={{ width: `${studentCount > 0 ? (evaluatedCount / studentCount) * 100 : 0}%` }}
+                                ></div>
+                              </div>
+                            </>
+                          ) : (
+                            <span className="italic text-light-outline">Not dispatched</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-3 py-3 align-top whitespace-nowrap">
+                        {a.status === 'Draft' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+                            Draft
+                          </span>
+                        )}
+                        {a.status === 'Assigned' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                            Assigned (Sent)
+                          </span>
+                        )}
+                        {a.status === 'Completed' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+                            <span className="material-symbols-outlined text-[13px]">check_circle</span>
+                            Completed & Graded
+                          </span>
+                        )}
+                      </td>
+
+                      {/* 3-Stage Lifecycle Actions */}
+                      <td className="px-4 py-3 align-top text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
-                          {/* STAGE 1: DRAFT -> SEND TO STUDENTS */}
-                          {isDraft && (
+                          {/* STAGE 2: SEND TO STUDENTS */}
+                          {a.status === 'Draft' ? (
                             <button
                               type="button"
                               onClick={() => handleSendToStudents(a)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-light-primary text-light-on-primary text-[11px] font-semibold hover:bg-light-primary-container shadow-2xs transition-colors"
-                              title="Dispatch and send task to enrolled students"
+                              title="Send Assignment to Batch Students"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#2B1B54] text-white hover:bg-[#3b2575] font-label text-[11px] font-semibold shadow-xs transition-colors"
                             >
-                              <span className="material-symbols-outlined text-[13px]">send</span>
+                              <span className="material-symbols-outlined text-[14px]">send</span>
                               <span>Send to Students</span>
                             </button>
-                          )}
-
-                          {/* STAGE 2: ASSIGNED -> EVALUATE & COMPLETE */}
-                          {isAssigned && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => setEvaluatingAssignment(a)}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-light-outline-variant hover:bg-light-surface-container text-[11px] font-semibold text-light-on-surface"
-                                title="Grade student submissions"
-                              >
-                                <span className="material-symbols-outlined text-[13px]">rate_review</span>
-                                <span>Evaluate ({submissions.length})</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleCompleteAssignment(a)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-success text-white text-[11px] font-semibold hover:bg-success/90 shadow-2xs"
-                                title="Finalize and complete assignment"
-                              >
-                                <span className="material-symbols-outlined text-[13px]">check</span>
-                                <span>Complete</span>
-                              </button>
-                            </>
-                          )}
-
-                          {/* STAGE 3: COMPLETED -> VIEW SUMMARY */}
-                          {isCompleted && (
+                          ) : (
+                            /* STAGE 3: EVALUATE & COMPLETE */
                             <button
                               type="button"
-                              onClick={() => setEvaluatingAssignment(a)}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded bg-success-container text-on-success-container text-[11px] font-semibold hover:bg-success-container/80"
+                              onClick={() => openEvaluationModal(a)}
+                              title={a.status === 'Completed' ? 'Review & Update Grades' : 'Evaluate & Complete Assignment'}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded font-label text-[11px] font-semibold shadow-xs transition-colors ${
+                                a.status === 'Completed'
+                                  ? 'bg-green-700 text-white hover:bg-green-800'
+                                  : 'bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary hover:bg-light-primary-container'
+                              }`}
                             >
-                              <span className="material-symbols-outlined text-[13px]">visibility</span>
-                              <span>View Results</span>
+                              <span className="material-symbols-outlined text-[14px]">
+                                {a.status === 'Completed' ? 'verified' : 'fact_check'}
+                              </span>
+                              <span>{a.status === 'Completed' ? 'Review Results' : 'Complete It'}</span>
                             </button>
                           )}
+
+                          {/* View Details */}
+                          <button
+                            type="button"
+                            onClick={() => setViewingAssignment(a)}
+                            title="View Assignment Details"
+                            className="p-1 rounded text-light-on-surface-variant hover:bg-light-surface-container-low transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">visibility</span>
+                          </button>
+
+                          {/* Delete Assignment */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAssignment(a.id, a.title)}
+                            title="Delete Assignment"
+                            className="p-1 rounded text-error hover:bg-error-container/20 transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -637,119 +812,177 @@ export function AssignmentManagement() {
         </div>
       </section>
 
-      {/* ===================================================================== */}
-      {/* MODAL 1: CREATE ASSIGNMENT                                            */}
-      {/* ===================================================================== */}
+      {/* ========================================================================= */}
+      {/* MODAL 1: CREATE ASSIGNMENT                                                */}
+      {/* ========================================================================= */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-xs flex items-center justify-center p-3">
-          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md shadow-modal w-full max-w-lg p-4 flex flex-col gap-3 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-light-outline-variant pb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-5 py-4 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-light-primary text-[20px]">add_task</span>
-                <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
+                <span className="w-7 h-7 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary inline-flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[18px]">assignment</span>
+                </span>
+                <h2 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface">
                   Create New Academic Assignment
-                </h3>
+                </h2>
               </div>
-              <button type="button" onClick={() => setShowCreateModal(false)} className="p-1 text-light-on-surface-variant">
-                <span className="material-symbols-outlined text-[16px]">close</span>
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="p-1 rounded text-light-on-surface-variant hover:bg-light-surface-container-low"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
 
-            <form onSubmit={handleCreateAssignment} className="flex flex-col gap-3 text-xs">
+            <form onSubmit={handleCreateAssignment} className="p-5 flex flex-col gap-3.5 text-xs">
               <div>
-                <label className="block text-[11px] font-semibold mb-1">Assignment Title *</label>
+                <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Assignment Title <span className="text-error">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={newAssignmentForm.title}
                   onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, title: e.target.value })}
-                  placeholder="e.g. Next.js Server Components Architecture Lab"
-                  className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface"
+                  placeholder="e.g. Full-Stack E-Commerce REST API & Auth Middleware"
+                  className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold mb-1">Target Cohort Batch *</label>
+                  <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Target Cohort / Batch <span className="text-error">*</span>
+                  </label>
                   <select
                     value={newAssignmentForm.batch_code}
                     onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, batch_code: e.target.value })}
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   >
-                    <option value="BIX-DEV-24A">BIX-DEV-24A (Full-Stack Dev)</option>
-                    <option value="BIX-UX-26D">BIX-UX-26D (UI/UX Design)</option>
-                    <option value="BIX-MKT-26B">BIX-MKT-26B (Digital Marketing)</option>
-                    <option value="BIX-DS-18C">BIX-DS-18C (Data Science)</option>
+                    {batchOptions.map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold mb-1">Course Track Domain</label>
+                  <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Course Track Domain
+                  </label>
                   <input
                     type="text"
                     value={newAssignmentForm.track}
                     onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, track: e.target.value })}
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface"
+                    placeholder="e.g. Full-Stack Web Development"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold mb-1">Total Marks</label>
+                  <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Total Marks
+                  </label>
                   <input
                     type="number"
+                    min="10"
+                    max="500"
                     value={newAssignmentForm.total_marks}
-                    onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, total_marks: Number(e.target.value) })}
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface font-mono"
+                    onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, total_marks: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-[11px] font-semibold mb-1">Passing Marks</label>
+                  <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Passing Marks
+                  </label>
                   <input
                     type="number"
+                    min="1"
+                    max="500"
                     value={newAssignmentForm.passing_marks}
-                    onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, passing_marks: Number(e.target.value) })}
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface font-mono"
+                    onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, passing_marks: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-[11px] font-semibold mb-1">Submission Deadline</label>
+                  <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                    Submission Deadline
+                  </label>
                   <input
                     type="date"
-                    required
                     value={newAssignmentForm.due_date}
                     onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, due_date: e.target.value })}
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface font-mono"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold mb-1">Brief &amp; Deliverables Description</label>
+                <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Brief & Deliverable Instructions
+                </label>
                 <textarea
                   rows="3"
                   value={newAssignmentForm.description}
                   onChange={(e) => setNewAssignmentForm({ ...newAssignmentForm, description: e.target.value })}
                   placeholder="Explain instructions, GitHub repo submission format, and grading rubric..."
-                  className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface"
+                  className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 border-t border-light-outline-variant pt-2 mt-1">
+              <div>
+                <label className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Initial Status
+                </label>
+                <div className="flex items-center gap-4">
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="asn_status"
+                      value="Draft"
+                      checked={newAssignmentForm.status === 'Draft'}
+                      onChange={() => setNewAssignmentForm({ ...newAssignmentForm, status: 'Draft' })}
+                      className="text-light-primary focus:ring-0"
+                    />
+                    <span>Draft (Ready to dispatch later)</span>
+                  </label>
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="asn_status"
+                      value="Assigned"
+                      checked={newAssignmentForm.status === 'Assigned'}
+                      onChange={() => setNewAssignmentForm({ ...newAssignmentForm, status: 'Assigned' })}
+                      className="text-light-primary focus:ring-0"
+                    />
+                    <span>Assigned (Dispatch immediately to students)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-light-outline-variant dark:border-dark-outline-variant mt-2">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-3 py-1.5 rounded border border-light-outline-variant text-xs hover:bg-light-surface-container"
+                  disabled={isSubmitting}
+                  className="px-3.5 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant font-label text-xs font-medium text-light-on-surface hover:bg-light-surface-container-low"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-1.5 rounded bg-light-primary text-light-on-primary font-semibold text-xs hover:bg-light-primary-container"
+                  className="px-4 py-1.5 rounded bg-light-primary text-light-on-primary dark:bg-dark-primary dark:text-dark-on-primary font-label text-xs font-semibold shadow-xs hover:bg-light-primary-container"
                 >
-                  {isSubmitting ? 'Saving...' : 'Save as Draft'}
+                  {isSubmitting ? 'Saving...' : 'Create Assignment'}
                 </button>
               </div>
             </form>
@@ -757,136 +990,247 @@ export function AssignmentManagement() {
         </div>
       )}
 
-      {/* ===================================================================== */}
-      {/* MODAL 2: EVALUATE & GRADE SUBMISSIONS                                 */}
-      {/* ===================================================================== */}
+      {/* ========================================================================= */}
+      {/* MODAL 2: STAGE 3 - EVALUATION, GRADING & COMPLETION                       */}
+      {/* ========================================================================= */}
       {evaluatingAssignment && (
-        <div className="fixed inset-0 z-50 bg-sidebar/60 backdrop-blur-xs flex items-center justify-center p-3">
-          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant rounded-md shadow-modal w-full max-w-2xl p-4 flex flex-col gap-3 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-light-outline-variant pb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-lg shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="px-5 py-3.5 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between bg-light-surface-container-low dark:bg-dark-surface-container">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-bold text-light-primary bg-light-primary-tint px-1.5 py-0.2 rounded">
+                  <span className="font-mono text-xs font-bold text-light-primary bg-light-primary-tint px-1.5 py-0.5 rounded">
                     {evaluatingAssignment.assignment_uid}
                   </span>
-                  <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                    {evaluatingAssignment.title}
-                  </h3>
+                  <h2 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface">
+                    Assignment Grading & Completion
+                  </h2>
                 </div>
-                <span className="text-[11px] text-light-on-surface-variant">
-                  Cohort: {evaluatingAssignment.batch_code} • Total: {evaluatingAssignment.total_marks} pts • Due: {evaluatingAssignment.due_date}
-                </span>
+                <p className="font-body text-xs text-light-on-surface-variant mt-0.5">
+                  {evaluatingAssignment.title} • Cohort: <span className="font-semibold">{evaluatingAssignment.batch_code}</span> • Max Marks: {evaluatingAssignment.total_marks || 100} • Pass: {evaluatingAssignment.passing_marks || 50}
+                </p>
               </div>
-              <button type="button" onClick={() => setEvaluatingAssignment(null)} className="p-1 text-light-on-surface-variant">
-                <span className="material-symbols-outlined text-[16px]">close</span>
-              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleAutoFillPassingScores}
+                  className="px-2.5 py-1 rounded border border-light-outline-variant text-[11px] font-semibold text-light-primary bg-light-surface hover:bg-light-surface-container transition-colors inline-flex items-center gap-1"
+                  title="Auto populate realistic scores for quick testing"
+                >
+                  <span className="material-symbols-outlined text-[14px]">bolt</span>
+                  <span>Auto-Fill Passing Scores</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setEvaluatingAssignment(null)}
+                  className="p-1 rounded text-light-on-surface-variant hover:bg-light-surface-container"
+                >
+                  <span className="material-symbols-outlined text-[20px]">close</span>
+                </button>
+              </div>
             </div>
 
             {/* Submissions Roster */}
-            <div className="overflow-x-auto">
+            <div className="flex-1 overflow-y-auto p-4">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-light-outline-variant bg-light-surface-container-low/60 text-[11px] font-semibold text-light-on-surface-variant uppercase">
-                    <th className="py-2 px-2.5">Student</th>
-                    <th className="py-2 px-2.5">Submission Status</th>
-                    <th className="py-2 px-2.5">Awarded Score</th>
-                    <th className="py-2 px-2.5">Evaluator Feedback</th>
+                  <tr className="bg-light-surface-container-low dark:bg-dark-surface-container border-b border-light-outline-variant dark:border-dark-outline-variant text-light-on-surface-variant font-semibold">
+                    <th className="px-3 py-2">Candidate Info</th>
+                    <th className="px-2 py-2">Status</th>
+                    <th className="px-2 py-2">Score ({evaluatingAssignment.total_marks || 100})</th>
+                    <th className="px-3 py-2">Evaluator Remarks</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-light-outline-variant/60">
-                  {(evaluatingAssignment.student_submissions || []).length === 0 ? (
-                    <tr>
-                      <td colSpan="4" className="py-6 text-center text-light-on-surface-variant">
-                        No students enrolled or assigned yet. Dispatch assignment first.
+                <tbody className="divide-y divide-light-outline-variant/50 font-body">
+                  {evaluatingAssignment.student_submissions.map((st, idx) => (
+                    <tr key={idx} className="hover:bg-light-surface-container-low/40">
+                      {/* Candidate */}
+                      <td className="px-3 py-2.5 whitespace-nowrap">
+                        <div className="font-semibold text-light-on-surface dark:text-dark-on-surface">
+                          {st.full_name}
+                        </div>
+                        <div className="font-mono text-[11px] text-light-on-surface-variant">
+                          {st.student_id}
+                        </div>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-2 py-2.5 whitespace-nowrap">
+                        <select
+                          value={st.status || 'Pending'}
+                          onChange={(e) => handleStudentStatusChange(idx, e.target.value)}
+                          className={`px-2 py-1 text-xs rounded font-semibold border ${
+                            st.status === 'Evaluated'
+                              ? 'bg-green-50 text-green-700 border-green-300'
+                              : st.status === 'Submitted'
+                              ? 'bg-blue-50 text-blue-700 border-blue-300'
+                              : 'bg-gray-50 text-gray-700 border-gray-300'
+                          }`}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Submitted">Submitted</option>
+                          <option value="Evaluated">Evaluated</option>
+                        </select>
+                      </td>
+
+                      {/* Score */}
+                      <td className="px-2 py-2.5 whitespace-nowrap">
+                        <input
+                          type="number"
+                          min="0"
+                          max={evaluatingAssignment.total_marks || 100}
+                          value={st.score !== null && st.score !== undefined ? st.score : ''}
+                          onChange={(e) => handleStudentScoreChange(idx, e.target.value)}
+                          placeholder="Score"
+                          className="w-20 px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-semibold focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        />
+                      </td>
+
+                      {/* Remarks */}
+                      <td className="px-3 py-2.5">
+                        <input
+                          type="text"
+                          value={st.remarks || ''}
+                          onChange={(e) => handleStudentRemarkChange(idx, e.target.value)}
+                          placeholder="Feedback & notes..."
+                          className="w-full px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        />
                       </td>
                     </tr>
-                  ) : (
-                    evaluatingAssignment.student_submissions.map((st, idx) => (
-                      <tr key={st.student_id || idx} className="hover:bg-light-surface-container-low/30">
-                        <td className="py-2 px-2.5 whitespace-nowrap">
-                          <span className="font-semibold block">{st.full_name}</span>
-                          <span className="font-mono text-[10px] text-light-on-surface-variant">{st.student_id}</span>
-                        </td>
-                        <td className="py-2 px-2.5 whitespace-nowrap">
-                          <select
-                            value={st.status}
-                            onChange={(e) => {
-                              const newStatus = e.target.value
-                              const updated = evaluatingAssignment.student_submissions.map((item, i) =>
-                                i === idx ? { ...item, status: newStatus } : item
-                              )
-                              setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
-                            }}
-                            className="px-1.5 py-0.5 rounded text-[11px] border border-light-outline-variant bg-light-surface-container-low"
-                          >
-                            <option value="Pending">Pending</option>
-                            <option value="Submitted">Submitted</option>
-                            <option value="Evaluated">Evaluated</option>
-                          </select>
-                        </td>
-                        <td className="py-2 px-2.5 whitespace-nowrap">
-                          <input
-                            type="number"
-                            min="0"
-                            max={evaluatingAssignment.total_marks}
-                            value={st.score ?? ''}
-                            onChange={(e) => {
-                              const val = e.target.value === '' ? null : Number(e.target.value)
-                              const updated = evaluatingAssignment.student_submissions.map((item, i) =>
-                                i === idx ? { ...item, score: val, status: val !== null ? 'Evaluated' : item.status } : item
-                              )
-                              setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
-                            }}
-                            placeholder="0-100"
-                            className="w-16 px-1.5 py-0.5 rounded border border-light-outline-variant text-center font-mono font-bold"
-                          />
-                        </td>
-                        <td className="py-2 px-2.5">
-                          <input
-                            type="text"
-                            value={st.remarks || ''}
-                            onChange={(e) => {
-                              const val = e.target.value
-                              const updated = evaluatingAssignment.student_submissions.map((item, i) =>
-                                i === idx ? { ...item, remarks: val } : item
-                              )
-                              setEvaluatingAssignment({ ...evaluatingAssignment, student_submissions: updated })
-                            }}
-                            placeholder="Add evaluation note..."
-                            className="w-full px-1.5 py-0.5 rounded border border-light-outline-variant text-xs"
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                  ))}
                 </tbody>
               </table>
             </div>
 
-            <div className="flex items-center justify-between border-t border-light-outline-variant pt-2 mt-1">
-              <button
-                type="button"
-                onClick={() => handleCompleteAssignment(evaluatingAssignment)}
-                className="px-3 py-1 rounded bg-success text-white text-xs font-semibold hover:bg-success/90"
-              >
-                Mark Assignment as Completed
-              </button>
-              <div className="flex items-center gap-2">
+            {/* Footer Summary & Complete Button */}
+            <div className="px-5 py-3 border-t border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-4 text-light-on-surface-variant">
+                <span>
+                  Total: <strong className="text-light-on-surface dark:text-dark-on-surface">{evaluatingAssignment.student_submissions.length}</strong>
+                </span>
+                <span>
+                  Evaluated: <strong className="text-green-600">{evaluatingAssignment.student_submissions.filter((s) => s.status === 'Evaluated' && typeof s.score === 'number').length}</strong>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setEvaluatingAssignment(null)}
-                  className="px-3 py-1 rounded border border-light-outline-variant text-xs hover:bg-light-surface-container"
+                  disabled={isSubmitting}
+                  className="px-3 py-1.5 rounded border border-light-outline-variant text-light-on-surface hover:bg-light-surface font-label text-xs font-medium"
                 >
-                  Close
+                  Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSaveEvaluation(evaluatingAssignment.student_submissions)}
-                  className="px-4 py-1 rounded bg-light-primary text-light-on-primary text-xs font-semibold hover:bg-light-primary-container"
+                  onClick={handleCompleteAssignmentAndPublish}
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded bg-green-700 text-white hover:bg-green-800 font-label text-xs font-semibold shadow-xs"
                 >
-                  Save Evaluation
+                  <span className="material-symbols-outlined text-[16px]">verified</span>
+                  <span>{isSubmitting ? 'Finalizing...' : 'Complete Assignment & Publish Grades'}</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 3: VIEW ASSIGNMENT DETAILS                                          */}
+      {/* ========================================================================= */}
+      {viewingAssignment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-lg shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="px-5 py-4 border-b border-light-outline-variant dark:border-dark-outline-variant flex items-center justify-between">
+              <div>
+                <span className="font-mono text-xs font-bold text-light-primary bg-light-primary-tint px-1.5 py-0.5 rounded">
+                  {viewingAssignment.assignment_uid}
+                </span>
+                <h2 className="font-title text-base font-bold text-light-on-surface dark:text-dark-on-surface mt-1">
+                  {viewingAssignment.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingAssignment(null)}
+                className="p-1 rounded text-light-on-surface-variant hover:bg-light-surface-container-low"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            <div className="p-5 flex-1 overflow-y-auto text-xs flex flex-col gap-3.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-light-surface-container-low dark:bg-dark-surface-container p-3 rounded">
+                <div>
+                  <span className="text-light-on-surface-variant">Cohort:</span>
+                  <p className="font-bold text-light-on-surface dark:text-dark-on-surface">{viewingAssignment.batch_code}</p>
+                </div>
+                <div>
+                  <span className="text-light-on-surface-variant">Track:</span>
+                  <p className="font-bold text-light-on-surface dark:text-dark-on-surface">{viewingAssignment.track}</p>
+                </div>
+                <div>
+                  <span className="text-light-on-surface-variant">Deadline:</span>
+                  <p className="font-bold text-light-on-surface dark:text-dark-on-surface">{viewingAssignment.due_date}</p>
+                </div>
+                <div>
+                  <span className="text-light-on-surface-variant">Total Marks:</span>
+                  <p className="font-bold text-light-on-surface dark:text-dark-on-surface">{viewingAssignment.total_marks || 100} (Pass: {viewingAssignment.passing_marks || 50})</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                  Description & Deliverable Guidelines
+                </h4>
+                <p className="font-body text-xs text-light-on-surface-variant bg-light-surface-container-low dark:bg-dark-surface-container p-2.5 rounded border border-light-outline-variant">
+                  {viewingAssignment.description || 'No special instructions.'}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-2">
+                  Enrolled Candidates & Submissions ({Array.isArray(viewingAssignment.student_submissions) ? viewingAssignment.student_submissions.length : 0})
+                </h4>
+                {Array.isArray(viewingAssignment.student_submissions) && viewingAssignment.student_submissions.length > 0 ? (
+                  <div className="divide-y divide-light-outline-variant/60 border border-light-outline-variant rounded">
+                    {viewingAssignment.student_submissions.map((st, i) => (
+                      <div key={i} className="px-3 py-2 flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-semibold text-light-on-surface dark:text-dark-on-surface">{st.full_name}</span>
+                          <span className="font-mono text-light-outline ml-2">({st.student_id})</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {st.score !== null && typeof st.score === 'number' ? (
+                            <span className="font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                              {st.score}/{viewingAssignment.total_marks || 100} pts
+                            </span>
+                          ) : (
+                            <span className="text-light-outline italic">{st.status}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-light-on-surface-variant italic">No students assigned yet. Click "Send to Students" to dispatch this assignment.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="px-5 py-3 border-t border-light-outline-variant dark:border-dark-outline-variant flex justify-end">
+              <button
+                type="button"
+                onClick={() => setViewingAssignment(null)}
+                className="px-4 py-1.5 rounded bg-light-primary text-light-on-primary font-label text-xs font-semibold"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

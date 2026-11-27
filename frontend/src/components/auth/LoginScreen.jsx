@@ -202,6 +202,98 @@ export default function LoginScreen({ onLoginSuccess }) {
                   </>
                 )}
               </button>
+
+              {/* 1-Click Quick Demo Login Personas */}
+              <div className="pt-3 border-t border-light-outline-variant/60 dark:border-dark-outline-variant/60">
+                <span className="block text-[11px] font-semibold text-light-on-surface-variant dark:text-dark-on-surface-variant mb-2">
+                  1-Click Quick Sign-In (Select Role):
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@bixcel.edu')
+                      setPassword('Admin@123')
+                      onLoginSuccess({
+                        id: 1,
+                        name: 'Elena Rostova',
+                        email: 'admin@bixcel.edu',
+                        role: 'Super Admin',
+                        role_code: 'ROLE_SUPER_ADMIN',
+                        emp_id: 'BX-ADM-002',
+                        avatar: '',
+                      })
+                    }}
+                    className="p-1.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary dark:hover:text-black transition-colors text-left flex items-center gap-1.5 text-[11px] font-medium border border-light-outline-variant"
+                  >
+                    <span className="material-symbols-outlined text-[15px] text-light-primary">admin_panel_settings</span>
+                    <span className="truncate">Super Admin</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('dean@bixcel.edu')
+                      setPassword('Dean@123')
+                      onLoginSuccess({
+                        id: 2,
+                        name: 'Dr. Marcus Vance',
+                        email: 'dean@bixcel.edu',
+                        role: 'Academic Dean',
+                        role_code: 'ROLE_DEAN',
+                        emp_id: 'BX-FAC-014',
+                        avatar: '',
+                      })
+                    }}
+                    className="p-1.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary dark:hover:text-black transition-colors text-left flex items-center gap-1.5 text-[11px] font-medium border border-light-outline-variant"
+                  >
+                    <span className="material-symbols-outlined text-[15px] text-purple-600">school</span>
+                    <span className="truncate">Academic Dean</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('faculty@bixcel.edu')
+                      setPassword('Faculty@123')
+                      onLoginSuccess({
+                        id: 3,
+                        name: 'Sophia Chen',
+                        email: 'faculty@bixcel.edu',
+                        role: 'Tutor / Faculty',
+                        role_code: 'ROLE_TUTOR',
+                        emp_id: 'BX-TUT-089',
+                        avatar: '',
+                      })
+                    }}
+                    className="p-1.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary dark:hover:text-black transition-colors text-left flex items-center gap-1.5 text-[11px] font-medium border border-light-outline-variant"
+                  >
+                    <span className="material-symbols-outlined text-[15px] text-blue-600">co_present</span>
+                    <span className="truncate">Faculty Tutor</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('student@bixcel.edu')
+                      setPassword('Student@123')
+                      onLoginSuccess({
+                        id: 4,
+                        name: 'Marcus Vance',
+                        email: 'student@bixcel.edu',
+                        role: 'Student',
+                        role_code: 'ROLE_STUDENT',
+                        emp_id: 'STU-2026-0842',
+                        avatar: '',
+                      })
+                    }}
+                    className="p-1.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary dark:hover:text-black transition-colors text-left flex items-center gap-1.5 text-[11px] font-medium border border-light-outline-variant"
+                  >
+                    <span className="material-symbols-outlined text-[15px] text-green-600">person</span>
+                    <span className="truncate">Student</span>
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
         </div>

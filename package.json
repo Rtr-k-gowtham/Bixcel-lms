@@ -4,9 +4,9 @@
   "description": "Full-Stack Learning Management System with React 19 and CodeIgniter 4 PHP",
   "scripts": {
     "dev": "concurrently -n \"CI4-BACKEND,REACT-FRONTEND\" -c \"magenta,cyan\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && php spark serve --port 8080",
-    "build:frontend": "cd frontend && npm run build"
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "php -S localhost:8080 -t backend/public",
+    "build:frontend": "npm --prefix frontend run build"
   },
   "keywords": [
     "react",
