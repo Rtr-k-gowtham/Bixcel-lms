@@ -39,6 +39,10 @@ class CalendarController extends BaseApiController
                 'track' => $e['track'] ?? 'Full-Stack Web Development',
                 'batch' => $e['batch_code'] ?? 'BIX-DEV-24A',
                 'instructor' => $e['instructor'] ?? 'Dr. Aris Thorne',
+                'tutor_status' => $e['tutor_status'] ?? 'Present',
+                'substitute_tutor' => $e['substitute_tutor'] ?? null,
+                'substitution_reason' => $e['substitution_reason'] ?? null,
+                'student_arrivals' => !empty($e['student_arrivals']) ? (is_string($e['student_arrivals']) ? (json_decode($e['student_arrivals'], true) ?? $e['student_arrivals']) : $e['student_arrivals']) : null,
                 'date' => $e['date'],
                 'start_time' => $e['start_time'] ?? '09:00',
                 'end_time' => $e['end_time'] ?? '11:00',
@@ -97,6 +101,10 @@ class CalendarController extends BaseApiController
                 'track' => $e['track'],
                 'batch' => $e['batch_code'],
                 'instructor' => $e['instructor'],
+                'tutor_status' => $e['tutor_status'] ?? 'Present',
+                'substitute_tutor' => $e['substitute_tutor'] ?? null,
+                'substitution_reason' => $e['substitution_reason'] ?? null,
+                'student_arrivals' => !empty($e['student_arrivals']) ? (is_string($e['student_arrivals']) ? (json_decode($e['student_arrivals'], true) ?? $e['student_arrivals']) : $e['student_arrivals']) : null,
                 'date' => $e['date'],
                 'start_time' => $e['start_time'],
                 'end_time' => $e['end_time'],
@@ -143,6 +151,10 @@ class CalendarController extends BaseApiController
                 'track' => $e['track'],
                 'batch' => $e['batch_code'],
                 'instructor' => $e['instructor'],
+                'tutor_status' => $e['tutor_status'] ?? 'Present',
+                'substitute_tutor' => $e['substitute_tutor'] ?? null,
+                'substitution_reason' => $e['substitution_reason'] ?? null,
+                'student_arrivals' => !empty($e['student_arrivals']) ? (is_string($e['student_arrivals']) ? (json_decode($e['student_arrivals'], true) ?? $e['student_arrivals']) : $e['student_arrivals']) : null,
                 'date' => $e['date'],
                 'start_time' => $e['start_time'],
                 'end_time' => $e['end_time'],
@@ -176,9 +188,13 @@ class CalendarController extends BaseApiController
             'start_time' => $input['start_time'] ?? '10:00',
             'end_time' => $input['end_time'] ?? '11:00',
             'track' => $input['track'] ?? 'Full-Stack Web Development',
-            'batch_code' => $input['batch'] ?? 'FSW-2026-A',
+            'batch_code' => $input['batch'] ?? ($input['batch_code'] ?? 'FSW-2026-A'),
             'instructor' => $input['instructor'] ?? 'Lead Instructor',
-            'room' => $input['location'] ?? 'Lab 304',
+            'tutor_status' => $input['tutor_status'] ?? 'Present',
+            'substitute_tutor' => $input['substitute_tutor'] ?? null,
+            'substitution_reason' => $input['substitution_reason'] ?? null,
+            'student_arrivals' => isset($input['student_arrivals']) ? (is_array($input['student_arrivals']) ? json_encode($input['student_arrivals']) : $input['student_arrivals']) : null,
+            'room' => $input['location'] ?? ($input['room'] ?? 'Lab 304'),
             'description' => $input['description'] ?? '',
             'attendance_required' => 1,
             'created_at' => $now,
@@ -195,6 +211,10 @@ class CalendarController extends BaseApiController
             'track' => $eventData['track'],
             'batch' => $eventData['batch_code'],
             'instructor' => $eventData['instructor'],
+            'tutor_status' => $eventData['tutor_status'],
+            'substitute_tutor' => $eventData['substitute_tutor'],
+            'substitution_reason' => $eventData['substitution_reason'],
+            'student_arrivals' => isset($input['student_arrivals']) ? $input['student_arrivals'] : null,
             'date' => $eventData['date'],
             'start_time' => $eventData['start_time'],
             'end_time' => $eventData['end_time'],
@@ -233,7 +253,19 @@ class CalendarController extends BaseApiController
         if (isset($input['start_time'])) $update['start_time'] = $input['start_time'];
         if (isset($input['end_time'])) $update['end_time'] = $input['end_time'];
         if (isset($input['location'])) $update['room'] = $input['location'];
+        if (isset($input['room'])) $update['room'] = $input['room'];
         if (isset($input['description'])) $update['description'] = $input['description'];
+        if (isset($input['instructor'])) $update['instructor'] = $input['instructor'];
+        if (isset($input['tutor_status'])) $update['tutor_status'] = $input['tutor_status'];
+        if (isset($input['substitute_tutor'])) $update['substitute_tutor'] = $input['substitute_tutor'];
+        if (isset($input['substitution_reason'])) $update['substitution_reason'] = $input['substitution_reason'];
+        if (isset($input['student_arrivals'])) {
+            $update['student_arrivals'] = is_array($input['student_arrivals']) ? json_encode($input['student_arrivals']) : $input['student_arrivals'];
+        }
+        if (isset($input['batch'])) $update['batch_code'] = $input['batch'];
+        if (isset($input['batch_code'])) $update['batch_code'] = $input['batch_code'];
+        if (isset($input['track'])) $update['track'] = $input['track'];
+
         $update['updated_at'] = date('Y-m-d H:i:s');
 
         $eventModel->update($id, $update);

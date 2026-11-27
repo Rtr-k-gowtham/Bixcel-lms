@@ -23,6 +23,7 @@ import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
 import StudentCalendar from './components/calendar/StudentCalendar'
+import TimetableScheduling from './components/timetable/TimetableScheduling'
 import LoginScreen from './components/auth/LoginScreen'
 import { apiService } from './services/api'
 
@@ -244,9 +245,11 @@ function Dashboard({ currentUser, onLogout }) {
                       ? 'Tutor Management & Allocation'
                       : currentTab === 'batches'
                         ? 'Batch Management'
-                        : ['calendar', 'timetable'].includes(currentTab)
-                          ? 'Student Environment & Calendar'
-                          : currentTab === 'fees'
+                        : currentTab === 'timetable'
+                          ? 'Timetable & Daily Scheduling'
+                          : currentTab === 'calendar'
+                            ? 'Student Environment & Calendar'
+                            : currentTab === 'fees'
                             ? 'Fees & Payment Collection'
                             : currentTab === 'users'
                               ? 'User Master'
@@ -312,7 +315,9 @@ function Dashboard({ currentUser, onLogout }) {
           )}
 
           {/* Conditional Screen Rendering */}
-          {['calendar', 'timetable'].includes(currentTab) ? (
+          {currentTab === 'timetable' ? (
+            <TimetableScheduling />
+          ) : currentTab === 'calendar' ? (
             <StudentCalendar />
           ) : ['courses', 'builder', 'curriculum'].includes(currentTab) ? (
             <CourseManagement onNavigateToModules={() => handleTabChange('modules')} />
