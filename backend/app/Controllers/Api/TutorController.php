@@ -121,26 +121,27 @@ class TutorController extends BaseApiController
     public function create()
     {
         $input = $this->getRequestData();
+        $name = trim((string) ($input['name'] ?? ($input['full_name'] ?? '')));
 
-        if (empty($input['name'])) {
+        if (empty($name)) {
             return $this->failValidationErrors(['name' => 'Tutor Full Name is required.']);
         }
 
         $tutorModel = new TutorModel();
         $count = $tutorModel->countAllResults();
-        $staffId = !empty($input['staff_id']) ? trim((string) $input['staff_id']) : 'TUT-' . (120 + $count);
+        $staffId = !empty($input['staff_id']) ? trim((string) $input['staff_id']) : (!empty($input['tutor_id']) ? trim((string) $input['tutor_id']) : 'TUT-' . (120 + $count));
 
         $now = date('Y-m-d H:i:s');
         $tutorData = [
             'tutor_id' => $staffId,
-            'full_name' => trim((string) $input['name']),
-            'email' => !empty($input['email']) ? trim((string) $input['email']) : strtolower(str_replace(' ', '.', trim((string) $input['name']))) . '@bixcel.edu',
-            'phone' => !empty($input['phone']) ? trim((string) $input['phone']) : '+1 (555) 000-0000',
-            'specialization' => $input['expertise'] ?? ($input['role'] ?? 'Specialist'),
-            'assigned_track' => $input['courses'] ?? 'Engineering',
-            'status' => 'Active',
+            'full_name' => $name,
+            'email' => !empty($input['email']) ? trim((string) $input['email']) : strtolower(str_replace(' ', '.', $name)) . '@bixcel.edu',
+            'phone' => !empty($input['phone']) ? trim((string) $input['phone']) : '+91 98765 43210',
+            'specialization' => $input['expertise'] ?? ($input['specialization'] ?? ($input['role'] ?? 'Specialist')),
+            'assigned_track' => $input['courses'] ?? ($input['assigned_track'] ?? 'General Engineering'),
+            'status' => $input['status'] ?? 'Active',
             'rating' => (float) ($input['rating'] ?? 4.9),
-            'total_hours' => (int) ($input['hours'] ?? 12),
+            'total_hours' => (int) ($input['hours'] ?? ($input['total_hours'] ?? 14)),
             'created_at' => $now,
             'updated_at' => $now,
         ];
@@ -160,7 +161,7 @@ class TutorController extends BaseApiController
             'rating' => $tutorData['rating'],
             'email' => $tutorData['email'],
             'phone' => $tutorData['phone'],
-            'assigned_batches' => [],
+            'assigned_batches' => !empty($input['batch']) ? [$input['batch']] : ['BIX-2026-A'],
         ];
 
         return $this->respondCreated([
@@ -186,11 +187,16 @@ class TutorController extends BaseApiController
 
         $update = [];
         if (isset($input['name'])) $update['full_name'] = trim((string) $input['name']);
+        if (isset($input['full_name'])) $update['full_name'] = trim((string) $input['full_name']);
         if (isset($input['email'])) $update['email'] = trim((string) $input['email']);
         if (isset($input['phone'])) $update['phone'] = trim((string) $input['phone']);
         if (isset($input['role'])) $update['specialization'] = trim((string) $input['role']);
         if (isset($input['expertise'])) $update['specialization'] = trim((string) $input['expertise']);
+        if (isset($input['specialization'])) $update['specialization'] = trim((string) $input['specialization']);
         if (isset($input['courses'])) $update['assigned_track'] = trim((string) $input['courses']);
+        if (isset($input['assigned_track'])) $update['assigned_track'] = trim((string) $input['assigned_track']);
+        if (isset($input['status'])) $update['status'] = trim((string) $input['status']);
+        if (isset($input['hours'])) $update['total_hours'] = (int) $input['hours'];
         if (isset($input['rating'])) $update['rating'] = (float) $input['rating'];
         $update['updated_at'] = date('Y-m-d H:i:s');
 
