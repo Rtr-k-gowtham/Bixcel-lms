@@ -617,19 +617,22 @@ export function StudentManagement({ initialTab = 'directory' }) {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant font-label text-[10px] font-bold uppercase tracking-wider">
-                    <th className="py-2.5 px-3">Student &amp; ID</th>
-                    <th className="py-2.5 px-3">Guardian &amp; Contact</th>
-                    <th className="py-2.5 px-3">Academic &amp; Course</th>
-                    <th className="py-2.5 px-3">Curriculum &amp; Pacing</th>
-                    <th className="py-2.5 px-3 text-center">Status &amp; Fee</th>
+                  <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 text-light-on-surface-variant dark:text-dark-on-surface-variant font-label text-[11px] uppercase tracking-wider">
+                    <th className="py-2.5 px-3">Student ID</th>
+                    <th className="py-2.5 px-3">Student Name</th>
+                    <th className="py-2.5 px-3">Phone</th>
+                    <th className="py-2.5 px-3">Course / Track</th>
+                    <th className="py-2.5 px-3">Batch</th>
+                    <th className="py-2.5 px-3">Duration</th>
+                    <th className="py-2.5 px-3 text-center">Status</th>
+                    <th className="py-2.5 px-3 text-center">Fee Status</th>
                     <th className="py-2.5 px-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-light-outline-variant dark:divide-dark-outline-variant font-body text-xs">
+                <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 font-body text-xs">
                   {filteredStudents.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="py-10 text-center text-light-on-surface-variant">
+                      <td colSpan="9" className="py-10 text-center text-light-on-surface-variant">
                         <span className="material-symbols-outlined text-[32px] opacity-40 block mb-1">person_search</span>
                         <p className="font-semibold text-xs">No student profiles match current criteria</p>
                         <p className="text-[11px] opacity-80 mt-0.5">Try clearing filters or onboarding a new student</p>
@@ -642,121 +645,103 @@ export function StudentManagement({ initialTab = 'directory' }) {
                       return (
                         <tr
                           key={s.id}
-                          className="hover:bg-light-surface-container-low/50 dark:hover:bg-dark-surface-container/50 transition-colors"
+                          className="hover:bg-light-surface-container-low/40 dark:hover:bg-dark-surface-container/30 transition-colors"
                         >
-                          {/* Student & ID */}
-                          <td className="py-2 px-3 align-top whitespace-nowrap">
+                          {/* Student ID */}
+                          <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                            <span className="font-mono text-xs font-bold text-light-primary dark:text-dark-primary">
+                              {s.student_id}
+                            </span>
+                          </td>
+
+                          {/* Student Name */}
+                          <td className="py-2.5 px-3 whitespace-nowrap align-middle">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-light-primary text-light-on-primary font-bold text-[11px] flex items-center justify-center shrink-0">
+                              <div className="w-6 h-6 rounded-full bg-light-primary text-light-on-primary font-bold text-[10px] flex items-center justify-center shrink-0">
                                 {initials}
                               </div>
-                              <div className="flex flex-col">
-                                <span className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
-                                  {s.full_name}
-                                </span>
-                                <div className="flex items-center gap-1 font-mono text-[10px] text-light-on-surface-variant">
-                                  <span>{s.student_id}</span>
-                                  <span>•</span>
-                                  <span>{s.gender || 'M'}</span>
-                                  {s.blood_group && <span>({s.blood_group})</span>}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Guardian & Contact */}
-                          <td className="py-2 px-3 align-top">
-                            <div className="flex flex-col gap-0.5 max-w-[200px]">
-                              <span className="text-xs text-light-on-surface dark:text-dark-on-surface font-medium truncate">
-                                {s.guardian_name} ({s.guardian_relation || 'Parent'})
-                              </span>
-                              <span className="text-[11px] text-light-on-surface-variant font-mono truncate">
-                                {s.phone}
-                              </span>
-                              <span className="text-[10px] text-light-on-surface-variant truncate">
-                                {s.email}
+                              <span className="font-body text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
+                                {s.full_name}
                               </span>
                             </div>
                           </td>
 
-                          {/* Academic & Course */}
-                          <td className="py-2 px-3 align-top">
-                            <div className="flex flex-col gap-0.5">
-                              <span className="inline-flex items-center w-fit px-1.5 py-0.5 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint dark:text-dark-on-primary-tint font-label text-[10px] font-semibold">
-                                {s.track}
-                              </span>
-                              <div className="flex items-center gap-1.5 text-[11px] text-light-on-surface-variant">
-                                <span className="font-mono font-medium">{s.batch}</span>
-                                {s.qualification && (
-                                  <>
-                                    <span>•</span>
-                                    <span className="truncate max-w-[120px]">{s.qualification}</span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
+                          {/* Phone / Contact */}
+                          <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                            <span className="font-mono text-xs text-light-on-surface-variant">
+                              {s.phone}
+                            </span>
                           </td>
 
-                          {/* Curriculum & Pacing */}
-                          <td className="py-2 px-3 align-top whitespace-nowrap">
-                            <div className="flex flex-col gap-0.5">
-                              <div className="flex items-center gap-1">
-                                <span
-                                  className={`px-1.5 py-0.2 rounded font-label text-[10px] font-bold ${
-                                    s.course_mode === 'custom'
-                                      ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'
-                                      : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                                  }`}
-                                >
-                                  {s.course_mode === 'custom' ? 'Custom' : 'Standard'}
-                                </span>
-                                <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                                  {s.instructional_days} Days
-                                </span>
-                              </div>
-                              <span className="text-[10px] text-light-on-surface-variant">
-                                {s.module_chunks?.length || 1} module chunks assigned
-                              </span>
-                            </div>
+                          {/* Course / Academic Track */}
+                          <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                            <span className="px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-[11px] font-medium text-light-on-surface-variant">
+                              {s.track || 'General'}
+                            </span>
                           </td>
 
-                          {/* Status & Fee */}
-                          <td className="py-2 px-3 align-top whitespace-nowrap text-center">
-                            <div className="flex flex-col items-center gap-1">
+                          {/* Batch */}
+                          <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                            <span className="font-mono text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
+                              {s.batch}
+                            </span>
+                          </td>
+
+                          {/* Duration (Instructional Days) */}
+                          <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                            <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+                              {s.instructional_days || 0} Days
+                            </span>
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                s.status === 'Active'
+                                  ? 'bg-success-container text-on-success-container'
+                                  : 'bg-pending-container text-on-pending-container'
+                              }`}
+                            >
                               <span
-                                className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[10px] font-semibold ${
-                                  s.status === 'Active'
-                                    ? 'bg-success-container text-on-success-container'
-                                    : 'bg-pending-container text-on-pending-container'
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  s.status === 'Active' ? 'bg-success' : 'bg-pending'
                                 }`}
-                              >
-                                <span
-                                  className={`w-1 h-1 rounded-full ${
-                                    s.status === 'Active' ? 'bg-success' : 'bg-pending'
-                                  }`}
-                                />
-                                <span>{s.status}</span>
-                              </span>
-                              <span
-                                className={`text-[10px] px-1 py-0.2 rounded font-medium ${
-                                  s.fee_status === 'Paid'
-                                    ? 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300'
-                                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
-                                }`}
-                              >
-                                {s.fee_status || 'Paid'}
-                              </span>
-                            </div>
+                              />
+                              <span>{s.status}</span>
+                            </span>
+                          </td>
+
+                          {/* Fee Status */}
+                          <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                s.fee_status === 'Paid'
+                                  ? 'bg-success-container text-on-success-container'
+                                  : 'bg-pending-container text-on-pending-container'
+                              }`}
+                            >
+                              {s.fee_status || 'Paid'}
+                            </span>
                           </td>
 
                           {/* Actions */}
-                          <td className="py-2 px-3 align-top whitespace-nowrap text-right">
+                          <td className="py-2.5 px-3 whitespace-nowrap text-right align-middle">
                             <div className="flex items-center justify-end gap-1">
+                              <button
+                                type="button"
+                                onClick={() => setEditingStudent({ ...s })}
+                                title="Edit Profile Details"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded bg-light-primary text-light-on-primary hover:bg-light-primary-container font-label text-[11px] font-semibold transition-colors cursor-pointer"
+                              >
+                                <span className="material-symbols-outlined text-[14px]">edit</span>
+                                <span>Edit</span>
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => setSelectedStudent(s)}
                                 title="View Detailed Profile"
-                                className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low transition-colors"
+                                className="p-1 rounded text-light-on-surface-variant hover:text-light-on-surface hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
                               >
                                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                               </button>
@@ -764,23 +749,15 @@ export function StudentManagement({ initialTab = 'directory' }) {
                                 type="button"
                                 onClick={() => setViewingPass(s)}
                                 title="Print Enrollment Pass"
-                                className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low transition-colors"
+                                className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low dark:hover:bg-dark-surface-container transition-colors cursor-pointer"
                               >
                                 <span className="material-symbols-outlined text-[16px]">badge</span>
                               </button>
                               <button
                                 type="button"
-                                onClick={() => setEditingStudent({ ...s })}
-                                title="Edit Profile Details"
-                                className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container-low transition-colors"
-                              >
-                                <span className="material-symbols-outlined text-[16px]">edit</span>
-                              </button>
-                              <button
-                                type="button"
                                 onClick={() => handleDeleteStudent(s.id, s.full_name)}
                                 title="Delete / Archive Record"
-                                className="p-1 rounded text-light-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors"
+                                className="p-1 rounded text-light-on-surface-variant hover:text-overdue hover:bg-overdue-container/20 transition-colors cursor-pointer"
                               >
                                 <span className="material-symbols-outlined text-[16px]">delete</span>
                               </button>
