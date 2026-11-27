@@ -15,6 +15,7 @@ import { UserMaster, RoleMaster, PermissionMatrix } from './components/access'
 import { AuditLogs } from './components/audit/AuditLogs'
 import { NotificationsScreen } from './components/notifications/NotificationsScreen'
 import { UserProfileScreen } from './components/profile/UserProfileScreen'
+import CourseManagement from './components/courses/CourseManagement'
 import ModuleLibrary from './components/modules/ModuleLibrary'
 import StudentManagement from './components/students/StudentManagement'
 import StudentOnboarding from './components/students/StudentOnboarding'
@@ -313,6 +314,8 @@ function Dashboard({ currentUser, onLogout }) {
           {/* Conditional Screen Rendering */}
           {['calendar', 'timetable'].includes(currentTab) ? (
             <StudentCalendar />
+          ) : ['courses', 'builder', 'curriculum'].includes(currentTab) ? (
+            <CourseManagement onNavigateToModules={() => handleTabChange('modules')} />
           ) : currentTab === 'fees' ? (
             <FeesPayment />
           ) : currentTab === 'tutors' ? (

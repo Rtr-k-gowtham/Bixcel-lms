@@ -12,8 +12,14 @@ class CourseModel extends Model
     protected $returnType = 'array';
     protected $allowedFields = [
         'title',
+        'code',
+        'category',
         'instructor',
         'level',
+        'price',
+        'days',
+        'module_ids',
+        'status',
         'duration',
         'description',
     ];

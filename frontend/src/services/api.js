@@ -92,6 +92,18 @@ export const apiService = {
     return response.data
   },
 
+  // Update existing course
+  updateCourse: async (id, courseData) => {
+    const response = await apiClient.put(`/courses/${id}`, courseData)
+    return response.data
+  },
+
+  // Delete course
+  deleteCourse: async (id) => {
+    const response = await apiClient.delete(`/courses/${id}`)
+    return response.data
+  },
+
   // Module Library API
   getModules: async () => {
     const response = await apiClient.get('/modules')
