@@ -502,6 +502,18 @@ class StudentController extends BaseApiController
 
         $studentModel->update($student['id'], $updateData);
 
+        if (isset($input['batch']) || isset($input['batch_id'])) {
+            $batchCode = $input['batch'] ?? $input['batch_id'];
+            $enrollmentModel = new StudentEnrollmentModel();
+            $enrollment = $enrollmentModel->where('student_code', $student['student_id'])->first();
+            if ($enrollment) {
+                $enrollmentModel->update($enrollment['id'], [
+                    'batch_id' => $batchCode,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
         return $this->respond([
             'status' => 'success',
             'message' => "Student {$student['full_name']} details updated successfully in database.",

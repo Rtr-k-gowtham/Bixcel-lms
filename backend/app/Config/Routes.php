@@ -20,6 +20,8 @@ $defineApiRoutes = static function ($routes) {
     $routes->get('health', 'Api\HealthController::index');
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
     $routes->resource('modules', ['controller' => 'Api\ModuleController']);
+    $routes->post('batches/assign-students', 'Api\BatchController::assignStudents');
+    $routes->post('batches/remove-student', 'Api\BatchController::removeStudent');
     $routes->resource('batches', ['controller' => 'Api\BatchController']);
     $routes->post('tutors/assign', 'Api\TutorController::assign');
     $routes->resource('tutors', ['controller' => 'Api\TutorController']);

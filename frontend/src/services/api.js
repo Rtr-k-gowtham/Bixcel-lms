@@ -261,6 +261,14 @@ export const apiService = {
     const response = await apiClient.delete(`/batches/${id}`)
     return response.data
   },
+  assignBatchStudents: async (payload) => {
+    const response = await apiClient.post('/batches/assign-students', payload)
+    return response.data
+  },
+  removeBatchStudent: async (payload) => {
+    const response = await apiClient.post('/batches/remove-student', payload)
+    return response.data
+  },
 
   // Tutor Management & Allocation API
   getTutors: async (params = {}) => {
