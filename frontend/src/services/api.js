@@ -361,6 +361,72 @@ export const apiService = {
     const response = await apiClient.post('/progress/remark', remarkData)
     return response.data
   },
+
+  // Assignment Management API
+  getAssignments: async (params = {}) => {
+    const response = await apiClient.get('/assignments', { params })
+    return response.data
+  },
+  getAssignment: async (id) => {
+    const response = await apiClient.get(`/assignments/${id}`)
+    return response.data
+  },
+  createAssignment: async (data) => {
+    const response = await apiClient.post('/assignments', data)
+    return response.data
+  },
+  updateAssignment: async (id, data) => {
+    const response = await apiClient.put(`/assignments/${id}`, data)
+    return response.data
+  },
+  deleteAssignment: async (id) => {
+    const response = await apiClient.delete(`/assignments/${id}`)
+    return response.data
+  },
+
+  // Examination Management API
+  getExams: async (params = {}) => {
+    const response = await apiClient.get('/exams', { params })
+    return response.data
+  },
+  getExam: async (id) => {
+    const response = await apiClient.get(`/exams/${id}`)
+    return response.data
+  },
+  createExam: async (data) => {
+    const response = await apiClient.post('/exams', data)
+    return response.data
+  },
+  updateExam: async (id, data) => {
+    const response = await apiClient.put(`/exams/${id}`, data)
+    return response.data
+  },
+  deleteExam: async (id) => {
+    const response = await apiClient.delete(`/exams/${id}`)
+    return response.data
+  },
+
+  // Competency Milestones API
+  getMilestones: async (params = {}) => {
+    const response = await apiClient.get('/milestones', { params })
+    return response.data
+  },
+  getMilestone: async (id) => {
+    const response = await apiClient.get(`/milestones/${id}`)
+    return response.data
+  },
+  createMilestone: async (data) => {
+    const response = await apiClient.post('/milestones', data)
+    return response.data
+  },
+  updateMilestone: async (id, data) => {
+    const response = await apiClient.put(`/milestones/${id}`, data)
+    return response.data
+  },
+  deleteMilestone: async (id) => {
+    const response = await apiClient.delete(`/milestones/${id}`)
+    return response.data
+  },
 }
 
 export default apiService

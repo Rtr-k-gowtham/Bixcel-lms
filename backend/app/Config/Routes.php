@@ -31,6 +31,9 @@ $defineApiRoutes = static function ($routes) {
     $routes->post('fees/collect', 'Api\FeeController::collect');
     $routes->get('fees/receipt/(:segment)', 'Api\FeeController::receipt/$1');
     $routes->resource('fees', ['controller' => 'Api\FeeController']);
+    $routes->resource('assignments', ['controller' => 'Api\AssignmentController']);
+    $routes->resource('exams', ['controller' => 'Api\ExamController']);
+    $routes->resource('milestones', ['controller' => 'Api\MilestoneController']);
     $routes->get('calendar/today', 'Api\CalendarController::today');
     $routes->resource('calendar', ['controller' => 'Api\CalendarController']);
     $routes->post('progress/remark', 'Api\ProgressController::remark');

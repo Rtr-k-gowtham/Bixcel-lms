@@ -24,6 +24,9 @@ import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
 import StudentCalendar from './components/calendar/StudentCalendar'
 import TimetableScheduling from './components/timetable/TimetableScheduling'
+import AssignmentManagement from './components/assignments/AssignmentManagement'
+import ExamManagement from './components/exams/ExamManagement'
+import MilestoneManagement from './components/milestones/MilestoneManagement'
 import LoginScreen from './components/auth/LoginScreen'
 import { apiService } from './services/api'
 
@@ -233,8 +236,14 @@ function Dashboard({ currentUser, onLogout }) {
         {/* Top Navigation Header */}
         <Header
           breadcrumbCurrent={
-            currentTab === 'courses'
-              ? 'Course Management'
+            currentTab === 'assignments'
+              ? 'Assignment Management'
+              : currentTab === 'exams'
+                ? 'Examination Management'
+                : currentTab === 'milestones'
+                  ? 'Competency Milestones'
+                  : currentTab === 'courses'
+                    ? 'Course Management'
               : currentTab === 'modules'
                 ? 'Module Library'
                 : currentTab === 'students'
@@ -315,7 +324,13 @@ function Dashboard({ currentUser, onLogout }) {
           )}
 
           {/* Conditional Screen Rendering */}
-          {currentTab === 'timetable' ? (
+          {currentTab === 'assignments' ? (
+            <AssignmentManagement />
+          ) : currentTab === 'exams' ? (
+            <ExamManagement />
+          ) : currentTab === 'milestones' ? (
+            <MilestoneManagement />
+          ) : currentTab === 'timetable' ? (
             <TimetableScheduling />
           ) : currentTab === 'calendar' ? (
             <StudentCalendar />
