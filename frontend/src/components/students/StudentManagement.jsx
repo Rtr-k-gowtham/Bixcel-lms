@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { apiService } from '../../services/api'
 
 // Fallback track catalog matching UI reference
@@ -152,63 +152,211 @@ export function StudentManagement({ initialTab = 'directory' }) {
   // STEP-BY-STEP ONBOARDING WIZARD STATE
   // -------------------------------------------------------------
   const [wizardStep, setWizardStep] = useState(1) // 1: Personal, 2: Guardian/Academic, 3: Course/Batch, 4: Modules, 5: Review
-  const [wizardCourseMode, setWizardCourseMode] = useState('custom') // 'custom' | 'standard'
+  const [wizardCourseMode, setWizardCourseMode] = useState('standard') // 'standard' (Course) | 'custom' (Custom Modular)
   const [wizardTrack, setWizardTrack] = useState('Full-Stack Web Development')
+  const [coursesList, setCoursesList] = useState([])
+  const [modulesList, setModulesList] = useState([])
+  const [selectedCourseId, setSelectedCourseId] = useState('')
   const [selectedModuleIds, setSelectedModuleIds] = useState(() => {
     return TRACK_CATALOG['Full-Stack Web Development'].modules.filter((m) => m.default).map((m) => m.id)
   })
+  const [moduleSearch, setModuleSearch] = useState('')
+  const [moduleCategoryFilter, setModuleCategoryFilter] = useState('All')
 
   const [wizardForm, setWizardForm] = useState(INITIAL_WIZARD_FORM)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Load backend students on mount
+  // Load backend students, courses, and modules on mount
   useEffect(() => {
     let isMounted = true
-    const fetchStudents = async () => {
+    const fetchAllData = async () => {
       try {
-        const res = await apiService.getStudents()
-        if (res && res.data && Array.isArray(res.data) && isMounted) {
-          setStudents(res.data)
+        const [studentsRes, coursesRes, modulesRes] = await Promise.allSettled([
+          apiService.getStudents(),
+          apiService.getCourses(),
+          apiService.getModules(),
+        ])
+
+        if (!isMounted) return
+
+        if (studentsRes.status === 'fulfilled' && studentsRes.value?.data) {
+          setStudents(Array.isArray(studentsRes.value.data) ? studentsRes.value.data : [])
+          if (studentsRes.value.tracks) {
+            setTracks(studentsRes.value.tracks)
+          }
         }
-        if (res && res.tracks && isMounted) {
-          setTracks(res.tracks)
+
+        if (coursesRes.status === 'fulfilled' && coursesRes.value?.data) {
+          const cData = Array.isArray(coursesRes.value.data) ? coursesRes.value.data : []
+          setCoursesList(cData)
+          if (cData.length > 0) {
+            const first = cData[0]
+            setSelectedCourseId(first.id)
+            setWizardTrack(first.title)
+            if (first.code) {
+              setWizardForm((prev) => ({ ...prev, batch: `${first.code}-26A` }))
+            }
+          }
+        }
+
+        if (modulesRes.status === 'fulfilled' && modulesRes.value?.data) {
+          const mData = Array.isArray(modulesRes.value.data) ? modulesRes.value.data : []
+          setModulesList(mData)
         }
       } catch (err) {
         console.warn('Fallback to local student records:', err)
       }
     }
-    fetchStudents()
+    fetchAllData()
     return () => { isMounted = false }
   }, [])
 
-  // Track change in Wizard
+  // All available modules from Module Library (with fallback if empty)
+  const allAvailableModules = useMemo(() => {
+    if (modulesList && modulesList.length > 0) {
+      return modulesList
+    }
+    const fallbackList = []
+    Object.entries(TRACK_CATALOG).forEach(([catName, trackObj]) => {
+      (trackObj.modules || []).forEach((m) => {
+        fallbackList.push({
+          id: m.id,
+          code: m.id,
+          title: m.title,
+          category: trackObj.category || catName,
+          days: m.days || 1,
+          lessons: m.days ? m.days * 2 : 1,
+          description: m.desc || '',
+        })
+      })
+    })
+    return fallbackList
+  }, [modulesList])
+
+  // Selected Course Object
+  const selectedCourse = useMemo(() => {
+    if (!coursesList || coursesList.length === 0) return null
+    if (!selectedCourseId) return coursesList[0]
+    return coursesList.find((c) => String(c.id) === String(selectedCourseId)) || coursesList[0]
+  }, [coursesList, selectedCourseId])
+
+  // Modules belonging to selected Course
+  const selectedCourseModules = useMemo(() => {
+    if (!selectedCourse) return []
+    const rawIds = selectedCourse.module_ids || []
+    const idSet = new Set(rawIds.map((id) => String(id)))
+    return allAvailableModules.filter((m) => idSet.has(String(m.id)) || idSet.has(String(m.code)))
+  }, [selectedCourse, allAvailableModules])
+
+  // Modules selected in Custom Modular mode
+  const selectedCustomModules = useMemo(() => {
+    return allAvailableModules.filter((m) => {
+      const idKey = m.id
+      const codeKey = m.code
+      return selectedModuleIds.includes(idKey) || (codeKey && selectedModuleIds.includes(codeKey))
+    })
+  }, [allAvailableModules, selectedModuleIds])
+
+  // Cumulative Instructional Days calculation
+  const cumulativeDays = useMemo(() => {
+    if (wizardCourseMode === 'standard') {
+      if (selectedCourse?.days && Number(selectedCourse.days) > 0) {
+        return Number(selectedCourse.days)
+      }
+      if (selectedCourseModules.length > 0) {
+        return selectedCourseModules.reduce((sum, m) => sum + (Number(m.days) || 0), 0)
+      }
+      return 60
+    }
+    return selectedCustomModules.reduce((sum, m) => sum + (Number(m.days) || 0), 0)
+  }, [wizardCourseMode, selectedCourse, selectedCourseModules, selectedCustomModules])
+
+  // Effective modules for this student
+  const effectiveModules = useMemo(() => {
+    if (wizardCourseMode === 'standard') {
+      if (selectedCourseModules.length > 0) return selectedCourseModules
+      if (selectedCourse) {
+        return [{
+          id: selectedCourse.code || `CRS-${selectedCourse.id}`,
+          code: selectedCourse.code || `CRS-${selectedCourse.id}`,
+          title: selectedCourse.title,
+          days: cumulativeDays,
+          category: selectedCourse.category || 'General',
+          description: selectedCourse.description || `Standard institutional curriculum for ${selectedCourse.title}`,
+        }]
+      }
+      return []
+    }
+    return selectedCustomModules
+  }, [wizardCourseMode, selectedCourseModules, selectedCourse, cumulativeDays, selectedCustomModules])
+
+  // Module Category domain list for filter
+  const moduleCategories = useMemo(() => {
+    const set = new Set(['All'])
+    allAvailableModules.forEach((m) => {
+      if (m.category) set.add(m.category)
+    })
+    return Array.from(set)
+  }, [allAvailableModules])
+
+  // Filtered modules for Custom Modular selection
+  const filteredModulesForCustom = useMemo(() => {
+    return allAvailableModules.filter((m) => {
+      const q = moduleSearch.toLowerCase().trim()
+      const matchSearch =
+        !q ||
+        m.title?.toLowerCase().includes(q) ||
+        m.code?.toLowerCase().includes(q) ||
+        m.category?.toLowerCase().includes(q) ||
+        m.description?.toLowerCase().includes(q)
+      const matchCat =
+        moduleCategoryFilter === 'All' ||
+        m.category?.toLowerCase() === moduleCategoryFilter.toLowerCase()
+      return matchSearch && matchCat
+    })
+  }, [allAvailableModules, moduleSearch, moduleCategoryFilter])
+
+  // Toggle Module Checkbox
+  const handleToggleModule = (mod) => {
+    const idKey = mod.id
+    const codeKey = mod.code
+    setSelectedModuleIds((prev) => {
+      const has = prev.includes(idKey) || (codeKey && prev.includes(codeKey))
+      if (has) {
+        return prev.filter((id) => id !== idKey && id !== codeKey)
+      } else {
+        return [...prev, idKey]
+      }
+    })
+  }
+
+  // Handle Track change in Wizard (for custom mode)
   const handleWizardTrackChange = (trackName) => {
     setWizardTrack(trackName)
     const trackData = tracks[trackName] || TRACK_CATALOG[trackName]
     if (trackData && trackData.modules) {
-      setSelectedModuleIds(trackData.modules.filter((m) => m.default).map((m) => m.id))
+      const defaults = trackData.modules.filter((m) => m.default).map((m) => m.id)
+      setSelectedModuleIds((prev) => Array.from(new Set([...prev, ...defaults])))
     }
     if (trackData?.batch_prefix) {
       setWizardForm((prev) => ({ ...prev, batch: trackData.batch_prefix }))
     }
   }
 
-  // Toggle Module Checkbox
-  const handleToggleModule = (modId) => {
-    setSelectedModuleIds((prev) =>
-      prev.includes(modId) ? prev.filter((id) => id !== modId) : [...prev, modId]
-    )
+  // Handle Course selection in Course mode
+  const handleSelectCourse = (courseId) => {
+    setSelectedCourseId(courseId)
+    const found = coursesList.find((c) => String(c.id) === String(courseId))
+    if (found) {
+      setWizardTrack(found.title)
+      if (found.code) {
+        setWizardForm((prev) => ({ ...prev, batch: `${found.code}-26A` }))
+      }
+      if (found.module_ids && Array.isArray(found.module_ids) && found.module_ids.length > 0) {
+        setSelectedModuleIds(found.module_ids)
+      }
+    }
   }
-
-  // Calculate Cumulative Days
-  const currentTrackData = tracks[wizardTrack] || TRACK_CATALOG[wizardTrack] || { modules: [] }
-  const selectedModules = (currentTrackData.modules || []).filter((m) =>
-    selectedModuleIds.includes(m.id)
-  )
-  const cumulativeDays =
-    wizardCourseMode === 'custom'
-      ? selectedModules.reduce((acc, curr) => acc + curr.days, 0)
-      : 60
 
   // Wizard Step Validation
   const validateStep = (step) => {
@@ -231,15 +379,26 @@ export function StudentManagement({ initialTab = 'directory' }) {
       return true
     }
     if (step === 3) {
-      if (!wizardTrack || !wizardForm.batch) {
-        alert('Please select a course track and batch')
+      if (wizardCourseMode === 'standard') {
+        if (!selectedCourseId && coursesList.length > 0) {
+          alert('Please select a Course Program')
+          return false
+        }
+      } else {
+        if (!wizardTrack.trim()) {
+          alert('Please select or enter a course track')
+          return false
+        }
+      }
+      if (!wizardForm.batch.trim()) {
+        alert('Please enter an assigned batch cohort')
         return false
       }
       return true
     }
     if (step === 4) {
-      if (wizardCourseMode === 'custom' && selectedModules.length === 0) {
-        alert('Please select at least one module chunk for custom curriculum')
+      if (wizardCourseMode === 'custom' && selectedCustomModules.length === 0) {
+        alert('Please select at least one module from the Module Library to frame this custom course')
         return false
       }
       return true
@@ -295,10 +454,11 @@ export function StudentManagement({ initialTab = 'directory' }) {
       track: wizardTrack,
       batch: wizardForm.batch,
       instructional_days: cumulativeDays,
-      module_chunks:
-        wizardCourseMode === 'custom'
-          ? selectedModules.map((m) => ({ title: m.title, days: m.days }))
-          : [{ title: `Full Curriculum ${wizardTrack} Standard Program`, days: 60 }],
+      module_chunks: effectiveModules.map((m) => ({
+        title: m.title,
+        days: Number(m.days) || 1,
+        code: m.code || m.id,
+      })),
       last_login_at: 'Never',
       created_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
     }
@@ -423,11 +583,10 @@ export function StudentManagement({ initialTab = 'directory' }) {
             <button
               type="button"
               onClick={() => setActiveTab('directory')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${
-                activeTab === 'directory'
-                  ? 'bg-light-primary text-light-on-primary shadow-xs'
-                  : 'text-light-on-surface-variant hover:text-light-on-surface'
-              }`}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${activeTab === 'directory'
+                ? 'bg-light-primary text-light-on-primary shadow-xs'
+                : 'text-light-on-surface-variant hover:text-light-on-surface'
+                }`}
             >
               <span className="material-symbols-outlined text-[15px]">badge</span>
               <span>Student Directory</span>
@@ -438,11 +597,10 @@ export function StudentManagement({ initialTab = 'directory' }) {
                 setActiveTab('wizard')
                 setWizardStep(1)
               }}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${
-                activeTab === 'wizard'
-                  ? 'bg-light-primary text-light-on-primary shadow-xs'
-                  : 'text-light-on-surface-variant hover:text-light-on-surface'
-              }`}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-label text-xs font-semibold transition-colors ${activeTab === 'wizard'
+                ? 'bg-light-primary text-light-on-primary shadow-xs'
+                : 'text-light-on-surface-variant hover:text-light-on-surface'
+                }`}
             >
               <span className="material-symbols-outlined text-[15px]">person_add</span>
               <span>Onboarding Wizard</span>
@@ -579,8 +737,8 @@ export function StudentManagement({ initialTab = 'directory' }) {
                 className="px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
               >
                 <option value="All">All Curriculum Modes</option>
-                <option value="custom">Custom Chunks</option>
-                <option value="standard">Standard Syllabus</option>
+                <option value="standard">Course</option>
+                <option value="custom">Custom Modular</option>
               </select>
 
               <select
@@ -675,9 +833,20 @@ export function StudentManagement({ initialTab = 'directory' }) {
 
                           {/* Course / Academic Track */}
                           <td className="py-2.5 px-3 whitespace-nowrap align-middle">
-                            <span className="px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-[11px] font-medium text-light-on-surface-variant">
-                              {s.track || 'General'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-[11px] font-medium text-light-on-surface-variant">
+                                {s.track || 'General'}
+                              </span>
+                              {s.course_mode === 'custom' ? (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-light-secondary-container text-light-on-secondary-container">
+                                  Custom
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint">
+                                  Course
+                                </span>
+                              )}
+                            </div>
                           </td>
 
                           {/* Batch */}
@@ -697,16 +866,14 @@ export function StudentManagement({ initialTab = 'directory' }) {
                           {/* Status */}
                           <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
                             <span
-                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                s.status === 'Active'
-                                  ? 'bg-success-container text-on-success-container'
-                                  : 'bg-pending-container text-on-pending-container'
-                              }`}
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.status === 'Active'
+                                ? 'bg-success-container text-on-success-container'
+                                : 'bg-pending-container text-on-pending-container'
+                                }`}
                             >
                               <span
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  s.status === 'Active' ? 'bg-success' : 'bg-pending'
-                                }`}
+                                className={`w-1.5 h-1.5 rounded-full ${s.status === 'Active' ? 'bg-success' : 'bg-pending'
+                                  }`}
                               />
                               <span>{s.status}</span>
                             </span>
@@ -715,11 +882,10 @@ export function StudentManagement({ initialTab = 'directory' }) {
                           {/* Fee Status */}
                           <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                s.fee_status === 'Paid'
-                                  ? 'bg-success-container text-on-success-container'
-                                  : 'bg-pending-container text-on-pending-container'
-                              }`}
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${s.fee_status === 'Paid'
+                                ? 'bg-success-container text-on-success-container'
+                                : 'bg-pending-container text-on-pending-container'
+                                }`}
                             >
                               {s.fee_status || 'Paid'}
                             </span>
@@ -795,8 +961,8 @@ export function StudentManagement({ initialTab = 'directory' }) {
                 <h2 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
                   {wizardStep === 1 && 'Personal Information & Identification'}
                   {wizardStep === 2 && 'Guardian, Contact & Academic Background'}
-                  {wizardStep === 3 && 'Course Track & Cohort Allocation'}
-                  {wizardStep === 4 && 'Modular Curriculum & Chunk Selection'}
+                  {wizardStep === 3 && (wizardCourseMode === 'standard' ? 'Course Program & Cohort Allocation' : 'Custom Modular Track & Cohort Allocation')}
+                  {wizardStep === 4 && (wizardCourseMode === 'standard' ? 'Course Program Curriculum & Modules' : 'Module Library & Custom Course Framing')}
                   {wizardStep === 5 && 'Fee Plan, Review & Confirm Admission'}
                 </h2>
               </div>
@@ -826,13 +992,12 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     onClick={() => {
                       if (s < wizardStep || validateStep(wizardStep)) setWizardStep(s)
                     }}
-                    className={`h-7 rounded px-1.5 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors ${
-                      isPassed
-                        ? 'bg-success text-white'
-                        : isCurrent
+                    className={`h-7 rounded px-1.5 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors ${isPassed
+                      ? 'bg-success text-white'
+                      : isCurrent
                         ? 'bg-light-primary text-light-on-primary'
                         : 'bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant'
-                    }`}
+                      }`}
                   >
                     {isPassed ? (
                       <span className="material-symbols-outlined text-[13px]">check</span>
@@ -1115,59 +1280,87 @@ export function StudentManagement({ initialTab = 'directory' }) {
               <div className="flex flex-col gap-3 animate-in fade-in duration-150">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div
-                    onClick={() => setWizardCourseMode('standard')}
-                    className={`p-3 rounded border cursor-pointer transition-all ${
-                      wizardCourseMode === 'standard'
-                        ? 'border-light-primary bg-light-primary-tint/30 dark:bg-dark-primary-tint/30 shadow-xs'
-                        : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:bg-light-surface-container'
-                    }`}
+                    onClick={() => {
+                      setWizardCourseMode('standard')
+                      if (coursesList.length > 0) {
+                        const first = coursesList.find((c) => String(c.id) === String(selectedCourseId)) || coursesList[0]
+                        setWizardTrack(first.title)
+                        if (first.code) setWizardForm((prev) => ({ ...prev, batch: `${first.code}-26A` }))
+                      }
+                    }}
+                    className={`p-3 rounded border cursor-pointer transition-all ${wizardCourseMode === 'standard'
+                      ? 'border-light-primary bg-light-primary-tint/30 dark:bg-dark-primary-tint/30 shadow-xs'
+                      : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:bg-light-surface-container'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-light-primary text-[18px]">
                         {wizardCourseMode === 'standard' ? 'radio_button_checked' : 'radio_button_unchecked'}
                       </span>
-                      <strong className="text-xs text-light-on-surface dark:text-dark-on-surface">Standard Institutional Syllabus</strong>
+                      <strong className="text-xs text-light-on-surface dark:text-dark-on-surface">Course</strong>
                     </div>
                     <p className="text-[11px] text-light-on-surface-variant mt-1 pl-6">
-                      Fixed 60-day curriculum with standardized lecture modules and predetermined milestones.
+                      Select a pre-framed course program created in Course Management.
                     </p>
                   </div>
 
                   <div
                     onClick={() => setWizardCourseMode('custom')}
-                    className={`p-3 rounded border cursor-pointer transition-all ${
-                      wizardCourseMode === 'custom'
-                        ? 'border-light-primary bg-light-primary-tint/30 dark:bg-dark-primary-tint/30 shadow-xs'
-                        : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:bg-light-surface-container'
-                    }`}
+                    className={`p-3 rounded border cursor-pointer transition-all ${wizardCourseMode === 'custom'
+                      ? 'border-light-primary bg-light-primary-tint/30 dark:bg-dark-primary-tint/30 shadow-xs'
+                      : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:bg-light-surface-container'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-light-primary text-[18px]">
                         {wizardCourseMode === 'custom' ? 'radio_button_checked' : 'radio_button_unchecked'}
                       </span>
-                      <strong className="text-xs text-light-on-surface dark:text-dark-on-surface">Custom Modular Track (Pick Chunks)</strong>
+                      <strong className="text-xs text-light-on-surface dark:text-dark-on-surface">Custom Modular</strong>
                     </div>
                     <p className="text-[11px] text-light-on-surface-variant mt-1 pl-6">
-                      Customize curriculum by selecting tailored modular chunks to assemble custom course pacing.
+                      Load the Module Library to frame a custom course curriculum.
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Target Course Track *
-                    </label>
-                    <select
-                      value={wizardTrack}
-                      onChange={(e) => handleWizardTrackChange(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    >
-                      {Object.keys(tracks).map((t) => (
-                        <option key={t} value={t}>{t}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {wizardCourseMode === 'standard' ? (
+                    <div>
+                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                        Select Course Program *
+                      </label>
+                      <select
+                        value={selectedCourseId}
+                        onChange={(e) => handleSelectCourse(e.target.value)}
+                        className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                      >
+                        {coursesList.length === 0 ? (
+                          <option value="">No courses created yet in Course Management</option>
+                        ) : (
+                          coursesList.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.title} ({c.code || `CRS-${c.id}`}) — {c.days || 0} Days • {c.category || 'General'}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                        Target Course Track Domain *
+                      </label>
+                      <select
+                        value={wizardTrack}
+                        onChange={(e) => handleWizardTrackChange(e.target.value)}
+                        className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                      >
+                        {Object.keys(tracks).map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
@@ -1195,6 +1388,31 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     />
                   </div>
                 </div>
+
+                {/* Course Mode Details Preview Card */}
+                {wizardCourseMode === 'standard' && selectedCourse && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded bg-light-surface-container dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[11px] font-bold text-light-primary bg-light-primary-tint/40 px-1.5 py-0.5 rounded">
+                        {selectedCourse.code || `CRS-${selectedCourse.id}`}
+                      </span>
+                      <strong className="text-light-on-surface dark:text-dark-on-surface">
+                        {selectedCourse.title}
+                      </strong>
+                      <span className="text-[11px] text-light-on-surface-variant">
+                        • {selectedCourse.category} • {selectedCourse.level}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-light-primary dark:text-dark-primary">
+                        {cumulativeDays} Total Days
+                      </span>
+                      <span className="font-bold text-light-on-surface dark:text-dark-on-surface">
+                        ₹{Number(selectedCourse.price || 0).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1203,71 +1421,190 @@ export function StudentManagement({ initialTab = 'directory' }) {
             {/* ------------------------------------------------------------- */}
             {wizardStep === 4 && (
               <div className="flex flex-col gap-3 animate-in fade-in duration-150">
-                <div className="flex items-center justify-between bg-light-surface-container-low dark:bg-dark-surface-container p-2.5 rounded border border-light-outline-variant dark:border-dark-outline-variant">
+                {/* Header Banner */}
+                <div className="flex flex-wrap items-center justify-between gap-2 bg-light-surface-container-low dark:bg-dark-surface-container p-3 rounded border border-light-outline-variant dark:border-dark-outline-variant">
                   <div>
-                    <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
-                      {wizardTrack}
-                    </span>
-                    <p className="text-[11px] text-light-on-surface-variant">
-                      {wizardCourseMode === 'custom'
-                        ? 'Select modular chunks to include in this student customized syllabus'
-                        : 'Standard 60-day institutional course includes all base modules'}
+                    <div className="flex items-center gap-2">
+                      <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                        {wizardCourseMode === 'standard' ? (selectedCourse?.title || wizardTrack) : 'Frame Custom Course from Module Library'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint">
+                        {wizardCourseMode === 'standard' ? 'Course Mode' : 'Custom Modular'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-light-on-surface-variant mt-0.5">
+                      {wizardCourseMode === 'standard'
+                        ? 'Standard pre-framed course program curriculum and its allocated module components.'
+                        : 'Select individual modules from the Module Library to compose a custom curriculum for this student.'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="font-label text-xs font-bold text-light-primary dark:text-dark-primary block">
+                    <span className="font-label text-sm font-bold text-light-primary dark:text-dark-primary block">
                       {cumulativeDays} Total Days
                     </span>
                     <span className="text-[10px] text-light-on-surface-variant">
-                      {selectedModules.length} Modules Selected
+                      {wizardCourseMode === 'standard'
+                        ? `${effectiveModules.length} Modules in Course`
+                        : `${selectedCustomModules.length} Modules Selected`}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {(currentTrackData.modules || []).map((mod) => {
-                    const isChecked = selectedModuleIds.includes(mod.id)
-                    const isStandardMode = wizardCourseMode === 'standard'
-
-                    return (
-                      <div
-                        key={mod.id}
-                        onClick={() => {
-                          if (!isStandardMode) handleToggleModule(mod.id)
-                        }}
-                        className={`p-2.5 rounded border transition-colors flex items-start gap-2.5 ${
-                          isChecked
-                            ? 'border-light-primary/60 bg-light-primary-tint/20 dark:bg-dark-primary-tint/20'
-                            : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low'
-                        } ${!isStandardMode ? 'cursor-pointer hover:border-light-primary' : 'opacity-90'}`}
-                      >
-                        <input
-                          type="checkbox"
-                          disabled={isStandardMode}
-                          checked={isChecked}
-                          onChange={() => handleToggleModule(mod.id)}
-                          className="mt-0.5 rounded text-light-primary focus:ring-0 cursor-pointer"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-1">
-                            <span className="font-mono text-[10px] text-light-primary font-bold">{mod.id}</span>
-                            <span className="font-label text-[10px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                              {mod.days} Days
-                            </span>
-                          </div>
-                          <span className="font-title text-xs font-semibold text-light-on-surface dark:text-dark-on-surface block mt-0.5">
-                            {mod.title}
-                          </span>
-                          {mod.desc && (
-                            <p className="text-[10px] text-light-on-surface-variant line-clamp-1 mt-0.5">
-                              {mod.desc}
-                            </p>
-                          )}
-                        </div>
+                {/* COURSE MODE: Display Course Program Modules */}
+                {wizardCourseMode === 'standard' && (
+                  <div className="flex flex-col gap-2">
+                    {effectiveModules.length === 0 ? (
+                      <div className="p-4 rounded border border-dashed border-light-outline-variant dark:border-dark-outline-variant text-center text-xs text-light-on-surface-variant">
+                        No linked modules found for this course program. Total duration is set to {cumulativeDays} days.
                       </div>
-                    )
-                  })}
-                </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {effectiveModules.map((mod, idx) => (
+                          <div
+                            key={mod.id || mod.code || idx}
+                            className="p-2.5 rounded border border-light-primary/40 bg-light-primary-tint/15 dark:bg-dark-primary-tint/15 flex items-start gap-2.5"
+                          >
+                            <span className="material-symbols-outlined text-light-primary text-[18px] mt-0.5">
+                              check_circle
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="font-mono text-[10px] text-light-primary font-bold">
+                                  {mod.code || mod.id}
+                                </span>
+                                <span className="font-label text-[10px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+                                  {mod.days} Days
+                                </span>
+                              </div>
+                              <span className="font-title text-xs font-semibold text-light-on-surface dark:text-dark-on-surface block mt-0.5">
+                                {mod.title}
+                              </span>
+                              {mod.description && (
+                                <p className="text-[10px] text-light-on-surface-variant line-clamp-1 mt-0.5">
+                                  {mod.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* CUSTOM MODULAR MODE: Module Library Browser & Selection */}
+                {wizardCourseMode === 'custom' && (
+                  <div className="flex flex-col gap-2.5">
+                    {/* Search & Domain Filter Toolbar */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant dark:border-dark-outline-variant">
+                      <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                        <div className="relative flex items-center flex-1">
+                          <span className="material-symbols-outlined text-[15px] text-light-outline absolute left-2 pointer-events-none">
+                            search
+                          </span>
+                          <input
+                            type="search"
+                            value={moduleSearch}
+                            onChange={(e) => setModuleSearch(e.target.value)}
+                            placeholder="Search Module Library by code, title, topic..."
+                            className="w-full pl-7 pr-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
+                          />
+                        </div>
+
+                        <select
+                          value={moduleCategoryFilter}
+                          onChange={(e) => setModuleCategoryFilter(e.target.value)}
+                          className="px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                        >
+                          {moduleCategories.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat === 'All' ? 'All Domains' : cat}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const ids = filteredModulesForCustom.map((m) => m.id ?? m.code)
+                            setSelectedModuleIds((prev) => Array.from(new Set([...prev, ...ids])))
+                          }}
+                          className="px-2 py-1 text-[11px] font-semibold rounded bg-light-surface-container hover:bg-light-surface-container-high border border-light-outline-variant text-light-on-surface dark:text-dark-on-surface"
+                        >
+                          Select All
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const rem = new Set(filteredModulesForCustom.map((m) => m.id ?? m.code))
+                            setSelectedModuleIds((prev) => prev.filter((id) => !rem.has(id)))
+                          }}
+                          className="px-2 py-1 text-[11px] font-semibold rounded bg-light-surface-container hover:bg-light-surface-container-high border border-light-outline-variant text-light-on-surface-variant"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Modules Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[420px] overflow-y-auto pr-1">
+                      {filteredModulesForCustom.length === 0 ? (
+                        <div className="col-span-2 p-6 text-center text-xs text-light-on-surface-variant">
+                          No modules found matching "{moduleSearch}". Try adjusting your search or domain filter.
+                        </div>
+                      ) : (
+                        filteredModulesForCustom.map((mod) => {
+                          const isChecked = selectedModuleIds.includes(mod.id) || (mod.code && selectedModuleIds.includes(mod.code))
+                          return (
+                            <div
+                              key={mod.id || mod.code}
+                              onClick={() => handleToggleModule(mod)}
+                              className={`p-2.5 rounded border transition-all cursor-pointer flex items-start gap-2.5 ${
+                                isChecked
+                                  ? 'border-light-primary bg-light-primary-tint/25 dark:bg-dark-primary-tint/25 shadow-xs'
+                                  : 'border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low hover:border-light-primary/60'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => handleToggleModule(mod)}
+                                className="mt-0.5 rounded text-light-primary focus:ring-0 cursor-pointer"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                  <div className="flex items-center gap-1.5 truncate">
+                                    <span className="font-mono text-[10px] text-light-primary font-bold">
+                                      {mod.code || `MOD-${mod.id}`}
+                                    </span>
+                                    {mod.category && (
+                                      <span className="px-1.5 py-0.2 rounded bg-light-surface-container-high text-[9px] text-light-on-surface-variant truncate">
+                                        {mod.category}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="font-label text-[10px] font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums shrink-0">
+                                    {mod.days} Days
+                                  </span>
+                                </div>
+                                <span className="font-title text-xs font-semibold text-light-on-surface dark:text-dark-on-surface block mt-0.5 truncate">
+                                  {mod.title}
+                                </span>
+                                {mod.description && (
+                                  <p className="text-[10px] text-light-on-surface-variant line-clamp-1 mt-0.5">
+                                    {mod.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1326,9 +1663,14 @@ export function StudentManagement({ initialTab = 'directory' }) {
 
                 {/* Final Review Summary Card */}
                 <div className="p-3 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 flex flex-col gap-2 mt-1">
-                  <span className="font-label text-xs font-bold text-light-primary dark:text-dark-primary">
-                    Onboarding Verification Summary
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="font-label text-xs font-bold text-light-primary dark:text-dark-primary">
+                      Onboarding Verification Summary
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-primary-tint dark:bg-dark-primary-tint text-light-on-primary-tint">
+                      {wizardCourseMode === 'standard' ? 'Course Mode' : 'Custom Modular Track'}
+                    </span>
+                  </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                     <div>
                       <span className="text-[10px] text-light-on-surface-variant block">Student Name:</span>
@@ -1345,6 +1687,25 @@ export function StudentManagement({ initialTab = 'directory' }) {
                     <div>
                       <span className="text-[10px] text-light-on-surface-variant block">Batch / Days:</span>
                       <strong className="text-light-on-surface dark:text-dark-on-surface">{wizardForm.batch} • {cumulativeDays} Days</strong>
+                    </div>
+                  </div>
+
+                  {/* Modules framed overview */}
+                  <div className="mt-1 pt-2 border-t border-light-outline-variant/60">
+                    <span className="text-[10px] font-semibold text-light-on-surface-variant block mb-1">
+                      Framed Curriculum ({effectiveModules.length} Modules • {cumulativeDays} Total Days):
+                    </span>
+                    <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                      {effectiveModules.map((m, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-light-surface-container dark:bg-dark-surface-container text-[10px] border border-light-outline-variant"
+                        >
+                          <span className="font-mono text-light-primary font-bold">{m.code || `M${idx + 1}`}</span>
+                          <span className="truncate max-w-[150px]">{m.title}</span>
+                          <span className="font-mono font-bold text-light-on-surface-variant">({m.days}d)</span>
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
