@@ -54,8 +54,8 @@ class ModuleController extends BaseApiController
                 'id'                 => (int) $mod['id'],
                 'title'              => $mod['title'],
                 'code'               => $mod['code'],
-                'version'            => 'v2.0',
                 'category'           => $mod['category'] ?? 'Engineering',
+                'tutor'              => $mod['tutor'] ?? '',
                 'status'             => $mod['status'] ?? 'Published',
                 'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 1),
                 'lessons'            => $totalLessons,
@@ -117,8 +117,8 @@ class ModuleController extends BaseApiController
                 'id'                 => (int) $mod['id'],
                 'title'              => $mod['title'],
                 'code'               => $mod['code'],
-                'version'            => 'v2.0',
                 'category'           => $mod['category'],
+                'tutor'              => $mod['tutor'] ?? '',
                 'status'             => $mod['status'],
                 'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 1),
                 'lessons'            => $totalLessons,
@@ -165,6 +165,7 @@ class ModuleController extends BaseApiController
             'code'               => $code,
             'title'              => trim((string) $data['title']),
             'category'           => $data['category'] ?? 'Engineering',
+            'tutor'              => !empty($data['tutor']) ? trim((string) $data['tutor']) : null,
             'duration_days'      => $totalDays > 0 ? $totalDays : (int) ($data['days'] ?? 10),
             'credits'            => (int) ($data['credits'] ?? 3),
             'level'              => $data['level'] ?? 'Intermediate',
@@ -179,8 +180,8 @@ class ModuleController extends BaseApiController
             'id'                 => (int) $id,
             'title'              => trim((string) $data['title']),
             'code'               => $code,
-            'version'            => $data['version'] ?? 'v1.0',
             'category'           => $data['category'] ?? 'General',
+            'tutor'              => $data['tutor'] ?? '',
             'status'             => $data['status'] ?? 'Draft',
             'days'               => $totalDays > 0 ? $totalDays : (int) ($data['days'] ?? 5),
             'lessons'            => $totalLessons > 0 ? $totalLessons : (int) ($data['lessons'] ?? 10),
@@ -215,6 +216,7 @@ class ModuleController extends BaseApiController
         if (isset($data['title'])) $update['title'] = trim((string) $data['title']);
         if (isset($data['code'])) $update['code'] = strtoupper(trim((string) $data['code']));
         if (isset($data['category'])) $update['category'] = $data['category'];
+        if (isset($data['tutor'])) $update['tutor'] = trim((string) $data['tutor']);
         if (isset($data['days'])) $update['duration_days'] = (int) $data['days'];
         if (isset($data['description'])) $update['description'] = $data['description'];
         if (isset($data['status'])) $update['status'] = $data['status'];

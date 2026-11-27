@@ -9,7 +9,7 @@ export function CourseManagement({ onNavigateToModules }) {
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [levelFilter, setLevelFilter] = useState('all')
-  const [viewMode, setViewMode] = useState('grid') // 'grid' | 'table'
+  const [viewMode, setViewMode] = useState('table') // Default to 'table' (list view)
 
   // Modal / Drawer state for Create / Edit
   const [showModal, setShowModal] = useState(false)
@@ -28,7 +28,7 @@ export function CourseManagement({ onNavigateToModules }) {
     instructor: '',
     level: 'Intermediate',
     price: '',
-    currency: '₹', // '₹' | '$'
+    currency: '₹',
     status: 'Published',
     description: '',
     selectedModuleIds: [],
@@ -862,7 +862,7 @@ export function CourseManagement({ onNavigateToModules }) {
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold font-mono text-light-primary">
-                        {formData.currency}
+                        ₹
                       </span>
                       <input
                         type="number"
@@ -878,30 +878,17 @@ export function CourseManagement({ onNavigateToModules }) {
 
                   <div>
                     <label className="block text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                      Currency Unit
+                      Currency
                     </label>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, currency: '₹' })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${formData.currency === '₹' ? 'bg-light-primary text-light-on-primary border-light-primary' : 'bg-light-surface-container-low border-light-outline-variant text-light-on-surface'}`}
-                      >
-                        ₹ INR
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, currency: '$' })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${formData.currency === '$' ? 'bg-light-primary text-light-on-primary border-light-primary' : 'bg-light-surface-container-low border-light-outline-variant text-light-on-surface'}`}
-                      >
-                        $ USD
-                      </button>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-light-outline-variant bg-light-surface-container-lowest text-light-primary">
+                      <span>₹ INR (Indian Rupees)</span>
                     </div>
                   </div>
 
                   <div className="text-xs text-light-on-surface-variant/80 pb-1">
                     {formData.price ? (
                       <span className="font-semibold text-light-primary">
-                        Total Course Tuition: {formData.currency}{Number(formData.price).toLocaleString()}
+                        Total Course Tuition: ₹{Number(formData.price).toLocaleString()}
                       </span>
                     ) : (
                       <span>Enter 0 or leave blank for a complimentary open course.</span>
@@ -1026,7 +1013,7 @@ export function CourseManagement({ onNavigateToModules }) {
                     No modules match the filter query.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-1 scrollbar-thin">
+                  <div className="flex flex-col gap-1.5 max-h-60 overflow-y-auto p-1 scrollbar-thin">
                     {filteredModulesForPicker.map((m) => {
                       const idNum = Number(m.id)
                       const isSelected = formData.selectedModuleIds.includes(idNum)
@@ -1035,34 +1022,42 @@ export function CourseManagement({ onNavigateToModules }) {
                         <div
                           key={m.id}
                           onClick={() => handleToggleModule(idNum)}
-                          className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2.5 select-none ${
+                          className={`px-3 py-2 rounded-lg border text-xs cursor-pointer transition-all flex items-center justify-between gap-3 select-none ${
                             isSelected
-                              ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-primary shadow-xs ring-1 ring-light-primary/30'
-                              : 'bg-light-surface-container-lowest/70 dark:bg-dark-surface-bright/50 border-light-outline-variant/60 hover:border-light-outline-variant hover:bg-light-surface-container-lowest'
+                              ? 'bg-light-primary-tint/25 dark:bg-dark-primary-tint/25 border-light-primary shadow-xs ring-1 ring-light-primary/30'
+                              : 'bg-light-surface-container-lowest/90 dark:bg-dark-surface-bright/70 border-light-outline-variant/60 hover:border-light-outline-variant hover:bg-light-surface-container-lowest'
                           }`}
                         >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => {}} // handled by parent div
-                            className="mt-0.5 rounded text-light-primary focus:ring-light-primary cursor-pointer"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1 mb-0.5">
-                              <span className="font-mono text-[10px] font-bold text-light-primary px-1.5 py-0.2 rounded bg-light-primary-tint/20">
-                                {m.code || `MOD-${m.id}`}
-                              </span>
-                              <span className="font-mono text-[11px] font-bold text-light-primary">
-                                {m.days || 1} Days
-                              </span>
-                            </div>
-                            <h4 className="font-bold text-light-on-surface dark:text-dark-on-surface truncate">
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {}} // handled by parent div
+                              className="rounded text-light-primary focus:ring-light-primary cursor-pointer shrink-0"
+                            />
+                            <span className="font-mono text-[10px] font-bold text-light-primary px-1.5 py-0.5 rounded bg-light-primary-tint/20 shrink-0">
+                              {m.code || `MOD-${m.id}`}
+                            </span>
+                            <span className="font-semibold text-light-on-surface dark:text-dark-on-surface truncate">
                               {m.title}
-                            </h4>
-                            <div className="flex items-center justify-between gap-1 text-[10px] text-light-on-surface-variant mt-1">
-                              <span className="truncate">{m.category || 'General'}</span>
-                              <span>{m.lessons || (m.days ? m.days * 2 : 2)} Lessons</span>
-                            </div>
+                            </span>
+                            <span className="text-[10px] text-light-on-surface-variant px-1.5 py-0.5 rounded bg-light-surface-container-low shrink-0 hidden sm:inline">
+                              {m.category || 'General'}
+                            </span>
+                            {m.tutor && (
+                              <span className="text-[10px] text-light-primary font-medium shrink-0 hidden md:inline">
+                                Tutor: {m.tutor}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-[10px] text-light-on-surface-variant font-mono">
+                              {m.lessons || (m.days ? m.days * 2 : 2)} Lessons
+                            </span>
+                            <span className="font-mono text-[11px] font-bold text-light-primary px-2 py-0.5 rounded bg-light-primary/10">
+                              {m.days || 1} Days
+                            </span>
                           </div>
                         </div>
                       )

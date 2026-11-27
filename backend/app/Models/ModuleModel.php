@@ -17,6 +17,7 @@ class ModuleModel extends Model
         'duration_days',
         'credits',
         'level',
+        'tutor',
         'description',
         'status',
         'curriculum_lessons',

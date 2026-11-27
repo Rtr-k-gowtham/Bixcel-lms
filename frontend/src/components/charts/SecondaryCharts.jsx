@@ -267,16 +267,16 @@ export function PlatformEngagementLineChart() {
 // 10. Departmental Budget vs Expense Breakdown
 export function BudgetProgressChart() {
   const budgetItems = [
-    { category: 'Faculty & Tutors', allocated: '$120K', spent: '$110K', pct: 91.6, color: 'bg-light-primary' },
-    { category: 'Cloud Labs & Servers', allocated: '$45K', spent: '$35K', pct: 77.7, color: 'bg-light-secondary' },
-    { category: 'Courseware & Software', allocated: '$30K', spent: '$26K', pct: 86.6, color: 'bg-light-primary-container' },
-    { category: 'Library & Learning Media', allocated: '$20K', spent: '$13K', pct: 65.0, color: 'bg-success' },
+    { category: 'Faculty & Tutors', allocated: '₹120K', spent: '₹110K', pct: 91.6, color: 'bg-light-primary' },
+    { category: 'Cloud Labs & Servers', allocated: '₹45K', spent: '₹35K', pct: 77.7, color: 'bg-light-secondary' },
+    { category: 'Courseware & Software', allocated: '₹30K', spent: '₹26K', pct: 86.6, color: 'bg-light-primary-container' },
+    { category: 'Library & Learning Media', allocated: '₹20K', spent: '₹13K', pct: 65.0, color: 'bg-success' },
   ]
 
   return (
     <div className="flex flex-col h-full justify-between gap-3">
       <div className="flex items-center justify-end text-label-sm">
-        <span className="font-mono text-label-sm font-semibold text-light-primary">$215K Allocated</span>
+        <span className="font-mono text-label-sm font-semibold text-light-primary">₹215K Allocated</span>
       </div>
 
       <div className="space-y-2.5 py-1">

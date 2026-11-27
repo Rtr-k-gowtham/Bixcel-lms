@@ -136,9 +136,9 @@ export function EnrollmentAreaChart() {
 // 3. Donut Chart: Fee Collection Status Breakdown
 export function FeeCollectionDonutChart() {
   const segments = [
-    { label: 'Paid in Full', percentage: 68, amount: '$125.4K', color: '#059669', strokeColor: 'stroke-success' },
-    { label: 'Pending Installment', percentage: 22, amount: '$40.6K', color: '#B45309', strokeColor: 'stroke-pending' },
-    { label: 'Overdue / Alerts', percentage: 10, amount: '$18.5K', color: '#BE123C', strokeColor: 'stroke-overdue' },
+    { label: 'Paid in Full', percentage: 68, amount: '₹125.4K', color: '#059669', strokeColor: 'stroke-success' },
+    { label: 'Pending Installment', percentage: 22, amount: '₹40.6K', color: '#B45309', strokeColor: 'stroke-pending' },
+    { label: 'Overdue / Alerts', percentage: 10, amount: '₹18.5K', color: '#BE123C', strokeColor: 'stroke-overdue' },
   ]
 
   // Circumference of 2 * PI * r (r = 40 => ~251.32)
@@ -149,7 +149,7 @@ export function FeeCollectionDonutChart() {
   return (
     <div className="flex flex-col h-full justify-between gap-3">
       <div className="flex items-center justify-end text-label-sm">
-        <span className="font-mono text-label-sm text-light-primary font-semibold">$184.5K Total</span>
+        <span className="font-mono text-label-sm text-light-primary font-semibold">₹184.5K Total</span>
       </div>
 
       <div className="flex items-center justify-center gap-4 py-0.5">

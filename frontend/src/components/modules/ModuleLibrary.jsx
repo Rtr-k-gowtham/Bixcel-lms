@@ -120,7 +120,7 @@ export function ModuleLibrary() {
       title: '',
       code: `MOD-ACC-${100 + modules.length + 1}`,
       category: 'UI/UX',
-      version: 'v1.0',
+      tutor: '',
       status: 'Published',
       days: 1,
       description: '',
@@ -147,7 +147,7 @@ export function ModuleLibrary() {
       title: m.title,
       code: m.code,
       category: m.category || 'UI/UX',
-      version: m.version || 'v1.0',
+      tutor: m.tutor || '',
       status: m.status || 'Published',
       days: m.days || 1,
       description: m.description || '',
@@ -776,10 +776,11 @@ export function ModuleLibrary() {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 text-light-on-surface-variant dark:text-dark-on-surface-variant font-label text-[11px] uppercase tracking-wider">
-                <th className="py-2.5 px-3">Module Identifier</th>
+                <th className="py-2.5 px-3">Code</th>
                 <th className="py-2.5 px-3">Module Title</th>
-                <th className="py-2.5 px-3">Duration &amp; Activities</th>
-                <th className="py-2.5 px-3">Components Breakdown</th>
+                <th className="py-2.5 px-3">Domain</th>
+                <th className="py-2.5 px-3">Tutor</th>
+                <th className="py-2.5 px-3">Duration</th>
                 <th className="py-2.5 px-3 text-center">Status</th>
                 <th className="py-2.5 px-3 text-right">Actions</th>
               </tr>
@@ -787,7 +788,7 @@ export function ModuleLibrary() {
             <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 font-body">
               {filteredModules.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-light-on-surface-variant">
+                  <td colSpan="7" className="py-8 text-center text-light-on-surface-variant">
                     <span className="material-symbols-outlined text-[36px] text-light-outline mb-1 block">
                       search_off
                     </span>
@@ -796,70 +797,49 @@ export function ModuleLibrary() {
                 </tr>
               ) : (
                 filteredModules.map((m) => {
-                  const lessonsCount = m.lessons || (m.curriculum_lessons ? m.curriculum_lessons.reduce((acc, d) => acc + (d.lessons ? d.lessons.length : 0), 0) : m.days * 2)
-
                   return (
                     <tr
                       key={m.id}
                       className="hover:bg-light-surface-container-low/40 dark:hover:bg-dark-surface-container/30 transition-colors"
                     >
-                      {/* Code & Version */}
-                      <td className="py-2.5 px-3 whitespace-nowrap align-top">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-mono text-xs font-bold text-light-primary dark:text-dark-primary">
-                            {m.code}
-                          </span>
-                          <span className="font-mono text-[10px] text-light-on-surface-variant">
-                            {m.version}
-                          </span>
-                        </div>
+                      {/* Code (No v2.0) */}
+                      <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                        <span className="font-mono text-xs font-bold text-light-primary dark:text-dark-primary">
+                          {m.code}
+                        </span>
                       </td>
 
-                      {/* Clean Title Only (No UI/UX tag, no description snippet) */}
-                      <td className="py-2.5 px-3 align-top">
+                      {/* Clean Title */}
+                      <td className="py-2.5 px-3 align-middle">
                         <span className="font-body text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
                           {m.title}
                         </span>
                       </td>
 
-                      {/* Duration & Lessons (Click opens Full Screen Studio) */}
-                      <td className="py-2.5 px-3 whitespace-nowrap align-top">
-                        <div className="flex flex-col gap-1">
-                          <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
-                            {m.days} Days
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(m)}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary dark:text-dark-primary hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary transition-colors text-left cursor-pointer"
-                            title="Open Full Screen Studio"
-                          >
-                            <span className="material-symbols-outlined text-[13px]">view_timeline</span>
-                            <span>{lessonsCount} Activities</span>
-                          </button>
-                        </div>
+                      {/* Domain / Category */}
+                      <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                        <span className="px-2 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-[11px] font-medium text-light-on-surface-variant">
+                          {m.category || 'General'}
+                        </span>
                       </td>
 
-                      {/* Curriculum Breakdown */}
-                      <td className="py-2.5 px-3 align-top">
-                        <div className="grid grid-cols-2 gap-1 min-w-[170px]">
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tasks || 4}</span> Tasks
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.assignments || 2}</span> Assign.
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.tests || 1}</span> Tests
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] font-medium">
-                            <span className="font-bold text-light-on-surface dark:text-dark-on-surface">{m.milestones || 1}</span> Milestone
-                          </span>
-                        </div>
+                      {/* Tutor */}
+                      <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-light-on-surface dark:text-dark-on-surface">
+                          <span className="material-symbols-outlined text-[15px] text-light-primary">person</span>
+                          {m.tutor || 'Not Assigned'}
+                        </span>
+                      </td>
+
+                      {/* Duration (Single row, no view_timeline or Activities button) */}
+                      <td className="py-2.5 px-3 whitespace-nowrap align-middle">
+                        <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface tabular-nums">
+                          {m.days} Days
+                        </span>
                       </td>
 
                       {/* Status */}
-                      <td className="py-2.5 px-3 whitespace-nowrap text-center align-top">
+                      <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                             m.status === 'Published'
@@ -876,8 +856,8 @@ export function ModuleLibrary() {
                         </span>
                       </td>
 
-                      {/* Actions (+ Course Button REMOVED) */}
-                      <td className="py-2.5 px-3 whitespace-nowrap text-right align-top">
+                      {/* Actions */}
+                      <td className="py-2.5 px-3 whitespace-nowrap text-right align-middle">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
@@ -1213,7 +1193,7 @@ export function ModuleLibrary() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                    <div className="sm:col-span-6">
+                    <div className="sm:col-span-4">
                       <label className="block text-[11px] font-medium text-light-on-surface-variant mb-1">
                         Module Title *
                       </label>
@@ -1256,6 +1236,19 @@ export function ModuleLibrary() {
                         <option value="Cloud Computing">Cloud Computing</option>
                         <option value="Data Science">Data Science & AI</option>
                       </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                        Module Tutor
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.tutor || ''}
+                        onChange={(e) => setFormData({ ...formData, tutor: e.target.value })}
+                        placeholder="e.g. Dr. Marcus Vance"
+                        className="w-full px-2 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                      />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -2318,7 +2311,7 @@ export function ModuleLibrary() {
             <div className="flex items-center justify-between pb-3 border-b border-light-outline-variant dark:border-dark-outline-variant mb-3">
               <div>
                 <span className="font-mono text-mono-xs text-light-primary font-bold">
-                  {inspectModule.code} • {inspectModule.version}
+                  {inspectModule.code}
                 </span>
                 <h3 className="font-title text-[13px] font-semibold text-light-on-surface dark:text-dark-on-surface">
                   {inspectModule.title}
@@ -2338,7 +2331,7 @@ export function ModuleLibrary() {
                 {inspectModule.description || 'No detailed summary provided.'}
               </p>
 
-              <div className="grid grid-cols-3 gap-2 p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-xs">
+              <div className="grid grid-cols-4 gap-2 p-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container text-xs">
                 <div>
                   <span className="text-[10px] text-light-on-surface-variant block uppercase font-medium">Duration:</span>
                   <strong className="text-light-on-surface dark:text-dark-on-surface">{inspectModule.days} Days</strong>
@@ -2346,6 +2339,10 @@ export function ModuleLibrary() {
                 <div>
                   <span className="text-[10px] text-light-on-surface-variant block uppercase font-medium">Category:</span>
                   <strong className="text-light-on-surface dark:text-dark-on-surface">{inspectModule.category}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-light-on-surface-variant block uppercase font-medium">Tutor:</span>
+                  <strong className="text-light-primary font-semibold">{inspectModule.tutor || 'Not Assigned'}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] text-light-on-surface-variant block uppercase font-medium">Status:</span>
