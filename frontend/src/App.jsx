@@ -27,7 +27,7 @@ import LoginScreen from './components/auth/LoginScreen'
 import { apiService } from './services/api'
 
 const VALID_TABS = new Set([
-  'dashboard', 'courses', 'modules', 'builder', 'curriculum', 'lessons',
+  'dashboard', 'courses', 'modules', 'builder', 'curriculum',
   'students', 'onboarding', 'tutors', 'batches', 'timetable', 'attendance',
   'assignments', 'exams', 'milestones', 'calendar', 'progress', 'feedback',
   'fees', 'balance', 'analytics', 'users', 'roles', 'permissions',

@@ -13,7 +13,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile }) 
         { id: 'modules', label: 'Module Library', icon: 'library_books' },
         { id: 'builder', label: 'Custom Course Builder', icon: 'view_quilt' },
         { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
-        { id: 'lessons', label: 'Lesson Management', icon: 'article' },
       ],
     },
     {
