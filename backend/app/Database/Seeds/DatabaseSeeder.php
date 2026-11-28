@@ -643,59 +643,8 @@ class DatabaseSeeder extends Seeder
         ];
         $db->table('student_remarks')->insertBatch($remarks);
 
-        // 13. Seed Modules Library
-        $db->table('modules')->emptyTable();
-        $modules = [
-            [
-                'code' => 'MOD-FS-01',
-                'title' => 'Frontend Foundations & Semantic HTML/CSS',
-                'category' => 'Engineering',
-                'duration_days' => 10,
-                'credits' => 4,
-                'level' => 'Beginner',
-                'description' => 'Semantic layout, responsive design systems, accessibility WCAG compliance.',
-                'status' => 'Active',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'code' => 'MOD-FS-02',
-                'title' => 'Modern JavaScript ES6+ & TypeScript',
-                'category' => 'Engineering',
-                'duration_days' => 14,
-                'credits' => 5,
-                'level' => 'Intermediate',
-                'description' => 'Event loop, asynchronous promises, strict type checking and interfaces.',
-                'status' => 'Active',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'code' => 'MOD-FS-03',
-                'title' => 'React & Next.js Architecture',
-                'category' => 'Engineering',
-                'duration_days' => 14,
-                'credits' => 5,
-                'level' => 'Advanced',
-                'description' => 'Server components, client hydration, state management, and edge caching.',
-                'status' => 'Active',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'code' => 'MOD-DM-01',
-                'title' => 'SEO & Keyword Strategy',
-                'category' => 'Marketing',
-                'duration_days' => 8,
-                'credits' => 3,
-                'level' => 'Beginner',
-                'description' => 'Technical search indexing, on-page optimization and SERP dominance.',
-                'status' => 'Active',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-        ];
-        $db->table('modules')->insertBatch($modules);
+        // 13. Modules Library (Managed directly via Module Studio / SQL seed queries)
+        // Kept clean for custom institutional modules
 
         // 14. Seed Courses
         $db->table('courses')->emptyTable();

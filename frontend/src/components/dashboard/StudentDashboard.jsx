@@ -899,17 +899,33 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                 onChange={(e) => setSelectedModuleId(e.target.value)}
                 className="px-3 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-xs font-bold text-light-on-surface dark:text-dark-on-surface focus:outline-none cursor-pointer max-w-xs sm:max-w-md"
               >
-                {liveModules.map((m) => (
-                  <option key={m.id} value={String(m.id)}>
-                    {m.code ? `${m.code}: ` : ''}{m.title} ({m.days || 10} Days)
-                  </option>
-                ))}
+                {liveModules.length === 0 ? (
+                  <option value="">No modules available</option>
+                ) : (
+                  liveModules.map((m) => (
+                    <option key={m.id} value={String(m.id)}>
+                      {m.code ? `${m.code}: ` : ''}{m.title} ({m.days || 10} Days)
+                    </option>
+                  ))
+                )}
               </select>
             </div>
           </div>
 
-          {/* Module Metadata Card */}
-          {selectedModule && (
+          {/* Module Metadata Card or Empty State */}
+          {!selectedModule ? (
+            <div className="p-8 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant text-center text-xs text-light-on-surface-variant flex flex-col items-center justify-center gap-2">
+              <span className="material-symbols-outlined text-[36px] text-light-outline">
+                menu_book
+              </span>
+              <p className="font-semibold text-sm text-light-on-surface dark:text-dark-on-surface">
+                No Active Curriculum Modules Found
+              </p>
+              <p className="text-xs text-light-on-surface-variant max-w-sm">
+                Modules and daily syllabus lessons will appear here once published from the Module Studio.
+              </p>
+            </div>
+          ) : (
             <div className="bg-gradient-to-r from-light-primary-tint/30 to-light-surface-container-lowest dark:from-dark-primary-tint/20 dark:to-dark-surface-bright border border-light-primary/30 dark:border-dark-primary/30 p-4 rounded-xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
@@ -972,8 +988,9 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           )}
 
           {/* Actual Day-by-Day Lesson Syllabus Cards */}
-          <div className="space-y-3">
-            {displayedLessons.length === 0 ? (
+          {selectedModule && (
+            <div className="space-y-3">
+              {displayedLessons.length === 0 ? (
               <div className="p-8 rounded-xl bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant text-center text-xs text-light-on-surface-variant">
                 <span className="material-symbols-outlined text-[32px] text-light-outline block mb-1">
                   task_alt
@@ -1083,6 +1100,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
               })
             )}
           </div>
+          )}
         </section>
       )}
 
