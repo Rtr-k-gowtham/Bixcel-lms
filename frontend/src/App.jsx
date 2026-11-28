@@ -91,7 +91,8 @@ function Dashboard({ currentUser, onLogout }) {
 
   const STUDENT_FORBIDDEN_TABS = new Set([
     'users', 'roles', 'permissions', 'audit', 'settings',
-    'tutors', 'students', 'onboarding', 'batches', 'builder', 'attendance', 'analytics'
+    'tutors', 'students', 'onboarding', 'batches', 'builder', 'attendance', 'analytics',
+    'modules', 'courses', 'fees', 'balance'
   ])
 
   const TUTOR_FORBIDDEN_TABS = new Set([

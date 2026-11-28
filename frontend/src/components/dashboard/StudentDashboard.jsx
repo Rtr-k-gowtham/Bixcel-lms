@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { apiService } from '../../services/api'
 
 export function StudentDashboard({ currentUser, onNavigate }) {
   // 1. Logged-in User Profile Information (Real Data)
   const sessionUser = currentUser || apiService.getCurrentUser() || {}
   
-  // Real Student Avatar (uploaded file or initials)
-  const fileInputRef = useRef(null)
-  const [studentAvatar, setStudentAvatar] = useState(() => {
+  // Real Student Avatar (from profile or initials)
+  const [studentAvatar] = useState(() => {
     try {
       const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
       const saved = localStorage.getItem(`bx_student_avatar_${studentId}`)
@@ -42,92 +41,10 @@ export function StudentDashboard({ currentUser, onNavigate }) {
   const [selectedCalendarType, setSelectedCalendarType] = useState('All')
   const [selectedEventModal, setSelectedEventModal] = useState(null)
 
-  // Attendance Check-In State
-  const [checkedInToday, setCheckedInToday] = useState(() => {
-    try {
-      return localStorage.getItem('bx_student_checked_in_2026-11-26') === 'true'
-    } catch {
-      return false
-    }
-  })
-  const [checkInTime, setCheckInTime] = useState(() => {
-    try {
-      return localStorage.getItem('bx_student_checkin_time') || '09:24 AM'
-    } catch {
-      return '09:24 AM'
-    }
-  })
-
   // Show Toast
   const showToast = (msg) => {
     setToastMessage(msg)
     setTimeout(() => setToastMessage(''), 3500)
-  }
-
-  // Handle Photo Upload
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (!file.type.startsWith('image/')) {
-      showToast('Please select a valid image file (PNG, JPG, JPEG, WEBP).')
-      return
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('Image file size must be under 5MB.')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      const base64Data = event.target?.result
-      if (base64Data) {
-        setStudentAvatar(base64Data)
-        try {
-          const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
-          localStorage.setItem(`bx_student_avatar_${studentId}`, base64Data)
-          // Update session user avatar
-          const storedAuth = localStorage.getItem('bx_auth_user')
-          if (storedAuth) {
-            const userObj = JSON.parse(storedAuth)
-            userObj.avatar = base64Data
-            localStorage.setItem('bx_auth_user', JSON.stringify(userObj))
-          }
-        } catch {}
-        showToast('Profile photo updated successfully!')
-      }
-    }
-    reader.readAsDataURL(file)
-  }
-
-  // Handle Remove Photo
-  const handleRemovePhoto = () => {
-    setStudentAvatar(null)
-    try {
-      const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
-      localStorage.removeItem(`bx_student_avatar_${studentId}`)
-      const storedAuth = localStorage.getItem('bx_auth_user')
-      if (storedAuth) {
-        const userObj = JSON.parse(storedAuth)
-        userObj.avatar = ''
-        localStorage.setItem('bx_auth_user', JSON.stringify(userObj))
-      }
-    } catch {}
-    showToast('Profile photo removed. Displaying student initials.')
-  }
-
-  // Handle Check-In
-  const handleCheckIn = () => {
-    const now = new Date()
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    setCheckedInToday(true)
-    setCheckInTime(timeStr)
-    try {
-      localStorage.setItem('bx_student_checked_in_2026-11-26', 'true')
-      localStorage.setItem('bx_student_checkin_time', timeStr)
-    } catch {}
-    showToast(`Checked in successfully at ${timeStr}! Attendance marked: Present (Lab 302).`)
   }
 
   // Fetch actual data from live backend
@@ -358,21 +275,12 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         </div>
       )}
 
-      {/* Hidden File Input for Real Photo Upload */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handlePhotoUpload}
-        accept="image/*"
-        className="hidden"
-      />
-
       {/* 1. STUDENT PROFILE HEADER (REAL DATA - NO PLACEHOLDERS) */}
       <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant p-4 rounded-xl shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        {/* Left: Real Student Avatar with Upload Action & Identity Details */}
+        {/* Left: Real Student Avatar & Identity Details */}
         <div className="flex items-start sm:items-center gap-4">
-          {/* Avatar Container with Upload Camera Overlay */}
-          <div className="relative group shrink-0">
+          {/* Avatar Container */}
+          <div className="relative shrink-0">
             {studentAvatar ? (
               <img
                 src={studentAvatar}
@@ -384,16 +292,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                 {getInitials(student.name)}
               </div>
             )}
-
-            {/* Photo Upload Trigger Button */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              title="Upload your real profile photo"
-              className="absolute -bottom-1 -right-1 p-1 rounded-full bg-white dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface border border-light-outline-variant shadow-xs hover:bg-light-primary hover:text-white transition-colors cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[14px]">photo_camera</span>
-            </button>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -431,60 +329,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Right: Upload Photo / Remove Photo Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2 self-start xl:self-center">
-          {/* Upload Photo Button */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface text-xs font-semibold hover:bg-light-surface-container-low transition-colors cursor-pointer"
-            title="Upload your real photo from your device"
-          >
-            <span className="material-symbols-outlined text-[15px] text-light-primary">upload</span>
-            <span>{studentAvatar ? 'Change Photo' : 'Upload Photo'}</span>
-          </button>
-
-          {studentAvatar && (
-            <button
-              type="button"
-              onClick={handleRemovePhoto}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-200 dark:border-red-900 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
-              title="Remove custom photo and use student initials"
-            >
-              <span className="material-symbols-outlined text-[14px]">delete</span>
-              <span>Remove</span>
-            </button>
-          )}
-
-          {/* Today's Campus Arrival Check-in */}
-          {checkedInToday ? (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-xs shadow-xs">
-              <span className="material-symbols-outlined text-[16px] text-emerald-600 dark:text-emerald-400">check_circle</span>
-              <span>Checked In at {checkInTime}</span>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={handleCheckIn}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[16px]">touch_app</span>
-              <span>Check In for Today</span>
-            </button>
-          )}
-
-          {/* Print Report */}
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface text-xs font-semibold hover:bg-light-surface-container-low transition-colors cursor-pointer"
-            title="Print Official Document"
-          >
-            <span className="material-symbols-outlined text-[16px]">print</span>
-            <span>Print Report</span>
-          </button>
         </div>
       </section>
 

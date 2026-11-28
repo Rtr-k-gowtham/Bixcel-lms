@@ -24,13 +24,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
 
   // 2. Academics Section
   if (isStudent) {
-    sections.push({
-      group: 'My Academics',
-      items: [
-        { id: 'modules', label: 'Module Master', icon: 'library_books' },
-        { id: 'courses', label: 'Course Master', icon: 'menu_book' },
-      ],
-    })
+    // Academics curriculum masters are hidden for students
   } else if (isTutor) {
     sections.push({
       group: 'Instruction & Academics',
@@ -103,13 +97,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
 
   // 5. Finance Section
   if (isStudent) {
-    sections.push({
-      group: 'Fees & Account',
-      items: [
-        { id: 'fees', label: 'My Fee Receipts', icon: 'payments' },
-        { id: 'balance', label: 'Outstanding Balance', icon: 'account_balance_wallet' },
-      ],
-    })
+    // Fees & Account are hidden for students
   } else if (isAdmin) {
     sections.push({
       group: 'Finance & Reports',
