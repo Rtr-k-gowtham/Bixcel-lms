@@ -85,7 +85,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
     sections.push({
       group: 'Faculty Operations',
       items: [
-        { id: 'calendar', label: 'Student Calendar', icon: 'calendar_month' },
         { id: 'progress', label: 'Academic Progress', icon: 'monitoring' },
         { id: 'feedback', label: 'Student Ratings', icon: 'star' },
       ],
@@ -96,7 +95,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       group: 'Operations',
       items: [
         { id: 'batches', label: 'Batch Management', icon: 'workspaces' },
-        { id: 'calendar', label: 'Student Calendar', icon: 'calendar_month' },
         { id: 'progress', label: 'Academic Progress', icon: 'monitoring' },
         { id: 'feedback', label: 'Tutor Rating & Feedback', icon: 'star' },
       ],
