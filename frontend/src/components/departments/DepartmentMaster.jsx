@@ -18,10 +18,6 @@ export function DepartmentMaster({ onNavigateToModules }) {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
-    description: '',
-    head_of_dept: '',
-    email: '',
-    phone: '',
     status: 'Active',
   })
 
@@ -56,10 +52,6 @@ export function DepartmentMaster({ onNavigateToModules }) {
     setFormData({
       code: '',
       name: '',
-      description: '',
-      head_of_dept: '',
-      email: '',
-      phone: '',
       status: 'Active',
     })
     setShowModal(true)
@@ -70,10 +62,6 @@ export function DepartmentMaster({ onNavigateToModules }) {
     setFormData({
       code: dept.code || '',
       name: dept.name || '',
-      description: dept.description || '',
-      head_of_dept: dept.head_of_dept || '',
-      email: dept.email || '',
-      phone: dept.phone || '',
       status: dept.status || 'Active',
     })
     setShowModal(true)
@@ -137,9 +125,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
   const filteredDepartments = departments.filter((d) => {
     const matchSearch =
       (d.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (d.code || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (d.head_of_dept || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (d.email || '').toLowerCase().includes(searchTerm.toLowerCase())
+      (d.code || '').toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchStatus = statusFilter === 'all' || (d.status || 'Active').toLowerCase() === statusFilter.toLowerCase()
     return matchSearch && matchStatus
@@ -149,7 +135,6 @@ export function DepartmentMaster({ onNavigateToModules }) {
   const totalCount = departments.length
   const activeCount = departments.filter((d) => (d.status || 'Active') === 'Active').length
   const totalModules = departments.reduce((acc, curr) => acc + (Number(curr.modules_count) || 0), 0)
-  const totalHODs = new Set(departments.filter((d) => d.head_of_dept).map((d) => d.head_of_dept)).size
 
   return (
     <div className="space-y-4">
@@ -180,7 +165,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
             </span>
           </div>
           <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5">
-            Manage academic faculties, departmental governance, and course module domains.
+            Create and manage academic departments for course and module curriculum classification.
           </p>
         </div>
 
@@ -207,8 +192,8 @@ export function DepartmentMaster({ onNavigateToModules }) {
         </div>
       </div>
 
-      {/* 4 KPI Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* 3 KPI Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="p-3 bg-light-surface-container-lowest dark:bg-dark-surface-bright rounded border border-light-outline-variant/60 dark:border-dark-outline-variant/60 shadow-xs">
           <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">
             <span className="text-[11px] font-semibold uppercase tracking-wider">Total Departments</span>
@@ -217,7 +202,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
           <div className="text-xl font-bold font-title text-light-on-surface dark:text-dark-on-surface">
             {totalCount}
           </div>
-          <span className="text-[10px] text-light-on-surface-variant">Faculty divisions</span>
+          <span className="text-[10px] text-light-on-surface-variant">Configured academic divisions</span>
         </div>
 
         <div className="p-3 bg-light-surface-container-lowest dark:bg-dark-surface-bright rounded border border-light-outline-variant/60 dark:border-dark-outline-variant/60 shadow-xs">
@@ -233,24 +218,13 @@ export function DepartmentMaster({ onNavigateToModules }) {
 
         <div className="p-3 bg-light-surface-container-lowest dark:bg-dark-surface-bright rounded border border-light-outline-variant/60 dark:border-dark-outline-variant/60 shadow-xs">
           <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Curriculum Modules</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">Assigned Modules</span>
             <span className="material-symbols-outlined text-[18px] text-blue-600">library_books</span>
           </div>
           <div className="text-xl font-bold font-title text-light-on-surface dark:text-dark-on-surface">
             {totalModules}
           </div>
-          <span className="text-[10px] text-light-on-surface-variant">Active modules linked</span>
-        </div>
-
-        <div className="p-3 bg-light-surface-container-lowest dark:bg-dark-surface-bright rounded border border-light-outline-variant/60 dark:border-dark-outline-variant/60 shadow-xs">
-          <div className="flex items-center justify-between text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Faculty Heads (HODs)</span>
-            <span className="material-symbols-outlined text-[18px] text-purple-600">person_celebrate</span>
-          </div>
-          <div className="text-xl font-bold font-title text-light-on-surface dark:text-dark-on-surface">
-            {totalHODs}
-          </div>
-          <span className="text-[10px] text-light-on-surface-variant">Governing academic leads</span>
+          <span className="text-[10px] text-light-on-surface-variant">Active curriculum modules linked</span>
         </div>
       </div>
 
@@ -264,7 +238,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search departments by code, title, head, or email..."
+            placeholder="Search departments by code or name..."
             className="w-full pl-8 pr-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
           />
         </div>
@@ -311,13 +285,11 @@ export function DepartmentMaster({ onNavigateToModules }) {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 bg-light-surface-container-low/50 dark:bg-dark-surface-container-low/50 text-light-on-surface-variant dark:text-dark-on-surface-variant text-[11px] font-semibold uppercase tracking-wider">
-                  <th className="py-2.5 px-3.5">Code</th>
-                  <th className="py-2.5 px-3.5">Department Name & Scope</th>
-                  <th className="py-2.5 px-3.5">Head of Dept (HOD)</th>
-                  <th className="py-2.5 px-3.5">Official Contact</th>
-                  <th className="py-2.5 px-3.5 text-center">Modules</th>
-                  <th className="py-2.5 px-3.5 text-center">Status</th>
-                  <th className="py-2.5 px-3.5 text-right">Actions</th>
+                  <th className="py-2.5 px-3.5 w-32">Department Code</th>
+                  <th className="py-2.5 px-3.5">Department Name</th>
+                  <th className="py-2.5 px-3.5 text-center w-28">Assigned Modules</th>
+                  <th className="py-2.5 px-3.5 text-center w-28">Status</th>
+                  <th className="py-2.5 px-3.5 text-right w-24">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-light-outline-variant/30 dark:divide-dark-outline-variant/30">
@@ -333,54 +305,16 @@ export function DepartmentMaster({ onNavigateToModules }) {
                       </span>
                     </td>
 
-                    {/* Name & Description */}
+                    {/* Name */}
                     <td className="py-2.5 px-3.5">
                       <div className="font-semibold text-light-on-surface dark:text-dark-on-surface">
                         {dept.name}
-                      </div>
-                      {dept.description && (
-                        <div className="text-[11px] text-light-on-surface-variant dark:text-dark-on-surface-variant line-clamp-1 mt-0.5">
-                          {dept.description}
-                        </div>
-                      )}
-                    </td>
-
-                    {/* Head of Dept */}
-                    <td className="py-2.5 px-3.5 whitespace-nowrap">
-                      {dept.head_of_dept ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-[16px] text-light-primary">
-                            account_circle
-                          </span>
-                          <span className="font-medium text-light-on-surface dark:text-dark-on-surface">
-                            {dept.head_of_dept}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-light-outline italic">Not Assigned</span>
-                      )}
-                    </td>
-
-                    {/* Contact */}
-                    <td className="py-2.5 px-3.5 whitespace-nowrap">
-                      <div className="flex flex-col text-[11px]">
-                        {dept.email && (
-                          <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                            {dept.email}
-                          </span>
-                        )}
-                        {dept.phone && (
-                          <span className="text-light-outline">{dept.phone}</span>
-                        )}
-                        {!dept.email && !dept.phone && (
-                          <span className="text-light-outline italic">No contact logged</span>
-                        )}
                       </div>
                     </td>
 
                     {/* Modules Count */}
                     <td className="py-2.5 px-3.5 text-center whitespace-nowrap">
-                      <span className="inline-flex items-center justify-center min-w-6 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
+                      <span className="inline-flex items-center justify-center min-w-6 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50">
                         {dept.modules_count || 0}
                       </span>
                     </td>
@@ -390,7 +324,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
                       <button
                         type="button"
                         onClick={() => handleToggleStatus(dept)}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold cursor-pointer transition-colors ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold cursor-pointer transition-colors ${
                           dept.status === 'Active'
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700'
@@ -437,7 +371,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
       {/* Create / Edit Department Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright rounded border border-light-outline-variant dark:border-dark-outline-variant shadow-xl w-full max-w-lg overflow-hidden animate-scale-up">
+          <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright rounded border border-light-outline-variant dark:border-dark-outline-variant shadow-xl w-full max-w-md overflow-hidden animate-scale-up">
             <div className="flex items-center justify-between px-4 py-3 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-light-primary text-[20px]">
@@ -456,37 +390,20 @@ export function DepartmentMaster({ onNavigateToModules }) {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Code */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                    Department Code <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    placeholder="e.g. DEP-FSD"
-                    className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface uppercase focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-
-                {/* Status */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                    Status
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
+            <form onSubmit={handleSubmit} className="p-4 space-y-3.5">
+              {/* Code */}
+              <div>
+                <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
+                  Department Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                  placeholder="e.g. DEP-FSD"
+                  className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface uppercase focus:outline-none focus:ring-1 focus:ring-light-primary"
+                />
               </div>
 
               {/* Department Name */}
@@ -504,60 +421,19 @@ export function DepartmentMaster({ onNavigateToModules }) {
                 />
               </div>
 
-              {/* Head of Department */}
+              {/* Status */}
               <div>
                 <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                  Head of Department (HOD)
+                  Status
                 </label>
-                <input
-                  type="text"
-                  value={formData.head_of_dept}
-                  onChange={(e) => setFormData({ ...formData, head_of_dept: e.target.value })}
-                  placeholder="e.g. Dr. Marcus Vance or Gowtham Tamilkathir"
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                />
-              </div>
-
-              {/* Contact Email & Phone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                    Official Email
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="dept@bixcel.edu"
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                    Phone / Extension
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+1 (555) 019-2831"
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                  Scope & Academic Objectives
-                </label>
-                <textarea
-                  rows="2"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Outline the core academic technologies, competencies, and domain coverage..."
-                  className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                />
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
               </div>
 
               {/* Actions */}
