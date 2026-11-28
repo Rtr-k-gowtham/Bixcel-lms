@@ -235,9 +235,10 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     const lessonsList = Array.isArray(dayItem.lessons) ? dayItem.lessons : []
 
     lessonsList.forEach((l, idx) => {
-      let status = 'upcoming'
-      if (dayNum < 9) status = 'completed'
-      else if (dayNum === 9) status = 'current'
+      let defaultStatus = 'upcoming'
+      if (dayNum < 9) defaultStatus = 'completed'
+      else if (dayNum === 9) defaultStatus = 'current'
+      const itemStatus = l.status || defaultStatus
 
       allParsedLessons.push({
         id: `${selectedModule?.id || 'm'}-${dayNum}-${idx}`,
@@ -249,9 +250,9 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         format: l.format || (l.type === 'task' ? 'Lab Practicum' : 'Interactive Lecture'),
         description: l.description || 'Core syllabus topic and hands-on programming implementation.',
         type: l.type || 'lesson',
-        status: status,
+        status: itemStatus,
         doc_link: l.doc_link || '',
-        live_link: status === 'current' ? 'https://meet.bixcel.edu/dev-24a' : null,
+        live_link: l.live_link || (itemStatus === 'current' ? 'https://meet.bixcel.edu/live' : null),
       })
     })
   })
