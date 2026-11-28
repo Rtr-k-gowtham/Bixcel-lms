@@ -37,6 +37,9 @@ export function FeeBalanceScreen({ onNavigate }) {
   // Task Category Filter: 'today' | 'overdue' | 'upcoming' | 'all' | 'cleared'
   const [taskCategoryFilter, setTaskCategoryFilter] = useState('all')
 
+  // Task Layout: 'list' (Table Listing) | 'cards' (Grid Cards) - Default to Listing
+  const [taskLayout, setTaskLayout] = useState('list')
+
   // Calendar State
   const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear())
   const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth()) // 0-indexed
@@ -195,7 +198,7 @@ export function FeeBalanceScreen({ onNavigate }) {
             guardian_relation: l.guardian_relation || 'Parent',
             guardian_phone: l.guardian_phone || '',
             guardian_email: l.guardian_email || '',
-            installment_no: idx + 1,
+            installment_no: inst.installment || idx + 1,
             title: inst.label || `Installment ${idx + 1}`,
             due_date: dueDate,
             amount: amount,
@@ -206,44 +209,6 @@ export function FeeBalanceScreen({ onNavigate }) {
             commitment: l.commitment || null,
             rawLedger: l,
           })
-        })
-      } else if (Number(l.balance_due) > 0) {
-        const dueDate = l.due_date || todayDateStr
-        const amount = Number(l.balance_due) || 0
-        let category = 'upcoming'
-        const dDue = new Date(dueDate + (dueDate.includes('T') ? '' : 'T00:00:00'))
-        const dToday = new Date(todayDateStr + 'T00:00:00')
-        const diffDays = isNaN(dDue.getTime()) ? 0 : Math.round((dToday.getTime() - dDue.getTime()) / (1000 * 3600 * 24))
-
-        if (dueDate === todayDateStr) {
-          category = 'today'
-        } else if (diffDays > 0) {
-          category = 'overdue'
-        } else {
-          category = 'upcoming'
-        }
-
-        tasks.push({
-          id: `${l.id || 0}-balance`,
-          ledgerId: l.id,
-          student_id: l.student_id || 'STU',
-          student_name: l.student_name || 'Student',
-          track: l.track || 'Track',
-          batch_code: l.batch_code || 'Cohort',
-          guardian_name: l.guardian_name || (l.student_name ? `${l.student_name} Guardian` : 'Guardian'),
-          guardian_relation: l.guardian_relation || 'Parent',
-          guardian_phone: l.guardian_phone || '',
-          guardian_email: l.guardian_email || '',
-          installment_no: 1,
-          title: 'Tuition Balance Settlement',
-          due_date: dueDate,
-          amount: amount,
-          category: category,
-          days_overdue: Math.max(0, diffDays),
-          days_until: Math.max(0, -diffDays),
-          status: category === 'today' ? 'Due Today' : category === 'overdue' ? 'Overdue' : 'Scheduled',
-          commitment: l.commitment || null,
-          rawLedger: l,
         })
       }
     })
@@ -939,21 +904,233 @@ export function FeeBalanceScreen({ onNavigate }) {
               })}
             </div>
 
-            <div className="text-xs text-light-on-surface-variant font-mono">
-              Showing <strong>{filteredTasks.length}</strong> collection tasks
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-light-on-surface-variant font-mono">
+                Showing <strong>{filteredTasks.length}</strong> scheduled dues
+              </div>
+
+              {/* Layout Switcher: Listing vs Cards */}
+              <div className="flex items-center bg-light-surface-container-low dark:bg-dark-surface-container p-0.5 rounded border border-light-outline-variant">
+                <button
+                  type="button"
+                  onClick={() => setTaskLayout('list')}
+                  className={`px-2 py-0.5 rounded text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                    taskLayout === 'list'
+                      ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface shadow-2xs'
+                      : 'text-light-on-surface-variant hover:text-light-on-surface'
+                  }`}
+                  title="List View (Table Listing)"
+                >
+                  <span className="material-symbols-outlined text-[14px]">format_list_bulleted</span>
+                  <span>Listing</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTaskLayout('cards')}
+                  className={`px-2 py-0.5 rounded text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors ${
+                    taskLayout === 'cards'
+                      ? 'bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface shadow-2xs'
+                      : 'text-light-on-surface-variant hover:text-light-on-surface'
+                  }`}
+                  title="Cards View"
+                >
+                  <span className="material-symbols-outlined text-[14px]">grid_view</span>
+                  <span>Cards</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Task Grid Cards */}
+          {/* Scheduled Dues Content */}
           {filteredTasks.length === 0 ? (
             <div className="p-12 text-center rounded-lg border border-dashed border-light-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright">
               <span className="material-symbols-outlined text-[36px] text-light-outline">checklist_rtl</span>
               <h3 className="font-bold text-sm text-light-on-surface mt-2">No Scheduled Dues in this Queue</h3>
               <p className="text-xs text-light-on-surface-variant mt-1">
-                All installments for this category are settled or no records match your filter criteria.
+                All scheduled installments for this category are settled or no records match your filter criteria.
               </p>
             </div>
+          ) : taskLayout === 'list' ? (
+            /* LISTING VIEW (Table Listing) */
+            <div className="rounded-lg border border-light-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-light-outline-variant bg-light-surface-container-low/70 dark:bg-dark-surface-container/70 text-[11px] font-bold uppercase tracking-wider text-light-on-surface-variant">
+                      <th className="py-2.5 px-3 w-12 text-center">#</th>
+                      <th className="py-2.5 px-3">Milestone / Installment</th>
+                      <th className="py-2.5 px-3">Student &amp; Cohort</th>
+                      <th className="py-2.5 px-3">Scheduled Due Date</th>
+                      <th className="py-2.5 px-3">Guardian Contact</th>
+                      <th className="py-2.5 px-3 text-right">Scheduled Due</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3 text-right">Collection Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-light-outline-variant/60 text-xs font-body text-light-on-surface dark:text-dark-on-surface">
+                    {filteredTasks.map((task) => {
+                      const isOverdue = task.category === 'overdue'
+                      const isToday = task.category === 'today'
+                      const isCleared = task.category === 'cleared'
+                      return (
+                        <tr
+                          key={task.id}
+                          className={`hover:bg-light-surface-container-low/50 transition-colors ${
+                            isToday
+                              ? 'bg-blue-50/30 dark:bg-blue-950/20'
+                              : isOverdue
+                              ? 'bg-rose-50/25 dark:bg-rose-950/15'
+                              : isCleared
+                              ? 'opacity-70'
+                              : ''
+                          }`}
+                        >
+                          {/* # Installment Badge */}
+                          <td className="py-2.5 px-3 text-center align-middle">
+                            <span className="w-6 h-6 rounded-full bg-light-primary-tint text-light-primary font-bold font-mono text-[10px] inline-flex items-center justify-center">
+                              #{task.installment_no}
+                            </span>
+                          </td>
+
+                          {/* Milestone Title */}
+                          <td className="py-2.5 px-3 align-middle">
+                            <div className="font-bold text-light-on-surface dark:text-dark-on-surface text-[12px]">
+                              {task.title}
+                            </div>
+                            <div className="text-[10px] font-mono text-light-on-surface-variant">
+                              Ref: {task.rawLedger?.invoice_no || 'Pending'}
+                            </div>
+                          </td>
+
+                          {/* Student & Cohort */}
+                          <td className="py-2.5 px-3 align-middle whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <span className="w-7 h-7 rounded-full bg-light-primary-tint text-light-primary font-bold text-[11px] flex items-center justify-center shrink-0">
+                                {getInitials(task.student_name)}
+                              </span>
+                              <div>
+                                <div className="font-semibold text-light-on-surface text-xs">
+                                  {task.student_name}
+                                </div>
+                                <div className="text-[10px] font-mono text-light-on-surface-variant">
+                                  {task.student_id} • {task.batch_code}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Scheduled Due Date & Urgency */}
+                          <td className="py-2.5 px-3 align-middle whitespace-nowrap">
+                            <div className="font-mono font-bold text-xs text-light-on-surface">
+                              {task.due_date}
+                            </div>
+                            {isToday ? (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.2 rounded font-bold bg-blue-600 text-white animate-pulse">
+                                <span className="material-symbols-outlined text-[11px]">alarm</span>
+                                <span>Due Today</span>
+                              </span>
+                            ) : isOverdue ? (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.2 rounded font-bold bg-rose-600 text-white">
+                                <span className="material-symbols-outlined text-[11px]">error</span>
+                                <span>{task.days_overdue}d Overdue</span>
+                              </span>
+                            ) : isCleared ? (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.2 rounded font-bold bg-emerald-600 text-white">
+                                <span className="material-symbols-outlined text-[11px]">check</span>
+                                <span>Settled</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.2 rounded font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                <span>In {task.days_until}d</span>
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Guardian Contact */}
+                          <td className="py-2.5 px-3 align-middle whitespace-nowrap">
+                            <div className="text-xs font-medium text-light-on-surface">
+                              {task.guardian_name || '—'}
+                            </div>
+                            <div className="flex items-center gap-1.5 font-mono text-[11px] text-light-on-surface-variant">
+                              <span>{task.guardian_phone || '—'}</span>
+                              {task.guardian_phone && (
+                                <a
+                                  href={`https://wa.me/${getCleanPhone(task.guardian_phone)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-emerald-600 hover:text-emerald-700"
+                                  title="Chat on WhatsApp"
+                                >
+                                  <span className="material-symbols-outlined text-[13px]">chat</span>
+                                </a>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Scheduled Due Amount */}
+                          <td className="py-2.5 px-3 align-middle text-right whitespace-nowrap font-mono font-bold text-sm text-light-on-surface dark:text-dark-on-surface">
+                            ₹{formatCurrency(task.amount)}
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-2.5 px-3 align-middle whitespace-nowrap">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              isToday
+                                ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                : isOverdue
+                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                : isCleared
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : 'bg-slate-100 text-slate-800 border border-slate-300'
+                            }`}>
+                              {task.status}
+                            </span>
+                            {task.commitment && (
+                              <div className="text-[10px] text-blue-600 font-mono mt-0.5 truncate max-w-[130px]" title={task.commitment.notes}>
+                                Promised: {task.commitment.promised_date}
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Action Buttons */}
+                          <td className="py-2.5 px-3 align-middle text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenRemind(task.rawLedger, task.title, task.amount)}
+                                className="p-1 rounded border border-light-outline-variant hover:bg-light-surface-container text-light-on-surface cursor-pointer"
+                                title="Send Reminder Notice via WhatsApp / SMS"
+                              >
+                                <span className="material-symbols-outlined text-[15px] text-amber-600">send</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenCommitment(task.rawLedger, task.amount)}
+                                className="p-1 rounded border border-light-outline-variant hover:bg-light-surface-container text-light-on-surface cursor-pointer"
+                                title="Log Payment Commitment"
+                              >
+                                <span className="material-symbols-outlined text-[15px] text-blue-600">handshake</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenCollect(task.rawLedger, task.amount)}
+                                className="px-2.5 py-1 rounded bg-light-primary text-light-on-primary text-[11px] font-bold hover:bg-light-primary-container shadow-2xs inline-flex items-center gap-1 cursor-pointer"
+                                title="Collect this installment amount"
+                              >
+                                <span className="material-symbols-outlined text-[13px]">payments</span>
+                                <span>Collect</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           ) : (
+            /* CARDS GRID VIEW */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredTasks.map((task) => {
                 const isOverdue = task.category === 'overdue'
