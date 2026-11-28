@@ -66,8 +66,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
     sections.push({
       group: 'People',
       items: [
-        { id: 'students', label: 'Student Management', icon: 'groups' },
-        { id: 'tutors', label: 'Tutor Management', icon: 'co_present' },
+        { id: 'students', label: 'Student Master', icon: 'groups' },
       ],
     })
   }
@@ -128,6 +127,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       items: [
         { id: 'users', label: 'User Master', icon: 'manage_accounts' },
         { id: 'departments', label: 'Department Master', icon: 'corporate_fare' },
+        { id: 'tutors', label: 'Tutor Master', icon: 'co_present' },
         { id: 'roles', label: 'Role Master', icon: 'badge' },
         { id: 'permissions', label: 'Permission Matrix', icon: 'security' },
       ],
@@ -166,13 +166,12 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
         </a>
 
         {/* Role Pill */}
-        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase ${
-          isStudent
-            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-            : isTutor
+        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase ${isStudent
+          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+          : isTutor
             ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
             : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-        }`}>
+          }`}>
           {isStudent ? 'STUDENT' : isTutor ? 'FACULTY' : 'ADMIN'}
         </span>
       </div>
@@ -215,9 +214,8 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       {currentUser && (
         <div className="p-3 border-t border-sidebar-surface bg-sidebar-surface/40 flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-              isStudent ? 'bg-emerald-700 text-white' : isTutor ? 'bg-blue-700 text-white' : 'bg-purple-700 text-white'
-            }`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${isStudent ? 'bg-emerald-700 text-white' : isTutor ? 'bg-blue-700 text-white' : 'bg-purple-700 text-white'
+              }`}>
               {(currentUser.name || 'U').charAt(0).toUpperCase()}
             </div>
             <div className="flex flex-col min-w-0">

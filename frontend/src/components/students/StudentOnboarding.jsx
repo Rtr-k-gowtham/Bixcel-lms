@@ -4,7 +4,7 @@ import StudentManagement from './StudentManagement'
 export { StudentManagement }
 
 export function StudentOnboarding(props) {
-  return <StudentManagement initialTab="wizard" {...props} />
+  return <StudentManagement {...props} />
 }
 
 export default StudentOnboarding

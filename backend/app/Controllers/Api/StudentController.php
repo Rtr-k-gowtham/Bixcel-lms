@@ -340,9 +340,7 @@ class StudentController extends BaseApiController
             return $this->failValidationErrors(['full_name' => 'Student Full Name is required.']);
         }
 
-        if (empty($input['guardian_name'])) {
-            return $this->failValidationErrors(['guardian_name' => 'Guardian Name is required.']);
-        }
+        $guardianName = !empty($input['guardian_name']) ? trim((string) $input['guardian_name']) : 'Self / Guardian';
 
         if (empty($input['phone'])) {
             return $this->failValidationErrors(['phone' => 'Phone number is required.']);
@@ -368,7 +366,7 @@ class StudentController extends BaseApiController
             'password' => $hashedPassword,
             'raw_password' => $rawPassword,
             'avatar' => $input['avatar'] ?? null,
-            'guardian_name' => trim((string) $input['guardian_name']),
+            'guardian_name' => $guardianName,
             'guardian_relation' => $input['guardian_relation'] ?? 'Guardian',
             'guardian_phone' => !empty($input['guardian_phone']) ? trim((string) $input['guardian_phone']) : trim((string) $input['phone']),
             'guardian_email' => $input['guardian_email'] ?? '',
@@ -462,41 +460,55 @@ class StudentController extends BaseApiController
         }
 
         // 4. Initialize Fee Invoice
-        $feeModel = new FeeInvoiceModel();
-        $feeModel->insert([
-            'invoice_no' => 'INV-2026-' . str_pad((string) rand(100, 999), 3, '0', STR_PAD_LEFT),
-            'student_id' => $studentId,
-            'student_code' => $studentCode,
-            'student_name' => $studentData['full_name'],
-            'track' => $track,
-            'batch_code' => $batch,
-            'total_amount' => 4500.00,
-            'paid_amount' => 0.00,
-            'balance_amount' => 4500.00,
-            'due_date' => date('Y-m-d', strtotime('+30 days')),
-            'status' => 'Pending',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        try {
+            $feeModel = new FeeInvoiceModel();
+            $feeModel->insert([
+                'invoice_no' => 'INV-2026-' . str_pad((string) rand(100, 999), 3, '0', STR_PAD_LEFT),
+                'student_id' => $studentId,
+                'student_code' => $studentCode,
+                'student_name' => $studentData['full_name'],
+                'track' => $track,
+                'batch_code' => $batch,
+                'total_amount' => 4500.00,
+                'paid_amount' => 0.00,
+                'balance_amount' => 4500.00,
+                'due_date' => date('Y-m-d', strtotime('+30 days')),
+                'status' => 'Pending',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Error initializing fee invoice: ' . $e->getMessage());
+        }
 
         // 5. Initialize Student Progress record
-        $progressModel = new ProgressModel();
-        $progressModel->insert([
-            'student_id' => $studentId,
-            'student_code' => $studentCode,
-            'track' => $track,
-            'batch_code' => $batch,
-            'cumulative_gpa' => 4.00,
-            'percentile' => 'Top 10%',
-            'syllabus_completed_credits' => 0,
-            'syllabus_total_credits' => $instructionalDays,
-            'average_score' => 100,
-            'attendance_rate' => 100,
-            'cleared_milestones' => 0,
-            'total_milestones' => 5,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        try {
+            $progressModel = new ProgressModel();
+            $existingProgress = $progressModel->where('student_code', $studentCode)->first();
+            $progressData = [
+                'student_id' => $studentId,
+                'student_code' => $studentCode,
+                'track' => $track,
+                'batch_code' => $batch,
+                'cumulative_gpa' => 4.00,
+                'percentile' => 'Top 10%',
+                'syllabus_completed_credits' => 0,
+                'syllabus_total_credits' => $instructionalDays,
+                'average_score' => 100,
+                'attendance_rate' => 100,
+                'cleared_milestones' => 0,
+                'total_milestones' => 5,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+            if ($existingProgress) {
+                $progressModel->update($existingProgress['id'], $progressData);
+            } else {
+                $progressModel->insert($progressData);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error initializing student progress: ' . $e->getMessage());
+        }
 
         $responseData = array_merge($studentData, [
             'id' => (int) $studentId,
