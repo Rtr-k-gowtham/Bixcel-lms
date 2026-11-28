@@ -438,6 +438,28 @@ export const apiService = {
     const response = await apiClient.delete(`/milestones/${id}`)
     return response.data
   },
+
+  // Department Master API
+  getDepartments: async (params = {}) => {
+    const response = await apiClient.get('/departments', { params })
+    return response.data
+  },
+  getDepartment: async (id) => {
+    const response = await apiClient.get(`/departments/${id}`)
+    return response.data
+  },
+  createDepartment: async (data) => {
+    const response = await apiClient.post('/departments', data)
+    return response.data
+  },
+  updateDepartment: async (id, data) => {
+    const response = await apiClient.put(`/departments/${id}`, data)
+    return response.data
+  },
+  deleteDepartment: async (id) => {
+    const response = await apiClient.delete(`/departments/${id}`)
+    return response.data
+  },
 }
 
 export default apiService

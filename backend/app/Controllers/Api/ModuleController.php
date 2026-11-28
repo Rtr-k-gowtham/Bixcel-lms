@@ -58,6 +58,7 @@ class ModuleController extends BaseApiController
                 'title'              => $mod['title'],
                 'code'               => $mod['code'],
                 'category'           => $mod['category'] ?? 'Engineering',
+                'department_id'      => !empty($mod['department_id']) ? (int)$mod['department_id'] : null,
                 'tutor'              => $mod['tutor'] ?? '',
                 'status'             => $mod['status'] ?? 'Published',
                 'days'               => count($curriculum) > 0 ? count($curriculum) : (int) ($mod['duration_days'] ?? 1),
@@ -166,10 +167,24 @@ class ModuleController extends BaseApiController
             $totalLessons += count($dayItem['lessons'] ?? []);
         }
 
+        $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
+        $category = !empty($data['category']) ? trim((string) $data['category']) : null;
+        if (!$category && $deptId) {
+            $deptModel = new \App\Models\DepartmentModel();
+            $dept = $deptModel->find($deptId);
+            if ($dept) {
+                $category = $dept['name'];
+            }
+        }
+        if (!$category) {
+            $category = 'Engineering';
+        }
+
         $id = $moduleModel->insert([
             'code'               => $code,
             'title'              => trim((string) $data['title']),
-            'category'           => $data['category'] ?? 'Engineering',
+            'category'           => $category,
+            'department_id'      => $deptId,
             'tutor'              => !empty($data['tutor']) ? trim((string) $data['tutor']) : null,
             'duration_days'      => $totalDays > 0 ? $totalDays : (int) ($data['days'] ?? 10),
             'credits'            => (int) ($data['credits'] ?? 3),
@@ -185,7 +200,8 @@ class ModuleController extends BaseApiController
             'id'                 => (int) $id,
             'title'              => trim((string) $data['title']),
             'code'               => $code,
-            'category'           => $data['category'] ?? 'General',
+            'category'           => $category,
+            'department_id'      => $deptId,
             'tutor'              => $data['tutor'] ?? '',
             'status'             => $data['status'] ?? 'Draft',
             'days'               => $totalDays > 0 ? $totalDays : (int) ($data['days'] ?? 5),
@@ -220,6 +236,7 @@ class ModuleController extends BaseApiController
         $update = [];
         if (isset($data['title'])) $update['title'] = trim((string) $data['title']);
         if (isset($data['code'])) $update['code'] = strtoupper(trim((string) $data['code']));
+        if (isset($data['department_id'])) $update['department_id'] = !empty($data['department_id']) ? (int) $data['department_id'] : null;
         if (isset($data['category'])) $update['category'] = $data['category'];
         if (isset($data['tutor'])) $update['tutor'] = trim((string) $data['tutor']);
         if (isset($data['days'])) $update['duration_days'] = (int) $data['days'];

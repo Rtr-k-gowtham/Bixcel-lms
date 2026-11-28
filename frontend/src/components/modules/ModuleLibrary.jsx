@@ -24,6 +24,7 @@ const DEFAULT_MODULES = []
 
 export function ModuleLibrary() {
   const [modules, setModules] = useState([])
+  const [departments, setDepartments] = useState([])
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -40,7 +41,8 @@ export function ModuleLibrary() {
   const [formData, setFormData] = useState({
     title: '',
     code: '',
-    category: 'UI/UX',
+    category: '',
+    department_id: null,
     version: 'v1.0',
     status: 'Published',
     days: 1,
@@ -74,6 +76,18 @@ export function ModuleLibrary() {
   // Fetch from backend
   useEffect(() => {
     let isMounted = true
+
+    const fetchDepartments = async () => {
+      try {
+        const res = await apiService.getDepartments()
+        if (res && res.data && isMounted) {
+          setDepartments(Array.isArray(res.data) ? res.data : [])
+        }
+      } catch (err) {
+        console.warn('Error fetching departments:', err)
+      }
+    }
+
     const fetchModules = async () => {
       try {
         const res = await apiService.getModules()
@@ -109,6 +123,8 @@ export function ModuleLibrary() {
         if (isMounted) setModules([])
       }
     }
+
+    fetchDepartments()
     fetchModules()
     return () => { isMounted = false }
   }, [])
@@ -116,10 +132,13 @@ export function ModuleLibrary() {
   // Open Full-Screen Studio for creating a new module
   const openCreateModal = () => {
     setEditingModule(null)
+    const defaultDept = departments[0] || null
+    const deptPrefix = defaultDept?.code ? defaultDept.code.replace(/^DEP-/, '') : 'ENG'
     setFormData({
       title: '',
-      code: `MOD-ACC-${100 + modules.length + 1}`,
-      category: 'UI/UX',
+      code: `MOD-${deptPrefix}-${100 + modules.length + 1}`,
+      category: defaultDept?.name || 'Full-Stack Web Development',
+      department_id: defaultDept?.id || null,
       tutor: '',
       status: 'Published',
       days: 1,
@@ -143,10 +162,12 @@ export function ModuleLibrary() {
   // Open Full-Screen Studio for editing an existing module
   const openEditModal = (m) => {
     setEditingModule(m)
+    const matchedDept = departments.find((d) => d.id === m.department_id || d.name === m.category)
     setFormData({
       title: m.title,
       code: m.code,
-      category: m.category || 'UI/UX',
+      category: m.category || (matchedDept?.name || 'General'),
+      department_id: m.department_id || (matchedDept?.id || null),
       tutor: m.tutor || '',
       status: m.status || 'Published',
       days: m.days || 1,
@@ -563,7 +584,10 @@ export function ModuleLibrary() {
       const matchSearch =
         m.title.toLowerCase().includes(search.toLowerCase()) ||
         m.code.toLowerCase().includes(search.toLowerCase())
-      const matchCategory = categoryFilter === 'all' || m.category === categoryFilter
+      const matchCategory =
+        categoryFilter === 'all' ||
+        m.category === categoryFilter ||
+        (m.department_id && departments.find((d) => d.id === m.department_id)?.name === categoryFilter)
       const matchStatus = statusFilter === 'all' || m.status === statusFilter
       return matchSearch && matchCategory && matchStatus
     })
@@ -724,19 +748,20 @@ export function ModuleLibrary() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Domain Filter */}
+          {/* Department Filter */}
           <div className="flex items-center gap-1">
-            <span className="text-[11px] font-medium text-light-on-surface-variant">Domain:</span>
+            <span className="text-[11px] font-medium text-light-on-surface-variant">Department:</span>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
             >
-              <option value="all">All Disciplines</option>
-              <option value="Design">Design</option>
-              <option value="UI/UX">UI/UX</option>
-              <option value="Programming">Programming</option>
-              <option value="Cloud Computing">Cloud Computing</option>
+              <option value="all">All Departments</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.name}>
+                  {dept.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -1223,18 +1248,27 @@ export function ModuleLibrary() {
 
                     <div className="sm:col-span-2">
                       <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
-                        Domain
+                        Department / Faculty
                       </label>
                       <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        value={formData.department_id || (departments.find((d) => d.name === formData.category)?.id || '')}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          const found = departments.find((d) => String(d.id) === String(val))
+                          setFormData({
+                            ...formData,
+                            department_id: found ? found.id : null,
+                            category: found ? found.name : formData.category,
+                          })
+                        }}
                         className="w-full px-2 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                       >
-                        <option value="UI/UX">UI/UX Design</option>
-                        <option value="Design">Graphic & Brand</option>
-                        <option value="Programming">Programming</option>
-                        <option value="Cloud Computing">Cloud Computing</option>
-                        <option value="Data Science">Data Science & AI</option>
+                        <option value="">-- Select Department --</option>
+                        {departments.map((dept) => (
+                          <option key={dept.id} value={dept.id}>
+                            {dept.name} ({dept.code})
+                          </option>
+                        ))}
                       </select>
                     </div>
 

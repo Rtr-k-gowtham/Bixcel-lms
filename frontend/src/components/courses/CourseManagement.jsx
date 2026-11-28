@@ -4,6 +4,7 @@ import { apiService } from '../../services/api'
 export function CourseManagement({ onNavigateToModules }) {
   const [courses, setCourses] = useState([])
   const [modules, setModules] = useState([])
+  const [departments, setDepartments] = useState([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState('')
   const [search, setSearch] = useState('')
@@ -39,9 +40,10 @@ export function CourseManagement({ onNavigateToModules }) {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const [coursesRes, modulesRes] = await Promise.allSettled([
+        const [coursesRes, modulesRes, deptsRes] = await Promise.allSettled([
           apiService.getCourses(),
           apiService.getModules(),
+          apiService.getDepartments(),
         ])
 
         if (isMounted) {
@@ -55,6 +57,12 @@ export function CourseManagement({ onNavigateToModules }) {
             setModules(modulesRes.value.data)
           } else {
             setModules([])
+          }
+
+          if (deptsRes.status === 'fulfilled' && deptsRes.value?.data) {
+            setDepartments(Array.isArray(deptsRes.value.data) ? deptsRes.value.data : [])
+          } else {
+            setDepartments([])
           }
         }
       } catch (err) {
@@ -688,12 +696,22 @@ export function CourseManagement({ onNavigateToModules }) {
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full px-3 py-2 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-label"
                     >
-                      <option value="Engineering">Engineering</option>
-                      <option value="UI/UX Design">UI/UX Design</option>
-                      <option value="Programming">Programming</option>
-                      <option value="Cloud Computing">Cloud Computing</option>
-                      <option value="Data Science & AI">Data Science & AI</option>
-                      <option value="Digital Marketing">Digital Marketing</option>
+                      {departments.length > 0 ? (
+                        departments.map((d) => (
+                          <option key={d.id} value={d.name}>
+                            {d.name} ({d.code})
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="Engineering">Engineering</option>
+                          <option value="Full-Stack Web Development">Full-Stack Web Development</option>
+                          <option value="UI/UX Design">UI/UX Design</option>
+                          <option value="Programming">Programming</option>
+                          <option value="Cloud Computing">Cloud Computing</option>
+                          <option value="Data Science & AI">Data Science & AI</option>
+                        </>
+                      )}
                     </select>
                   </div>
 

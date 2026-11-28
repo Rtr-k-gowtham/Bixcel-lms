@@ -47,6 +47,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       group: 'Academics',
       items: [
         { id: 'courses', label: 'Course Management', icon: 'menu_book' },
+        { id: 'departments', label: 'Department Master', icon: 'corporate_fare' },
         { id: 'modules', label: 'Module Library', icon: 'library_books' },
         { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
       ],

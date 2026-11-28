@@ -18,6 +18,7 @@ $defineApiRoutes = static function ($routes) {
     $routes->post('auth/logout', 'Api\AuthController::logout');
 
     $routes->get('health', 'Api\HealthController::index');
+    $routes->resource('departments', ['controller' => 'Api\DepartmentController']);
     $routes->resource('courses', ['controller' => 'Api\CourseController']);
     $routes->resource('modules', ['controller' => 'Api\ModuleController']);
     $routes->post('batches/assign-students', 'Api\BatchController::assignStudents');

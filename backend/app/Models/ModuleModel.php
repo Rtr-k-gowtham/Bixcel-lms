@@ -21,6 +21,7 @@ class ModuleModel extends Model
         'description',
         'status',
         'curriculum_lessons',
+        'department_id',
     ];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';

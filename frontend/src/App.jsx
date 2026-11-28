@@ -28,11 +28,12 @@ import TimetableScheduling from './components/timetable/TimetableScheduling'
 import AssignmentManagement from './components/assignments/AssignmentManagement'
 import ExamManagement from './components/exams/ExamManagement'
 import MilestoneManagement from './components/milestones/MilestoneManagement'
+import DepartmentMaster from './components/departments/DepartmentMaster'
 import LoginScreen from './components/auth/LoginScreen'
 import { apiService } from './services/api'
 
 const VALID_TABS = new Set([
-  'dashboard', 'courses', 'modules', 'builder', 'curriculum',
+  'dashboard', 'courses', 'departments', 'modules', 'builder', 'curriculum',
   'students', 'onboarding', 'tutors', 'batches', 'timetable', 'attendance',
   'assignments', 'exams', 'milestones', 'calendar', 'progress', 'feedback',
   'fees', 'balance', 'analytics', 'users', 'roles', 'permissions',
@@ -384,6 +385,8 @@ function Dashboard({ currentUser, onLogout }) {
             <StudentManagement initialTab="directory" />
           ) : currentTab === 'onboarding' ? (
             <StudentOnboarding />
+          ) : currentTab === 'departments' ? (
+            <DepartmentMaster onNavigateToModules={() => handleTabChange('modules')} />
           ) : currentTab === 'modules' ? (
             <ModuleLibrary />
           ) : currentTab === 'users' ? (
