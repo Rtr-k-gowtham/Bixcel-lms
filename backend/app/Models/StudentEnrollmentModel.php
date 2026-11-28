@@ -22,6 +22,9 @@ class StudentEnrollmentModel extends Model
         'total_modules',
         'status',
         'tuition_fee',
+        'paid_amount',
+        'balance_amount',
+        'due_date',
         'plan',
         'payment_method',
     ];

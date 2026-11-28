@@ -7,6 +7,7 @@ use App\Models\StudentEnrollmentModel;
 use App\Models\StudentModuleModel;
 use App\Models\CourseModel;
 use App\Models\ProgressModel;
+use App\Models\FeeInvoiceModel;
 
 class EnrollmentController extends BaseApiController
 {
@@ -65,6 +66,13 @@ class EnrollmentController extends BaseApiController
 
             $enrolledMods = $modulesMap[$enr['student_code']] ?? [];
 
+            $totalFee = (float) ($enr['tuition_fee'] ?? 4500.00);
+            $paidAmt = (float) ($enr['paid_amount'] ?? 0.00);
+            $balAmt = (float) (isset($enr['balance_amount']) ? $enr['balance_amount'] : max(0, $totalFee - $paidAmt));
+            $dueDate = !empty($enr['due_date']) ? $enr['due_date'] : date('Y-m-d', strtotime('+30 days'));
+
+            $feeStatus = ($balAmt <= 0) ? 'Paid' : (($paidAmt > 0) ? 'Partial' : 'Pending');
+
             $item = [
                 'id' => (int) $enr['id'],
                 'student_id' => $enr['student_id'],
@@ -84,7 +92,12 @@ class EnrollmentController extends BaseApiController
                 'total_days' => (int) ($enr['total_days'] ?? 30),
                 'total_modules' => (int) ($enr['total_modules'] ?? count($enrolledMods)),
                 'status' => $enr['status'] ?? 'Active',
-                'tuition_fee' => (float) ($enr['tuition_fee'] ?? 4500.00),
+                'tuition_fee' => $totalFee,
+                'total_amount' => $totalFee,
+                'paid_amount' => $paidAmt,
+                'balance_amount' => $balAmt,
+                'due_date' => $dueDate,
+                'fee_status' => $feeStatus,
                 'plan' => $enr['plan'] ?? 'Standard',
                 'payment_method' => $enr['payment_method'] ?? 'Bank Transfer',
                 'modules' => $enrolledMods,
@@ -165,6 +178,15 @@ class EnrollmentController extends BaseApiController
         $status = !empty($input['status']) ? $input['status'] : 'Active';
         $now = date('Y-m-d H:i:s');
 
+        // Tuition Fee Scheduler Fields
+        $tuitionFee = !empty($input['tuition_fee']) ? (float) $input['tuition_fee'] : (!empty($input['total_amount']) ? (float) $input['total_amount'] : 4500.00);
+        $paidAmount = !empty($input['paid_amount']) ? (float) $input['paid_amount'] : 0.00;
+        $balanceAmount = isset($input['balance_amount']) ? (float) $input['balance_amount'] : max(0, $tuitionFee - $paidAmount);
+        $dueDate = !empty($input['due_date']) ? $input['due_date'] : date('Y-m-d', strtotime('+30 days'));
+        $paymentMethod = !empty($input['payment_method']) ? $input['payment_method'] : 'Bank Transfer';
+
+        $feeStatus = ($balanceAmount <= 0) ? 'Paid' : (($paidAmount > 0) ? 'Partial' : 'Pending');
+
         $modules = $input['modules'] ?? [];
         $totalModules = !empty($modules) ? count($modules) : 1;
 
@@ -180,9 +202,12 @@ class EnrollmentController extends BaseApiController
             'total_days' => $totalDays,
             'total_modules' => $totalModules,
             'status' => $status,
-            'tuition_fee' => (float) ($input['tuition_fee'] ?? 4500.00),
+            'tuition_fee' => $tuitionFee,
+            'paid_amount' => $paidAmount,
+            'balance_amount' => $balanceAmount,
+            'due_date' => $dueDate,
             'plan' => $plan,
-            'payment_method' => $input['payment_method'] ?? 'Bank Transfer',
+            'payment_method' => $paymentMethod,
             'created_at' => $now,
             'updated_at' => $now,
         ];
@@ -237,22 +262,69 @@ class EnrollmentController extends BaseApiController
             log_message('error', 'Error syncing progress: ' . $e->getMessage());
         }
 
+        // Synchronize into Fee Invoices & Payments table
+        try {
+            $feeInvoiceModel = new FeeInvoiceModel();
+            $existingInv = $feeInvoiceModel->where('student_code', $studentCode)->where('track', $track)->first();
+            $invData = [
+                'invoice_no' => 'INV-2026-' . str_pad((string) rand(100, 999), 3, '0', STR_PAD_LEFT),
+                'student_id' => $studentId,
+                'student_code' => $studentCode,
+                'student_name' => $student['full_name'],
+                'track' => $track,
+                'batch_code' => $batch,
+                'total_amount' => $tuitionFee,
+                'paid_amount' => $paidAmount,
+                'balance_amount' => $balanceAmount,
+                'due_date' => $dueDate,
+                'status' => $feeStatus,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+            if ($existingInv) {
+                $feeInvoiceModel->update($existingInv['id'], $invData);
+                $invId = $existingInv['id'];
+            } else {
+                $invId = $feeInvoiceModel->insert($invData);
+            }
+
+            // If an initial payment was made, record in fee_payments
+            if ($paidAmount > 0) {
+                $db = \Config\Database::connect();
+                $db->table('fee_payments')->insert([
+                    'receipt_no' => 'REC-2026-' . str_pad((string) rand(1000, 9999), 4, '0', STR_PAD_LEFT),
+                    'invoice_id' => $invId,
+                    'student_id' => $studentId,
+                    'student_name' => $student['full_name'],
+                    'amount' => $paidAmount,
+                    'payment_method' => $paymentMethod,
+                    'transaction_ref' => 'ENROLL-SCHED-' . time(),
+                    'notes' => 'Initial payment collected during Course Onboarding',
+                    'payment_date' => date('Y-m-d'),
+                    'created_at' => $now,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error creating fee invoice: ' . $e->getMessage());
+        }
+
         return $this->respondCreated([
             'status' => 'success',
-            'message' => 'Student successfully onboarded to course!',
+            'message' => 'Student successfully onboarded to course with fee schedule!',
             'data' => array_merge($enrollmentData, [
                 'id' => (int) $enrollmentId,
                 'student_name' => $student['full_name'],
                 'student_phone' => $student['phone'],
                 'student_email' => $student['email'],
                 'student_avatar' => $student['avatar'],
+                'fee_status' => $feeStatus,
                 'modules' => $modules,
             ]),
         ]);
     }
 
     /**
-     * Update Course Onboarding record
+     * Update Course Onboarding record & Fee Schedule
      */
     public function update($id = null)
     {
@@ -273,12 +345,43 @@ class EnrollmentController extends BaseApiController
         if (isset($input['plan'])) $updateData['plan'] = $input['plan'];
         if (isset($input['total_days'])) $updateData['total_days'] = (int) $input['total_days'];
 
+        // Fee Schedule updates
+        if (isset($input['tuition_fee'])) $updateData['tuition_fee'] = (float) $input['tuition_fee'];
+        if (isset($input['paid_amount'])) $updateData['paid_amount'] = (float) $input['paid_amount'];
+        if (isset($input['balance_amount'])) $updateData['balance_amount'] = (float) $input['balance_amount'];
+        if (isset($input['due_date'])) $updateData['due_date'] = $input['due_date'];
+        if (isset($input['payment_method'])) $updateData['payment_method'] = $input['payment_method'];
+
         $updateData['updated_at'] = date('Y-m-d H:i:s');
         $enrollmentModel->update($id, $updateData);
 
+        // Also update fee_invoices if amount or due date changed
+        try {
+            $feeInvoiceModel = new FeeInvoiceModel();
+            $inv = $feeInvoiceModel->where('student_code', $enrollment['student_code'])->where('track', $enrollment['track'])->first();
+            if ($inv) {
+                $totalAmt = $updateData['tuition_fee'] ?? (float)$inv['total_amount'];
+                $paidAmt = $updateData['paid_amount'] ?? (float)$inv['paid_amount'];
+                $balAmt = $updateData['balance_amount'] ?? max(0, $totalAmt - $paidAmt);
+                $dueDate = $updateData['due_date'] ?? $inv['due_date'];
+                $feeStatus = ($balAmt <= 0) ? 'Paid' : (($paidAmt > 0) ? 'Partial' : 'Pending');
+
+                $feeInvoiceModel->update($inv['id'], [
+                    'total_amount' => $totalAmt,
+                    'paid_amount' => $paidAmt,
+                    'balance_amount' => $balAmt,
+                    'due_date' => $dueDate,
+                    'status' => $feeStatus,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error updating fee invoice: ' . $e->getMessage());
+        }
+
         return $this->respond([
             'status' => 'success',
-            'message' => 'Course onboarding updated successfully.',
+            'message' => 'Course onboarding and fee schedule updated successfully.',
             'data' => array_merge($enrollment, $updateData),
         ]);
     }

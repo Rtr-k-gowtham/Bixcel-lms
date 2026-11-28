@@ -47,14 +47,35 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
   const [moduleSearch, setModuleSearch] = useState('')
   const [moduleCategoryFilter, setModuleCategoryFilter] = useState('All')
 
-  // Cohort & Scheduling State
+  // Cohort, Scheduling & Tuition Fee Scheduler State
   const [batchCode, setBatchCode] = useState('BIX-2026-A')
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
   const [endDate, setEndDate] = useState(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [status, setStatus] = useState('Active')
-  const [tuitionFee, setTuitionFee] = useState(4500)
-  const [plan, setPlan] = useState('Full Payment')
+  const [totalAmount, setTotalAmount] = useState(45000)
+  const [paidNow, setPaidNow] = useState(15000)
+  const [dueDate, setDueDate] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 30)
+    return d.toISOString().split('T')[0]
+  })
+  const [paymentMethod, setPaymentMethod] = useState('Bank Transfer')
+  const [plan, setPlan] = useState('Installments')
   const [isOnboarding, setIsOnboarding] = useState(false)
+
+  // Balance calculation (Dynamic: Total Amount - Now Paid)
+  const balanceAmount = useMemo(() => {
+    const tot = Number(totalAmount) || 0
+    const paid = Number(paidNow) || 0
+    return Math.max(0, tot - paid)
+  }, [totalAmount, paidNow])
+
+  // Helper to schedule due date relative to today
+  const setDueDaysFromNow = (days) => {
+    const d = new Date()
+    d.setDate(d.getDate() + days)
+    setDueDate(d.toISOString().split('T')[0])
+  }
 
   // Fetch initial data
   const loadData = async () => {
@@ -186,8 +207,13 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     setStartDate(new Date().toISOString().split('T')[0])
     setEndDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
     setStatus('Active')
-    setTuitionFee(4500)
-    setPlan('Full Payment')
+    setTotalAmount(45000)
+    setPaidNow(15000)
+    const d = new Date()
+    d.setDate(d.getDate() + 30)
+    setDueDate(d.toISOString().split('T')[0])
+    setPaymentMethod('Bank Transfer')
+    setPlan('Installments')
 
     setViewMode('form')
   }
@@ -260,8 +286,12 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
       total_modules: effectiveModules.length,
       status: status,
       plan: plan,
-      tuition_fee: Number(tuitionFee) || 4500,
-      payment_method: 'Bank Transfer',
+      tuition_fee: Number(totalAmount) || 0,
+      total_amount: Number(totalAmount) || 0,
+      paid_amount: Number(paidNow) || 0,
+      balance_amount: balanceAmount,
+      due_date: dueDate || null,
+      payment_method: paymentMethod || 'Bank Transfer',
       modules: effectiveModules.map((m, idx) => ({
         module_code: m.code || m.id || `MOD-${idx + 1}`,
         title: m.title,
@@ -307,16 +337,30 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     e.preventDefault()
     if (!editingOnboarding) return
 
+    const tot = Number(editingOnboarding.tuition_fee || editingOnboarding.total_amount) || 0
+    const paid = Number(editingOnboarding.paid_amount) || 0
+    const bal = Math.max(0, tot - paid)
+
+    const updated = {
+      ...editingOnboarding,
+      tuition_fee: tot,
+      total_amount: tot,
+      paid_amount: paid,
+      balance_amount: bal,
+      due_date: editingOnboarding.due_date || null,
+      payment_method: editingOnboarding.payment_method || 'Bank Transfer',
+    }
+
     try {
-      await apiService.updateEnrollment(editingOnboarding.id, editingOnboarding)
+      await apiService.updateEnrollment(updated.id, updated)
     } catch (err) {
       console.warn('API update failed:', err)
     }
 
     setEnrollments((prev) =>
-      prev.map((item) => (item.id === editingOnboarding.id ? { ...editingOnboarding, updated_at: new Date().toISOString() } : item))
+      prev.map((item) => (item.id === updated.id ? { ...updated, updated_at: new Date().toISOString() } : item))
     )
-    setToast(`Course onboarding for "${editingOnboarding.student_name}" updated!`)
+    setToast(`Course onboarding & fee schedule for "${editingOnboarding.student_name}" updated!`)
     setEditingOnboarding(null)
     setTimeout(() => setToast(''), 3000)
   }
@@ -786,21 +830,22 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
               )}
             </section>
 
-            {/* STEP 3: COHORT, SCHEDULE & TUITION */}
-            <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-xs flex flex-col gap-3">
+            {/* STEP 3: COHORT, SCHEDULE & TUITION FEE SCHEDULER */}
+            <section className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md p-4 shadow-xs flex flex-col gap-4">
               <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-2">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-light-primary text-light-on-primary text-xs font-bold flex items-center justify-center">
                     3
                   </span>
                   <h2 className="font-title text-sm font-bold text-light-on-surface dark:text-dark-on-surface">
-                    Cohort Batch Allocation &amp; Schedule
+                    Batch Allocation &amp; Tuition Fee Scheduler
                   </h2>
                 </div>
                 <span className="text-[11px] text-light-on-surface-variant">Step 3 of 3</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Cohort Batch & Schedule Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                     Batch Cohort Code *
@@ -810,7 +855,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     required
                     value={batchCode}
                     onChange={(e) => setBatchCode(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+                    className="w-full px-3 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
                 <div>
@@ -822,7 +867,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     required
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
                 <div>
@@ -833,51 +878,237 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Initial Enrollment Status
+                    Initial Status
                   </label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
                   >
                     <option value="Active">Active</option>
                     <option value="Pending">Pending</option>
                     <option value="On Leave">On Leave</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Tuition Fee Plan
-                  </label>
-                  <select
-                    value={plan}
-                    onChange={(e) => setPlan(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
-                  >
-                    <option value="Full Payment">Full Payment</option>
-                    <option value="Installments">Installments</option>
-                    <option value="Scholarship">Scholarship</option>
-                  </select>
+              </div>
+
+              {/* DEDICATED TUITION FEE SCHEDULER */}
+              <div className="p-3.5 rounded-md border-2 border-light-primary/30 bg-light-surface-container-low/50 dark:bg-dark-surface-container/40 flex flex-col gap-3">
+                <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-full bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">payments</span>
+                    </span>
+                    <div>
+                      <h3 className="font-title text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                        Tuition Fee &amp; Balance Scheduler
+                      </h3>
+                      <p className="text-[10px] text-light-on-surface-variant">
+                        Open total amount, enter initial payment received now, and schedule the remaining balance due date in DB.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary font-mono">
+                    Fee Auto-Sync
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                    Tuition Fee Amount (₹)
-                  </label>
-                  <input
-                    type="number"
-                    value={tuitionFee}
-                    onChange={(e) => setTuitionFee(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
-                  />
+
+                {/* 3 Fee Inputs: Total Amount, Now Paid, Payment Mode */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                      Total Tuition Amount (₹) *
+                    </label>
+                    <div className="relative flex items-center">
+                      <span className="absolute left-2.5 text-xs font-bold text-light-outline pointer-events-none">₹</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="500"
+                        required
+                        value={totalAmount}
+                        onChange={(e) => setTotalAmount(e.target.value)}
+                        placeholder="e.g. 45000"
+                        className="w-full pl-6 pr-3 py-1.5 text-xs font-mono font-bold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface">
+                        Amount Now Paid (₹) *
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setPaidNow(totalAmount)}
+                          className="text-[9px] font-bold text-light-primary hover:underline cursor-pointer"
+                        >
+                          Full
+                        </button>
+                        <span className="text-[9px] text-light-outline">•</span>
+                        <button
+                          type="button"
+                          onClick={() => setPaidNow(Math.round((Number(totalAmount) || 0) / 2))}
+                          className="text-[9px] font-bold text-light-primary hover:underline cursor-pointer"
+                        >
+                          50%
+                        </button>
+                        <span className="text-[9px] text-light-outline">•</span>
+                        <button
+                          type="button"
+                          onClick={() => setPaidNow(0)}
+                          className="text-[9px] font-bold text-light-on-surface-variant hover:underline cursor-pointer"
+                        >
+                          Zero
+                        </button>
+                      </div>
+                    </div>
+                    <div className="relative flex items-center">
+                      <span className="absolute left-2.5 text-xs font-bold text-light-outline pointer-events-none">₹</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max={totalAmount}
+                        step="500"
+                        required
+                        value={paidNow}
+                        onChange={(e) => setPaidNow(e.target.value)}
+                        placeholder="e.g. 15000"
+                        className="w-full pl-6 pr-3 py-1.5 text-xs font-mono font-bold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                      Payment Mode / Method
+                    </label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                    >
+                      <option value="UPI">UPI / QR Code</option>
+                      <option value="Cash">Cash Receipt</option>
+                      <option value="Credit / Debit Card">Credit / Debit Card</option>
+                      <option value="Bank Transfer">Bank Transfer (NEFT/RTGS/IMPS)</option>
+                      <option value="Net Banking">Net Banking</option>
+                      <option value="Cheque / DD">Cheque / Demand Draft</option>
+                    </select>
+                  </div>
                 </div>
+
+                {/* Live Calculated Fee Balance & Schedule Status Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-2.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/70 text-xs">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-light-on-surface-variant font-medium">Total Course Fee</span>
+                    <span className="font-mono text-sm font-bold text-light-on-surface dark:text-dark-on-surface">
+                      ₹{Number(totalAmount || 0).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-light-on-surface-variant font-medium">Now Paid (Receipt)</span>
+                    <span className="font-mono text-sm font-bold text-success">
+                      ₹{Number(paidNow || 0).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-light-on-surface-variant font-medium">Remaining Balance</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`font-mono text-sm font-bold ${balanceAmount === 0 ? 'text-success' : 'text-pending'}`}>
+                        ₹{balanceAmount.toLocaleString('en-IN')}
+                      </span>
+                      {balanceAmount === 0 ? (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-success-container text-on-success-container">
+                          Settled
+                        </span>
+                      ) : (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300">
+                          Balance Due
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* SCHEDULE BALANCE DUE DATE SECTION */}
+                {balanceAmount > 0 ? (
+                  <div className="p-3 rounded border border-pending/30 bg-pending-container/20 dark:bg-pending-container/10 flex flex-col gap-2.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[17px] text-pending">event_upcoming</span>
+                        <label className="text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                          Schedule Balance Due Date *
+                        </label>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1">
+                        <span className="text-[10px] text-light-on-surface-variant font-medium mr-1">Quick Presets:</span>
+                        <button
+                          type="button"
+                          onClick={() => setDueDaysFromNow(15)}
+                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                        >
+                          +15 Days
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDueDaysFromNow(30)}
+                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-primary cursor-pointer"
+                        >
+                          +30 Days (1 Mo)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDueDaysFromNow(45)}
+                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                        >
+                          +45 Days
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDueDaysFromNow(60)}
+                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                        >
+                          +60 Days (2 Mo)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDueDaysFromNow(90)}
+                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                        >
+                          +90 Days (3 Mo)
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                      <div>
+                        <input
+                          type="date"
+                          required
+                          value={dueDate}
+                          onChange={(e) => setDueDate(e.target.value)}
+                          className="w-full px-3 py-1.5 text-xs font-mono font-bold rounded border border-pending/40 bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-pending"
+                        />
+                      </div>
+                      <div className="text-[11px] text-light-on-surface-variant bg-light-surface-container-lowest/80 dark:bg-dark-surface-bright/80 p-2 rounded border border-light-outline-variant/60">
+                        Balance of <strong className="text-pending font-mono">₹{balanceAmount.toLocaleString('en-IN')}</strong> will be captured in the database with scheduled due date <strong className="font-mono text-light-primary">{dueDate}</strong>.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded border border-success/30 bg-success-container/20 text-xs flex items-center gap-2 text-on-success-container font-medium">
+                    <span className="material-symbols-outlined text-[18px] text-success">verified</span>
+                    <span>Tuition fee marked as fully paid at onboarding. No future balance invoice will be scheduled.</span>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -1081,7 +1312,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     <th className="py-2.5 px-3">Curriculum / Days</th>
                     <th className="py-2.5 px-3">Start Date</th>
                     <th className="py-2.5 px-3 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-center">Fee Plan</th>
+                    <th className="py-2.5 px-3 text-center">Tuition &amp; Fee Schedule</th>
                     <th className="py-2.5 px-3 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -1191,11 +1422,33 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                             </span>
                           </td>
 
-                          {/* Fee Plan */}
+                          {/* Tuition & Fee Schedule */}
                           <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
-                            <span className="text-[11px] font-medium text-light-on-surface dark:text-dark-on-surface">
-                              {item.plan || 'Standard'}
-                            </span>
+                            <div className="flex flex-col items-center">
+                              <div className="flex items-center gap-1">
+                                <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
+                                  ₹{(item.tuition_fee || item.total_amount || 0).toLocaleString('en-IN')}
+                                </span>
+                                {(item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))) <= 0 ? (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-success-container text-on-success-container">
+                                    Paid
+                                  </span>
+                                ) : (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                                    Bal ₹{(item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))).toLocaleString('en-IN')}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-light-on-surface-variant font-mono">
+                                <span>Paid: ₹{(item.paid_amount || 0).toLocaleString('en-IN')}</span>
+                                {item.due_date && (item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))) > 0 && (
+                                  <span className="inline-flex items-center gap-0.5 text-pending font-semibold" title={`Balance Due Date: ${item.due_date}`}>
+                                    <span className="material-symbols-outlined text-[11px]">event</span>
+                                    Due: {item.due_date}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </td>
 
                           {/* Actions */}
@@ -1300,6 +1553,45 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
               <div>
                 <span className="text-light-on-surface-variant block">Status:</span>
                 <span className="font-semibold text-success">{viewingOnboarding.status}</span>
+              </div>
+            </div>
+
+            {/* Tuition Fee & Balance Schedule Card */}
+            <div className="p-3 rounded-md border border-light-outline-variant bg-light-surface-container-low/70 dark:bg-dark-surface-container/70 flex flex-col gap-2">
+              <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-1.5">
+                <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[16px] text-light-primary">payments</span>
+                  Tuition Fee &amp; Balance Schedule
+                </span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                  (viewingOnboarding.balance_amount !== undefined ? viewingOnboarding.balance_amount : ((viewingOnboarding.tuition_fee || 0) - (viewingOnboarding.paid_amount || 0))) <= 0
+                    ? 'bg-success-container text-on-success-container'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300'
+                }`}>
+                  {viewingOnboarding.fee_status || ((viewingOnboarding.balance_amount !== undefined ? viewingOnboarding.balance_amount : ((viewingOnboarding.tuition_fee || 0) - (viewingOnboarding.paid_amount || 0))) <= 0 ? 'Paid in Full' : 'Balance Scheduled')}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                <div>
+                  <span className="text-light-on-surface-variant block">Total Tuition:</span>
+                  <strong className="font-mono text-light-on-surface dark:text-dark-on-surface">₹{(viewingOnboarding.tuition_fee || viewingOnboarding.total_amount || 0).toLocaleString('en-IN')}</strong>
+                </div>
+                <div>
+                  <span className="text-light-on-surface-variant block">Now Paid:</span>
+                  <strong className="font-mono text-success">₹{(viewingOnboarding.paid_amount || 0).toLocaleString('en-IN')}</strong>
+                </div>
+                <div>
+                  <span className="text-light-on-surface-variant block">Balance Amount:</span>
+                  <strong className="font-mono text-pending">₹{(viewingOnboarding.balance_amount !== undefined ? viewingOnboarding.balance_amount : ((viewingOnboarding.tuition_fee || 0) - (viewingOnboarding.paid_amount || 0))).toLocaleString('en-IN')}</strong>
+                </div>
+                <div>
+                  <span className="text-light-on-surface-variant block">Scheduled Due Date:</span>
+                  <strong className="font-mono text-light-primary">{viewingOnboarding.due_date || 'N/A'}</strong>
+                </div>
+              </div>
+              <div className="text-[10px] text-light-on-surface-variant flex items-center justify-between border-t border-light-outline-variant/40 pt-1">
+                <span>Payment Mode: <strong>{viewingOnboarding.payment_method || 'Bank Transfer'}</strong></span>
+                <span>Fee Plan: <strong>{viewingOnboarding.plan || 'Standard'}</strong></span>
               </div>
             </div>
 
@@ -1428,6 +1720,79 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                 </div>
               </div>
 
+              {/* Fee & Schedule Settings in Edit Modal */}
+              <div className="p-2.5 rounded border border-light-outline-variant bg-light-surface-container-low/60 dark:bg-dark-surface-container/60 space-y-2">
+                <span className="font-label text-[11px] font-bold text-light-on-surface dark:text-dark-on-surface block border-b border-light-outline-variant/60 pb-1">
+                  Tuition Fee &amp; Balance Schedule
+                </span>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
+                      Total Tuition (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editingOnboarding.tuition_fee || editingOnboarding.total_amount || 0}
+                      onChange={(e) => setEditingOnboarding({ ...editingOnboarding, tuition_fee: Number(e.target.value), total_amount: Number(e.target.value) })}
+                      className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
+                      Now Paid (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editingOnboarding.paid_amount || 0}
+                      onChange={(e) => setEditingOnboarding({ ...editingOnboarding, paid_amount: Number(e.target.value) })}
+                      className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] p-1.5 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/60">
+                  <span className="text-light-on-surface-variant font-medium">Calculated Balance:</span>
+                  <strong className={`font-mono ${
+                    (Number(editingOnboarding.tuition_fee || editingOnboarding.total_amount || 0) - Number(editingOnboarding.paid_amount || 0)) <= 0 ? 'text-success' : 'text-pending'
+                  }`}>
+                    ₹{Math.max(0, Number(editingOnboarding.tuition_fee || editingOnboarding.total_amount || 0) - Number(editingOnboarding.paid_amount || 0)).toLocaleString('en-IN')}
+                  </strong>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
+                      Balance Due Date
+                    </label>
+                    <input
+                      type="date"
+                      value={editingOnboarding.due_date || ''}
+                      onChange={(e) => setEditingOnboarding({ ...editingOnboarding, due_date: e.target.value })}
+                      className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
+                      Payment Mode
+                    </label>
+                    <select
+                      value={editingOnboarding.payment_method || 'Bank Transfer'}
+                      onChange={(e) => setEditingOnboarding({ ...editingOnboarding, payment_method: e.target.value })}
+                      className="w-full px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
+                    >
+                      <option value="UPI">UPI</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Credit / Debit Card">Card</option>
+                      <option value="Bank Transfer">Bank Transfer</option>
+                      <option value="Net Banking">Net Banking</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-2 border-t border-light-outline-variant dark:border-dark-outline-variant pt-2 mt-2">
                 <button
                   type="button"
@@ -1499,6 +1864,18 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                 <div>
                   <span className="text-[10px] text-light-on-surface-variant block">Fee Plan:</span>
                   <strong className="text-success">{viewingPass.plan || 'Full Payment'}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-light-on-surface-variant block">Tuition Paid / Total:</span>
+                  <strong className="font-mono text-light-on-surface dark:text-dark-on-surface">
+                    ₹{(viewingPass.paid_amount || 0).toLocaleString('en-IN')} / ₹{(viewingPass.tuition_fee || viewingPass.total_amount || 0).toLocaleString('en-IN')}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-light-on-surface-variant block">Scheduled Balance Due:</span>
+                  <strong className="font-mono text-pending">
+                    {(viewingPass.balance_amount || 0) > 0 ? `₹${(viewingPass.balance_amount || 0).toLocaleString('en-IN')} (Due: ${viewingPass.due_date || 'TBD'})` : 'Paid in Full (₹0)'}
+                  </strong>
                 </div>
               </div>
             </div>
