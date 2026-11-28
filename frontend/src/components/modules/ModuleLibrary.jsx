@@ -25,6 +25,7 @@ const DEFAULT_MODULES = []
 export function ModuleLibrary() {
   const [modules, setModules] = useState([])
   const [departments, setDepartments] = useState([])
+  const [tutors, setTutors] = useState([])
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -88,6 +89,17 @@ export function ModuleLibrary() {
       }
     }
 
+    const fetchTutors = async () => {
+      try {
+        const res = await apiService.getTutors()
+        if (res && res.data && isMounted) {
+          setTutors(Array.isArray(res.data) ? res.data : [])
+        }
+      } catch (err) {
+        console.warn('Error fetching tutors in ModuleLibrary:', err)
+      }
+    }
+
     const fetchModules = async () => {
       try {
         const res = await apiService.getModules()
@@ -125,6 +137,7 @@ export function ModuleLibrary() {
     }
 
     fetchDepartments()
+    fetchTutors()
     fetchModules()
     return () => { isMounted = false }
   }, [])
@@ -1276,13 +1289,21 @@ export function ModuleLibrary() {
                       <label className="block text-[11px] font-semibold text-light-on-surface-variant mb-1">
                         Module Tutor
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={formData.tutor || ''}
                         onChange={(e) => setFormData({ ...formData, tutor: e.target.value })}
-                        placeholder="e.g. Dr. Marcus Vance"
                         className="w-full px-2 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                      />
+                      >
+                        <option value="">-- Not Assigned / Select Tutor --</option>
+                        {formData.tutor && !tutors.some((t) => t.name === formData.tutor) && (
+                          <option value={formData.tutor}>{formData.tutor} (Current)</option>
+                        )}
+                        {tutors.map((t) => (
+                          <option key={t.id} value={t.name}>
+                            {t.name} {t.staff_id ? `(${t.staff_id})` : ''} {t.role ? `• ${t.role}` : ''}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className="sm:col-span-2">

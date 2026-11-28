@@ -5,6 +5,7 @@ export function CourseManagement({ onNavigateToModules }) {
   const [courses, setCourses] = useState([])
   const [modules, setModules] = useState([])
   const [departments, setDepartments] = useState([])
+  const [tutors, setTutors] = useState([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState('')
   const [search, setSearch] = useState('')
@@ -40,10 +41,11 @@ export function CourseManagement({ onNavigateToModules }) {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const [coursesRes, modulesRes, deptsRes] = await Promise.allSettled([
+        const [coursesRes, modulesRes, deptsRes, tutorsRes] = await Promise.allSettled([
           apiService.getCourses(),
           apiService.getModules(),
           apiService.getDepartments(),
+          apiService.getTutors(),
         ])
 
         if (isMounted) {
@@ -63,6 +65,12 @@ export function CourseManagement({ onNavigateToModules }) {
             setDepartments(Array.isArray(deptsRes.value.data) ? deptsRes.value.data : [])
           } else {
             setDepartments([])
+          }
+
+          if (tutorsRes.status === 'fulfilled' && tutorsRes.value?.data) {
+            setTutors(Array.isArray(tutorsRes.value.data) ? tutorsRes.value.data : [])
+          } else {
+            setTutors([])
           }
         }
       } catch (err) {
@@ -719,13 +727,21 @@ export function CourseManagement({ onNavigateToModules }) {
                     <label className="block text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                       Faculty Lead / Instructor
                     </label>
-                    <input
-                      type="text"
-                      value={formData.instructor}
+                    <select
+                      value={formData.instructor || ''}
                       onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-                      placeholder="e.g. Dr. Marcus Vance"
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface placeholder:text-light-outline focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    />
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary font-label"
+                    >
+                      <option value="">-- Not Assigned / Select Tutor --</option>
+                      {formData.instructor && !tutors.some((t) => t.name === formData.instructor) && (
+                        <option value={formData.instructor}>{formData.instructor} (Current)</option>
+                      )}
+                      {tutors.map((t) => (
+                        <option key={t.id} value={t.name}>
+                          {t.name} {t.staff_id ? `(${t.staff_id})` : ''}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
