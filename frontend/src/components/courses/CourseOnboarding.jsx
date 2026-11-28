@@ -1761,21 +1761,20 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     <th className="py-2.5 px-3">Curriculum / Days</th>
                     <th className="py-2.5 px-3">Start Date</th>
                     <th className="py-2.5 px-3 text-center">Status</th>
-                    <th className="py-2.5 px-3 text-center">Tuition &amp; Fee Schedule</th>
                     <th className="py-2.5 px-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 font-body text-xs">
                   {loading ? (
                     <tr>
-                      <td colSpan="9" className="py-12 text-center text-light-on-surface-variant">
+                      <td colSpan="8" className="py-12 text-center text-light-on-surface-variant">
                         <span className="material-symbols-outlined text-[32px] text-light-primary animate-spin block mb-1">sync</span>
                         <p className="font-semibold text-xs">Loading course onboarding roster...</p>
                       </td>
                     </tr>
                   ) : filteredEnrollments.length === 0 ? (
                     <tr>
-                      <td colSpan="9" className="py-12 text-center text-light-on-surface-variant">
+                      <td colSpan="8" className="py-12 text-center text-light-on-surface-variant">
                         <span className="material-symbols-outlined text-[36px] opacity-40 block mb-1">assignment_late</span>
                         <p className="font-semibold text-xs">No student course onboardings match criteria</p>
                         <p className="text-[11px] opacity-80 mt-0.5">Click "+ Onboard Student to Course" to frame and enroll a student</p>
@@ -1876,55 +1875,6 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                               />
                               <span>{item.status || 'Active'}</span>
                             </span>
-                          </td>
-
-                          {/* Tuition & Fee Schedule */}
-                          <td className="py-2.5 px-3 whitespace-nowrap text-center align-middle">
-                            <div className="flex flex-col items-center">
-                              <div className="flex items-center gap-1">
-                                <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
-                                  ₹{(item.tuition_fee || item.total_amount || 0).toLocaleString('en-IN')}
-                                </span>
-                                {(item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))) <= 0 ? (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-success-container text-on-success-container">
-                                    Paid
-                                  </span>
-                                ) : (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
-                                    Bal ₹{(item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))).toLocaleString('en-IN')}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-light-on-surface-variant font-mono">
-                                <span>Paid: ₹{(item.paid_amount || 0).toLocaleString('en-IN')}</span>
-                                {(() => {
-                                  const bal = item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))
-                                  if (bal <= 0) return null
-                                  const sched = getRecordFeeSchedule(item)
-                                  if (sched.length > 1) {
-                                    return (
-                                      <span
-                                        className="inline-flex items-center gap-0.5 text-pending font-semibold bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.2 rounded border border-pending/30 cursor-help"
-                                        title={sched.map((s, idx) => `#${idx + 1}: ₹${(s.amount || 0).toLocaleString('en-IN')} due ${s.due_date || 'TBD'}`).join(' | ')}
-                                      >
-                                        <span className="material-symbols-outlined text-[11px]">event_repeat</span>
-                                        <span>{sched.length} Dates</span>
-                                        <span className="text-[9px] opacity-80">({sched[0]?.due_date})</span>
-                                      </span>
-                                    )
-                                  }
-                                  if (item.due_date) {
-                                    return (
-                                      <span className="inline-flex items-center gap-0.5 text-pending font-semibold" title={`Balance Due Date: ${item.due_date}`}>
-                                        <span className="material-symbols-outlined text-[11px]">event</span>
-                                        Due: {item.due_date}
-                                      </span>
-                                    )
-                                  }
-                                  return null
-                                })()}
-                              </div>
-                            </div>
                           </td>
 
                           {/* Actions */}
