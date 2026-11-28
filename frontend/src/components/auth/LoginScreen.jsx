@@ -4,81 +4,17 @@ import { apiService } from '../../services/api'
 
 export default function LoginScreen({ onLoginSuccess }) {
   const { theme, toggleTheme } = useTheme()
-  const [activePortal, setActivePortal] = useState('student') // 'student' | 'tutor' | 'admin'
-  const [identifier, setIdentifier] = useState('STU-2026-0843')
-  const [password, setPassword] = useState('Student@123')
+  const [identifier, setIdentifier] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Portal tab configurations
-  const portalConfig = {
-    student: {
-      title: 'Student Academic Portal',
-      subtitle: 'Sign in to access your enrolled courses, class timetable, assignments, and exam hall tickets',
-      badge: 'Student Environment',
-      badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-      icon: 'school',
-      iconBg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-      label: 'Student ID / Username / Email',
-      placeholder: 'e.g. STU-2026-0843 or gowtham.dev',
-      defaultId: 'STU-2026-0843',
-      defaultPass: 'Student@123',
-      quickLogins: [
-        { label: 'Student: Marcus Vance (STU-2026-0842)', id: 'student@bixcel.edu', pass: 'Student@123' },
-        { label: 'Student: Gowtham Tamilkathir (STU-2026-0843)', id: 'STU-2026-0843', pass: 'Gowtham@2026' },
-      ],
-    },
-    tutor: {
-      title: 'Faculty & Tutor Portal',
-      subtitle: 'Sign in to track student arrivals, grade submissions, invigilate exams, and certify milestones',
-      badge: 'Faculty Workspace',
-      badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-      icon: 'co_present',
-      iconBg: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
-      label: 'Staff / Tutor ID or Institutional Email',
-      placeholder: 'e.g. TUT-2026-001 or faculty@bixcel.edu',
-      defaultId: 'faculty@bixcel.edu',
-      defaultPass: 'Faculty@123',
-      quickLogins: [
-        { label: 'Faculty: Sophia Chen (Design Fellow)', id: 'faculty@bixcel.edu', pass: 'Faculty@123' },
-        { label: 'Lead: Dr. Marcus Vance (TUT-2026-001)', id: 'TUT-2026-001', pass: 'Admin@123' },
-      ],
-    },
-    admin: {
-      title: 'Institutional Administration • bixceltech.com',
-      subtitle: 'Secure administrative command portal for Super Admin and Admin operations at bixceltech.com',
-      badge: 'Bixcel Tech Admin',
-      badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
-      icon: 'admin_panel_settings',
-      iconBg: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
-      label: 'Admin Email / Username (bixceltech.com)',
-      placeholder: 'superadmin@bixceltech.com or admin@bixceltech.com',
-      defaultId: 'superadmin@bixceltech.com',
-      defaultPass: 'Admin@123',
-      quickLogins: [
-        { label: '👑 Super Admin: superadmin@bixceltech.com', id: 'superadmin@bixceltech.com', pass: 'Admin@123' },
-        { label: '🛡️ Admin: admin@bixceltech.com', id: 'admin@bixceltech.com', pass: 'Admin@123' },
-        { label: '🎓 Academic Dean: dean@bixcel.edu', id: 'dean@bixcel.edu', pass: 'Dean@123' },
-      ],
-    },
-  }
-
-  const currentCfg = portalConfig[activePortal]
-
-  const handlePortalSwitch = (portalKey) => {
-    setActivePortal(portalKey)
-    setError('')
-    const cfg = portalConfig[portalKey]
-    setIdentifier(cfg.defaultId)
-    setPassword(cfg.defaultPass)
-  }
-
   const handleLogin = async (e) => {
     if (e) e.preventDefault()
     if (!identifier.trim() || !password.trim()) {
-      setError('Please provide your ID/Email and password.')
+      setError('Please provide your ID, Username, or Email, and your password.')
       return
     }
 
@@ -87,9 +23,9 @@ export default function LoginScreen({ onLoginSuccess }) {
 
     try {
       const res = await apiService.login({
-        email: identifier,
-        password: password,
-        portal: activePortal,
+        email: identifier.trim(),
+        password: password.trim(),
+        portal: 'all',
         rememberMe,
       })
 
@@ -103,77 +39,18 @@ export default function LoginScreen({ onLoginSuccess }) {
         }
         onLoginSuccess(res.user)
       } else {
-        setError(res?.message || 'Invalid credentials. Please verify your ID and password.')
+        setError(res?.message || 'Invalid credentials. Please verify your ID/Email and password.')
       }
     } catch (err) {
-      console.warn('Backend login returned error, checking client fallback:', err)
       const msg =
         err.response?.data?.message ||
         err.response?.data?.messages?.error ||
         err.message ||
-        'Authentication failed. Please verify your credentials.'
-
-      // Fallback: If network glitch or temporary backend hiccup, provide graceful persona entry
+        'Authentication failed. Please verify your ID/Email and password.'
       setError(msg)
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleQuickLogin = (id, pass) => {
-    setIdentifier(id)
-    setPassword(pass)
-    setError('')
-    // Trigger login with new credentials
-    setTimeout(() => {
-      apiService
-        .login({
-          email: id,
-          password: pass,
-          portal: activePortal,
-          rememberMe: true,
-        })
-        .then((res) => {
-          if (res && res.user) {
-            try {
-              localStorage.setItem('bx_auth_token', res.token || 'bx_session')
-              localStorage.setItem('bx_auth_user', JSON.stringify(res.user))
-              localStorage.removeItem('bx_logged_out')
-            } catch {
-              // ignore
-            }
-            onLoginSuccess(res.user)
-          }
-        })
-        .catch(() => {
-          // Client-side fallback if backend is unreachable
-          let fallbackUser = {
-            id: 101,
-            name: 'Marcus Vance',
-            email: id,
-            role: activePortal === 'student' ? 'Student' : activePortal === 'tutor' ? 'Tutor / Faculty' : 'Super Admin',
-            role_code: activePortal === 'student' ? 'ROLE_STUDENT' : activePortal === 'tutor' ? 'ROLE_TUTOR' : 'ROLE_SUPER_ADMIN',
-            emp_id: id,
-            avatar: '',
-          }
-          if (activePortal === 'tutor') {
-            fallbackUser.name = 'Sophia Chen'
-            fallbackUser.role = 'Tutor / Faculty'
-            fallbackUser.role_code = 'ROLE_TUTOR'
-          } else if (activePortal === 'admin') {
-            fallbackUser.name = 'Elena Rostova'
-            fallbackUser.role = 'Super Admin'
-            fallbackUser.role_code = 'ROLE_SUPER_ADMIN'
-          }
-          try {
-            localStorage.setItem('bx_auth_user', JSON.stringify(fallbackUser))
-            localStorage.removeItem('bx_logged_out')
-          } catch {
-            // ignore
-          }
-          onLoginSuccess(fallbackUser)
-        })
-    }, 50)
   }
 
   return (
@@ -197,9 +74,9 @@ export default function LoginScreen({ onLoginSuccess }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-label font-medium border ${currentCfg.badgeColor}`}>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-label font-medium border bg-light-primary/10 text-light-primary border-light-primary/20">
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
-            {currentCfg.badge}
+            Unified Institutional Access
           </span>
 
           <button
@@ -217,99 +94,58 @@ export default function LoginScreen({ onLoginSuccess }) {
       </header>
 
       {/* Main Login Card Container */}
-      <main className="flex-1 flex items-center justify-center p-3 sm:p-6 md:p-8">
-        <div className="w-full max-w-lg bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          {/* Role Portal Switcher Tabs */}
-          <div className="grid grid-cols-3 border-b border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => handlePortalSwitch('student')}
-              className={`py-3 px-2 flex flex-col sm:flex-row items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
-                activePortal === 'student'
-                  ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400 bg-light-surface-container-lowest dark:bg-dark-surface-bright font-bold shadow-xs'
-                  : 'border-transparent text-light-on-surface-variant hover:text-light-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">school</span>
-              <span>Student Login</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handlePortalSwitch('tutor')}
-              className={`py-3 px-2 flex flex-col sm:flex-row items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
-                activePortal === 'tutor'
-                  ? 'border-blue-600 text-blue-700 dark:text-blue-400 bg-light-surface-container-lowest dark:bg-dark-surface-bright font-bold shadow-xs'
-                  : 'border-transparent text-light-on-surface-variant hover:text-light-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">co_present</span>
-              <span>Tutor Login</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handlePortalSwitch('admin')}
-              className={`py-3 px-2 flex flex-col sm:flex-row items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
-                activePortal === 'admin'
-                  ? 'border-purple-600 text-purple-700 dark:text-purple-400 bg-light-surface-container-lowest dark:bg-dark-surface-bright font-bold shadow-xs'
-                  : 'border-transparent text-light-on-surface-variant hover:text-light-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
-              <span>Admin Login</span>
-            </button>
-          </div>
-
-          {/* Card Header with Portal Context */}
-          <div className="p-5 pb-4 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 flex items-start gap-3.5">
-            <div className={`w-11 h-11 rounded-lg ${currentCfg.iconBg} flex items-center justify-center shrink-0 shadow-inner`}>
-              <span className="material-symbols-outlined text-[24px]">{currentCfg.icon}</span>
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
+        <div className="w-full max-w-md bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          {/* Card Header */}
+          <div className="p-6 pb-4 border-b border-light-outline-variant/60 dark:border-dark-outline-variant/60 flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-light-primary/15 text-light-primary flex items-center justify-center shrink-0 shadow-inner">
+              <span className="material-symbols-outlined text-[26px]">lock</span>
             </div>
             <div>
-              <h1 className="font-title text-[18px] font-bold text-light-on-surface dark:text-dark-on-surface tracking-tight">
-                {currentCfg.title}
+              <h1 className="font-title text-[19px] font-bold text-light-on-surface dark:text-dark-on-surface tracking-tight">
+                Institutional Sign In
               </h1>
-              <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-0.5 leading-snug">
-                {currentCfg.subtitle}
+              <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1 leading-snug">
+                Enter your authorized credentials to access your portal workspace.
               </p>
             </div>
           </div>
 
           {/* Form Body */}
-          <div className="p-5 space-y-4">
+          <div className="p-6 space-y-4">
             {/* Error Banner */}
             {error && (
               <div
                 role="alert"
-                className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-150"
+                className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-150"
               >
                 <span className="material-symbols-outlined text-[18px] shrink-0">error</span>
-                <div className="flex-1 font-body text-body-sm leading-snug">{error}</div>
+                <div className="flex-1 font-body text-xs leading-snug">{error}</div>
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-3.5">
+            <form onSubmit={handleLogin} className="space-y-4">
               {/* Identifier Input */}
               <div>
                 <label
                   htmlFor="portal-identifier"
-                  className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1"
+                  className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1.5"
                 >
-                  {currentCfg.label} <span className="text-error">*</span>
+                  Username, Email, or ID <span className="text-error">*</span>
                 </label>
                 <div className="relative">
                   <span className="material-symbols-outlined text-[18px] text-light-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    {currentCfg.icon}
+                    person
                   </span>
                   <input
                     id="portal-identifier"
                     type="text"
                     required
+                    autoFocus
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder={currentCfg.placeholder}
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-body placeholder:text-light-outline focus:outline-none focus:ring-2 focus:ring-light-primary focus:bg-light-surface-container-lowest"
+                    placeholder="e.g. STU-2026-0843 or admin@bixceltech.com"
+                    className="w-full pl-9 pr-3 py-2.5 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-body placeholder:text-light-outline focus:outline-none focus:ring-2 focus:ring-light-primary focus:bg-light-surface-container-lowest transition-all"
                   />
                 </div>
               </div>
@@ -318,13 +154,13 @@ export default function LoginScreen({ onLoginSuccess }) {
               <div>
                 <label
                   htmlFor="portal-password"
-                  className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1"
+                  className="block font-label text-xs font-semibold text-light-on-surface dark:text-dark-on-surface mb-1.5"
                 >
                   Password <span className="text-error">*</span>
                 </label>
                 <div className="relative">
                   <span className="material-symbols-outlined text-[18px] text-light-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    lock
+                    key
                   </span>
                   <input
                     id="portal-password"
@@ -333,7 +169,7 @@ export default function LoginScreen({ onLoginSuccess }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full pl-9 pr-10 py-2 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-body placeholder:text-light-outline focus:outline-none focus:ring-2 focus:ring-light-primary focus:bg-light-surface-container-lowest"
+                    className="w-full pl-9 pr-10 py-2.5 text-xs rounded-lg border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface font-body placeholder:text-light-outline focus:outline-none focus:ring-2 focus:ring-light-primary focus:bg-light-surface-container-lowest transition-all"
                   />
                   <button
                     type="button"
@@ -350,14 +186,14 @@ export default function LoginScreen({ onLoginSuccess }) {
 
               {/* Remember Me */}
               <div className="flex items-center justify-between text-xs pt-0.5">
-                <label className="flex items-center gap-1.5 cursor-pointer select-none text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-light-on-surface-variant dark:text-dark-on-surface-variant">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="rounded border-light-outline-variant text-light-primary focus:ring-light-primary"
                   />
-                  <span>Keep me authenticated</span>
+                  <span>Keep me signed in</span>
                 </label>
                 <span className="text-light-outline text-[11px] font-mono">TLS 1.3 / AES-256</span>
               </div>
@@ -366,46 +202,23 @@ export default function LoginScreen({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-4 rounded-lg bg-light-primary text-light-on-primary font-label text-xs font-semibold hover:bg-light-primary-container shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer mt-1"
+                className="w-full py-2.5 px-4 rounded-lg bg-light-primary text-light-on-primary font-label text-xs font-semibold hover:bg-light-primary-container shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
               >
                 {loading ? (
                   <>
                     <span className="material-symbols-outlined text-[18px] animate-spin">
                       progress_activity
                     </span>
-                    <span>Verifying Credentials...</span>
+                    <span>Authenticating...</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In to {currentCfg.badge}</span>
+                    <span>Sign In</span>
                     <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </>
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Credentials Box */}
-            <div className="pt-3 border-t border-light-outline-variant/60 dark:border-dark-outline-variant/60">
-              <span className="block text-[11px] font-semibold text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1.5">
-                ⚡ 1-Click Test Personas ({currentCfg.badge}):
-              </span>
-              <div className="flex flex-col gap-1.5">
-                {currentCfg.quickLogins.map((item, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleQuickLogin(item.id, item.pass)}
-                    className="w-full py-1.5 px-2.5 rounded bg-light-surface-container-low dark:bg-dark-surface-container hover:bg-light-primary hover:text-white dark:hover:bg-dark-primary dark:hover:text-black transition-colors text-left flex items-center justify-between text-[11px] font-medium border border-light-outline-variant"
-                  >
-                    <span className="flex items-center gap-1.5 truncate">
-                      <span className="material-symbols-outlined text-[15px]">{currentCfg.icon}</span>
-                      <span className="truncate">{item.label}</span>
-                    </span>
-                    <span className="text-[10px] opacity-75 font-mono ml-2 shrink-0">Pass: {item.pass}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </main>
@@ -416,7 +229,7 @@ export default function LoginScreen({ onLoginSuccess }) {
         <div className="flex items-center gap-3">
           <span>Role-Based Access Control</span>
           <span>•</span>
-          <span>CI4 Backend Protected</span>
+          <span>Database Protected</span>
           <span>•</span>
           <span>React 19</span>
         </div>
