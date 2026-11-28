@@ -268,16 +268,34 @@ class FeeController extends BaseApiController
     {
         $invoiceModel = new FeeInvoiceModel();
         $studentModel = new \App\Models\StudentModel();
+        $enrollmentModel = new \App\Models\StudentEnrollmentModel();
 
         $invoices = $invoiceModel->findAll();
         $students = $studentModel->findAll();
+        $enrollments = $enrollmentModel->findAll();
 
         $studentMap = [];
         foreach ($students as $s) {
             $studentMap[$s['student_id']] = $s;
         }
 
-        $today = strtotime('2026-11-26');
+        $enrollmentScheduleMap = [];
+        foreach ($enrollments as $enr) {
+            if (!empty($enr['fee_schedule'])) {
+                $sched = is_string($enr['fee_schedule']) ? json_decode($enr['fee_schedule'], true) : $enr['fee_schedule'];
+                if (!empty($sched)) {
+                    if (!empty($enr['student_code'])) {
+                        $enrollmentScheduleMap[$enr['student_code']] = $sched;
+                    }
+                    if (!empty($enr['student_id'])) {
+                        $enrollmentScheduleMap[(string) $enr['student_id']] = $sched;
+                    }
+                }
+            }
+        }
+
+        $todayStr = date('Y-m-d');
+        $today = strtotime($todayStr);
         $ledgers = [];
 
         $totalBalance = 0;
@@ -351,6 +369,10 @@ class FeeController extends BaseApiController
             $guardianPhone = $st['guardian_phone'] ?? ($st['phone'] ?? '+1 (555) 349-2190');
             $guardianEmail = $st['guardian_email'] ?? 'guardian@gmail.com';
 
+            $feeSchedule = !empty($inv['fee_schedule'])
+                ? (is_string($inv['fee_schedule']) ? json_decode($inv['fee_schedule'], true) : $inv['fee_schedule'])
+                : ($enrollmentScheduleMap[$sCode] ?? ($enrollmentScheduleMap[(string) ($inv['student_id'] ?? '')] ?? null));
+
             $ledgers[] = [
                 'id' => (int) $inv['id'],
                 'invoice_no' => $inv['invoice_no'],
@@ -363,6 +385,7 @@ class FeeController extends BaseApiController
                 'balance_due' => $balance,
                 'paid_pct' => $totalAmount > 0 ? round(($paidAmount / $totalAmount) * 100, 1) : 0,
                 'due_date' => $dueDate,
+                'fee_schedule' => $feeSchedule,
                 'days_overdue' => $daysOverdue,
                 'is_overdue' => $isOverdue,
                 'aging_category' => $agingCategory,
@@ -400,7 +423,7 @@ class FeeController extends BaseApiController
                 'promised_commitments_count' => count($sampleCommitments),
                 'recovery_efficiency_pct' => 74.2,
                 'avg_overdue_days' => 18.5,
-                'as_of_date' => '2026-11-26',
+                'as_of_date' => $todayStr,
             ],
         ]);
     }

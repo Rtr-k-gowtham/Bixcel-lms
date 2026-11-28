@@ -205,12 +205,6 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     })
   }
 
-  const setInstallmentDaysFromToday = (id, days) => {
-    const d = new Date()
-    d.setDate(d.getDate() + days)
-    updateInstallment(id, 'due_date', d.toISOString().split('T')[0])
-  }
-
   const autoReconcileInstallments = () => {
     if (installments.length === 0 || balanceAmount <= 0) return
     const each = Math.floor(balanceAmount / installments.length)
@@ -1467,7 +1461,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                           <tr className="bg-light-surface-container dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] uppercase font-bold border-b border-light-outline-variant">
                             <th className="py-2 px-3 w-12 text-center">#</th>
                             <th className="py-2 px-3">Milestone / Label</th>
-                            <th className="py-2 px-3 min-w-[200px]">Due Date &amp; Quick Days</th>
+                            <th className="py-2 px-3 min-w-[160px]">Due Date</th>
                             <th className="py-2 px-3 w-44">Due Amount (₹)</th>
                             <th className="py-2 px-3 w-16 text-center">Action</th>
                           </tr>
@@ -1492,29 +1486,13 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                                   />
                                 </td>
                                 <td className="py-2.5 px-3 align-middle">
-                                  <div className="flex flex-col gap-1">
-                                    <input
-                                      type="date"
-                                      required
-                                      value={inst.due_date || ''}
-                                      onChange={(e) => updateInstallment(inst.id, 'due_date', e.target.value)}
-                                      className="w-full px-2 py-1 text-xs font-mono font-bold rounded border border-pending/40 bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-pending"
-                                    />
-                                    {/* Quick day-to-day shortcuts for this specific due date */}
-                                    <div className="flex items-center gap-1 text-[9px]">
-                                      <span className="text-light-on-surface-variant font-medium">Quick:</span>
-                                      {[15, 30, 45, 60, 90].map((d) => (
-                                        <button
-                                          key={d}
-                                          type="button"
-                                          onClick={() => setInstallmentDaysFromToday(inst.id, d)}
-                                          className="px-1.5 py-0.2 rounded font-mono bg-light-surface-container dark:bg-dark-surface-container hover:bg-light-primary-tint hover:text-light-primary text-light-on-surface cursor-pointer border border-light-outline-variant/40"
-                                        >
-                                          +{d}d
-                                        </button>
-                                      ))}
-                                    </div>
-                                  </div>
+                                  <input
+                                    type="date"
+                                    required
+                                    value={inst.due_date || ''}
+                                    onChange={(e) => updateInstallment(inst.id, 'due_date', e.target.value)}
+                                    className="w-full px-2.5 py-1.5 text-xs font-mono font-bold rounded border border-pending/40 bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-pending"
+                                  />
                                 </td>
                                 <td className="py-2.5 px-3 align-middle">
                                   <div className="flex items-center gap-1.5">

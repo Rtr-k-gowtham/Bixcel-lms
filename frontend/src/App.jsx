@@ -22,6 +22,7 @@ import CourseOnboarding from './components/courses/CourseOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
+import { FeeBalanceScreen } from './components/fees/FeeBalanceScreen'
 import StudentCalendar from './components/calendar/StudentCalendar'
 import StudentDashboard from './components/dashboard/StudentDashboard'
 import TimetableScheduling from './components/timetable/TimetableScheduling'
@@ -280,6 +281,8 @@ function Dashboard({ currentUser, onLogout }) {
                             ? 'Student Environment & Calendar'
                             : currentTab === 'fees'
                             ? 'Fees & Payment Collection'
+                            : currentTab === 'balance'
+                              ? 'Fee Balance & Dues'
                             : currentTab === 'users'
                               ? 'User Master'
                               : currentTab === 'roles'
@@ -376,7 +379,9 @@ function Dashboard({ currentUser, onLogout }) {
           ) : ['courses', 'builder', 'curriculum'].includes(currentTab) ? (
             <CourseManagement onNavigateToModules={() => handleTabChange('modules')} />
           ) : currentTab === 'fees' ? (
-            <FeesPayment />
+            <FeesPayment onNavigate={(tab) => handleTabChange(tab)} />
+          ) : currentTab === 'balance' ? (
+            <FeeBalanceScreen onNavigate={(tab) => handleTabChange(tab)} />
           ) : currentTab === 'tutors' ? (
             <TutorManagement />
           ) : currentTab === 'batches' ? (
