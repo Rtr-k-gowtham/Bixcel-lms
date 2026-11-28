@@ -155,16 +155,13 @@ export function StudentManagement() {
   const openAddModal = () => {
     const nextNum = 845 + students.length
     const nextId = `STU-2026-0${nextNum}`
-    const defaultTrack = coursesList.length > 0 ? coursesList[0].title : 'Full-Stack Web Development'
-    const defaultBatch = coursesList.length > 0 && coursesList[0].code ? `${coursesList[0].code}-26A` : 'BIX-DEV-26A'
-    const defaultDays = coursesList.length > 0 && coursesList[0].days ? Number(coursesList[0].days) : 36
 
     setAddForm({
       ...INITIAL_ADD_FORM,
       studentId: nextId,
-      track: defaultTrack,
-      batch: defaultBatch,
-      instructionalDays: defaultDays,
+      track: 'General',
+      batch: 'BIX-2026',
+      instructionalDays: 0,
     })
     setShowAddModal(true)
   }
@@ -198,11 +195,11 @@ export function StudentManagement() {
       password: autoPass,
       raw_password: autoPass,
       avatar: addForm.avatar || null,
-      track: addForm.track || 'Full-Stack Web Development',
-      batch: addForm.batch || 'BIX-DEV-26A',
+      track: addForm.track || 'General',
+      batch: addForm.batch || 'BIX-2026',
       status: addForm.status || 'Active',
-      course_mode: addForm.courseMode || 'standard',
-      instructional_days: Number(addForm.instructionalDays) || 36,
+      course_mode: 'standard',
+      instructional_days: 0,
       guardian_name: addForm.guardianName.trim() || 'Self / Guardian',
       guardian_phone: addForm.guardianPhone.trim() || addForm.phone.trim(),
       guardian_relation: addForm.guardianRelation || 'Guardian',
@@ -210,8 +207,8 @@ export function StudentManagement() {
       gender: addForm.gender || 'Not Specified',
       blood_group: addForm.bloodGroup || 'O+',
       address: addForm.address.trim() || '',
-      fee_plan: addForm.feePlan || 'Standard',
-      fee_status: addForm.feeStatus || 'Paid',
+      fee_plan: 'Standard',
+      fee_status: 'Pending',
     }
 
     try {
@@ -861,103 +858,6 @@ export function StudentManagement() {
                     <option value="On Leave">On Leave</option>
                     <option value="Dropped">Dropped</option>
                   </select>
-                </div>
-              </div>
-
-              {/* Course & Cohort Allocation */}
-              <div className="p-3 rounded bg-light-surface-container-low dark:bg-dark-surface-container border border-light-outline-variant flex flex-col gap-2.5">
-                <span className="font-label text-[11px] font-bold text-light-primary dark:text-dark-primary flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[15px]">menu_book</span>
-                  <span>Course Program &amp; Batch Cohort Allocation</span>
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <div className="sm:col-span-2">
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
-                      Assigned Course / Track *
-                    </label>
-                    <select
-                      value={addForm.track}
-                      onChange={(e) => {
-                        const selTitle = e.target.value
-                        const matchCourse = coursesList.find((c) => c.title === selTitle)
-                        const batchCode = matchCourse?.code ? `${matchCourse.code}-26A` : (TRACK_CATALOG[selTitle]?.batch_prefix || 'BIX-2026-A')
-                        const days = matchCourse?.days ? Number(matchCourse.days) : (TRACK_CATALOG[selTitle]?.default_days || 36)
-                        setAddForm((prev) => ({
-                          ...prev,
-                          track: selTitle,
-                          batch: batchCode,
-                          instructionalDays: days,
-                        }))
-                      }}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    >
-                      {coursesList.length > 0 ? (
-                        coursesList.map((c) => (
-                          <option key={c.id} value={c.title}>
-                            {c.title} ({c.code || 'CRS'}) - {c.days || 30} Days
-                          </option>
-                        ))
-                      ) : (
-                        Object.keys(tracks).map((t) => (
-                          <option key={t} value={t}>{t}</option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
-                      Batch Code *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={addForm.batch}
-                      onChange={(e) => setAddForm((prev) => ({ ...prev, batch: e.target.value }))}
-                      className="w-full px-2.5 py-1.5 text-xs font-mono font-medium rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
-                      Curriculum Mode
-                    </label>
-                    <select
-                      value={addForm.courseMode}
-                      onChange={(e) => setAddForm((prev) => ({ ...prev, courseMode: e.target.value }))}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
-                    >
-                      <option value="standard">Standard Course</option>
-                      <option value="custom">Custom Modular</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
-                      Duration (Days)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={addForm.instructionalDays}
-                      onChange={(e) => setAddForm((prev) => ({ ...prev, instructionalDays: e.target.value }))}
-                      className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
-                      Tuition Fee Status
-                    </label>
-                    <select
-                      value={addForm.feeStatus}
-                      onChange={(e) => setAddForm((prev) => ({ ...prev, feeStatus: e.target.value }))}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
-                    >
-                      <option value="Paid">Paid</option>
-                      <option value="Partial">Partial</option>
-                      <option value="Pending">Pending</option>
-                    </select>
-                  </div>
                 </div>
               </div>
 
