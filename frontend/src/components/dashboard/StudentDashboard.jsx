@@ -8,7 +8,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
   // Real Student Avatar (from profile or initials)
   const [studentAvatar] = useState(() => {
     try {
-      const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0843'
+      const studentId = sessionUser.student_id || sessionUser.emp_id || 'STU-2026-0845'
       const saved = localStorage.getItem(`bx_student_avatar_${studentId}`)
       if (saved) return saved
       if (sessionUser.avatar && !sessionUser.avatar.includes('unsplash.com')) {
@@ -19,6 +19,8 @@ export function StudentDashboard({ currentUser, onNavigate }) {
   })
 
   // Live State from Backend APIs
+  const [liveStudent, setLiveStudent] = useState(null)
+  const [liveEnrollment, setLiveEnrollment] = useState(null)
   const [liveModules, setLiveModules] = useState([])
   const [calendarEvents, setCalendarEvents] = useState([])
   const [liveProgress, setLiveProgress] = useState(null)
@@ -53,7 +55,47 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     const fetchAllData = async () => {
       setLoading(true)
       try {
-        // 1. Fetch real modules from backend database
+        // 1. Fetch real student profile from database
+        let currentStudent = null
+        try {
+          const stuRes = await apiService.getStudents()
+          if (stuRes && stuRes.status === 'success' && Array.isArray(stuRes.data) && isMounted) {
+            const userEmail = (sessionUser.email || '').toLowerCase()
+            const userName = (sessionUser.name || '').toLowerCase()
+            const userStudentId = sessionUser.student_id || sessionUser.emp_id || ''
+
+            currentStudent = stuRes.data.find((s) =>
+              (userStudentId && s.student_id === userStudentId) ||
+              (s.id && String(s.id) === String(sessionUser.id)) ||
+              (userEmail && s.email && s.email.toLowerCase() === userEmail) ||
+              (userName && s.full_name && s.full_name.toLowerCase().includes(userName.split(' ')[0]))
+            ) || stuRes.data[0] || null
+
+            setLiveStudent(currentStudent)
+          }
+        } catch (err) {
+          console.warn('Failed to load real student profile:', err)
+        }
+
+        // 2. Fetch real student enrollment & course track from database
+        try {
+          const enrRes = await apiService.getEnrollments()
+          if (enrRes && enrRes.status === 'success' && Array.isArray(enrRes.data) && isMounted) {
+            const targetCode = currentStudent?.student_id || sessionUser.student_id || 'STU-2026-0845'
+            const targetId = currentStudent?.id || sessionUser.id
+
+            const currentEnrollment = enrRes.data.find((e) =>
+              (e.student_code && e.student_code === targetCode) ||
+              (e.student_id && String(e.student_id) === String(targetId))
+            ) || enrRes.data[0] || null
+
+            setLiveEnrollment(currentEnrollment)
+          }
+        } catch (err) {
+          console.warn('Failed to load real enrollment:', err)
+        }
+
+        // 3. Fetch real modules from backend database
         try {
           const modRes = await apiService.getModules()
           if (modRes && modRes.status === 'success' && Array.isArray(modRes.data) && isMounted) {
@@ -66,7 +108,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           console.warn('Failed to load real modules:', err)
         }
 
-        // 2. Fetch real calendar events from backend database
+        // 4. Fetch real calendar events from backend database
         try {
           const calRes = await apiService.getCalendarEvents()
           if (calRes && Array.isArray(calRes.data) && isMounted) {
@@ -76,15 +118,17 @@ export function StudentDashboard({ currentUser, onNavigate }) {
           console.warn('Failed to load real calendar events:', err)
         }
 
-        // 3. Fetch real academic progress from backend database
+        // 5. Fetch real academic progress from backend database
         try {
           const progRes = await apiService.getProgressList()
           if (progRes && Array.isArray(progRes.data) && isMounted) {
             const userEmail = sessionUser.email?.toLowerCase() || ''
             const userName = sessionUser.name?.toLowerCase() || ''
+            const targetStudentId = currentStudent?.student_id || sessionUser.student_id
             const found = progRes.data.find(
               (p) =>
-                (p.student_id && p.student_id === sessionUser.student_id) ||
+                (p.student_code && p.student_code === targetStudentId) ||
+                (p.student_id && String(p.student_id) === String(targetStudentId)) ||
                 (p.email && userEmail && p.email.toLowerCase() === userEmail) ||
                 (p.full_name && userName && p.full_name.toLowerCase().includes(userName.split(' ')[0]))
             )
@@ -102,26 +146,32 @@ export function StudentDashboard({ currentUser, onNavigate }) {
     return () => {
       isMounted = false
     }
-  }, [sessionUser.email, sessionUser.name, sessionUser.student_id])
+  }, [sessionUser.email, sessionUser.name, sessionUser.student_id, sessionUser.id])
 
   // Real Student Data object
   const student = {
-    name: sessionUser.name || liveProgress?.full_name || 'Gowtham Tamilkathir',
-    student_id: sessionUser.student_id || sessionUser.emp_id || liveProgress?.student_id || 'STU-2026-0843',
-    reg_no: liveProgress?.reg_no || sessionUser.reg_no || 'REG-2026-DEV-084',
-    email: sessionUser.email || liveProgress?.email || 'gowthamtamilkathir@gmail.com',
-    batch: sessionUser.batch || liveProgress?.batch || 'BIX-DEV-24A',
-    track: sessionUser.track || liveProgress?.track || 'Full-Stack Web Development',
-    course_name: liveProgress?.course_name || (sessionUser.track ? `Professional Diploma in ${sessionUser.track}` : 'Professional Diploma in Full-Stack Software Engineering'),
-    term: liveProgress?.term || 'Semester 2 • Fall Term 2026',
-    attendance_pct: liveProgress?.attendance_pct || 96.4,
-    attendance_present: liveProgress?.attendance_days_present || 48,
-    attendance_total: liveProgress?.attendance_days_total || 50,
-    gpa: liveProgress?.gpa || 3.86,
-    standing: liveProgress?.standing || 'Honors Distinction',
-    fee_status: 'Paid in Full',
-    fee_receipt: 'RCP-2026-9041',
-    advisor_remarks: liveProgress?.advisor_remarks?.[0]?.remarks || 'Demonstrates exceptional mastery in full-stack architecture, RESTful API design, and database query optimization. Outstanding academic standing in cohort.',
+    name: liveStudent?.full_name || sessionUser.name || 'Gowtham Tester',
+    student_id: liveStudent?.student_id || sessionUser.student_id || 'STU-2026-0845',
+    reg_no: liveStudent?.id_proof_number || liveStudent?.student_id || sessionUser.reg_no || 'REG-2026-0845',
+    email: liveStudent?.email || sessionUser.email || 'gowtham.tester@student.bixcel.edu',
+    phone: liveStudent?.phone || sessionUser.phone || '+91 98765 43210',
+    batch: liveEnrollment?.batch || liveEnrollment?.batch_id || liveStudent?.batch || sessionUser.batch || 'CLOUD-2026-A',
+    track: liveEnrollment?.track || liveStudent?.track || sessionUser.track || 'Full Stack Cloud Architecture',
+    course_name: liveEnrollment?.course_title || liveStudent?.track || sessionUser.track || 'Full Stack Cloud Architecture',
+    term: 'Semester 1 • Academic Year 2026-27',
+    attendance_pct: Number(liveStudent?.attendance_pct ?? liveProgress?.attendance_pct ?? 96),
+    attendance_present: Math.round(((Number(liveStudent?.attendance_pct ?? 96)) / 100) * (liveEnrollment?.total_days || 60)),
+    attendance_total: liveEnrollment?.total_days || 60,
+    gpa: liveProgress?.cumulative_gpa || 4.00,
+    standing: (liveProgress?.cumulative_gpa || 4.00) >= 3.8 ? 'Honors Distinction' : 'Good Standing',
+    fee_status: liveEnrollment && Number(liveEnrollment.balance_amount) > 0
+      ? `Partial (Due: ₹${Number(liveEnrollment.balance_amount).toLocaleString('en-IN')})`
+      : (liveEnrollment?.fee_status || liveStudent?.fee_status || 'Paid in Full'),
+    fee_receipt: liveEnrollment?.id ? `INV-2026-00${liveEnrollment.id}` : 'INV-2026-979',
+    guardian_name: liveStudent?.guardian_name || 'Self / Guardian',
+    guardian_phone: liveStudent?.guardian_phone || '+91 98765 43210',
+    guardian_relation: liveStudent?.guardian_relation || 'Guardian',
+    advisor_remarks: liveProgress?.advisor_remarks?.[0]?.remarks || 'Demonstrates exceptional dedication in core modules, cloud systems, and applied engineering. Outstanding academic standing in cohort.',
     dean_name: 'Dr. Marcus Vance',
     dean_title: 'Dean of Computing & Information Systems',
   }
@@ -169,7 +219,6 @@ export function StudentDashboard({ currentUser, onNavigate }) {
         type: l.type || 'lesson',
         status: itemStatus,
         doc_link: l.doc_link || '',
-        live_link: l.live_link || (itemStatus === 'current' ? 'https://meet.bixcel.edu/live' : null),
       })
     })
   })
@@ -640,22 +689,16 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                 <span className="font-mono text-xs text-purple-200">Room 302</span>
               </div>
               <h3 className="font-title text-sm font-bold text-white leading-snug">
-                React 19 Server Actions &amp; Optimistic UI Updates
+                {selectedModule?.title || student.course_name || 'Core Curriculum & Practicum'}
               </h3>
               <p className="text-xs text-purple-200/90">
-                Lead: Dr. Marcus Vance • Full-Stack Web Dev ({student.batch})
+                Lead Faculty • {student.track} ({student.batch})
               </p>
               <div className="flex items-center justify-between border-t border-purple-800/80 pt-2.5 text-xs">
                 <span className="text-purple-300 font-mono">09:30 AM - 12:30 PM</span>
-                <a
-                  href="https://meet.bixcel.edu/dev-24a"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-[#2B1B54] font-bold text-xs hover:bg-purple-100 transition-colors shadow-xs"
-                >
-                  <span className="material-symbols-outlined text-[16px]">videocam</span>
-                  <span>Launch Class</span>
-                </a>
+                <span className="px-2.5 py-1 rounded bg-white/10 text-purple-100 text-xs font-semibold border border-purple-500/30">
+                  Campus Classroom
+                </span>
               </div>
             </article>
 
@@ -913,17 +956,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                       </div>
 
                       <div className="flex flex-col items-end gap-1.5 shrink-0 self-end sm:self-center">
-                        {lesson.live_link ? (
-                          <a
-                            href={lesson.live_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-[16px]">videocam</span>
-                            <span>Join Live Classroom</span>
-                          </a>
-                        ) : isUpcoming ? (
+                        {isUpcoming ? (
                           <button
                             type="button"
                             onClick={() => showToast(`Pre-session materials for "${lesson.title}" available 24 hours prior to class.`)}

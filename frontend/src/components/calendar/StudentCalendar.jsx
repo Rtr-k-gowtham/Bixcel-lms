@@ -554,18 +554,6 @@ export function StudentCalendar({ currentUser }) {
                       </div>
 
                       <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        {ev.link && ev.link !== '#' && (
-                          <a
-                            href={ev.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-light-primary text-light-on-primary text-[11px] font-semibold hover:bg-light-primary-container"
-                          >
-                            <span className="material-symbols-outlined text-[13px]">videocam</span>
-                            <span>Join</span>
-                          </a>
-                        )}
                         <span className="material-symbols-outlined text-light-outline text-[16px]">chevron_right</span>
                       </div>
                     </div>
@@ -599,15 +587,9 @@ export function StudentCalendar({ currentUser }) {
 
             <div className="flex items-center justify-between border-t border-purple-800/80 pt-2 text-[11px]">
               <span className="text-purple-300">09:30 - 11:30 AM</span>
-              <a
-                href="https://meet.bixcel.edu/dev-24a"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded bg-white text-[#2B1B54] font-bold text-xs hover:bg-purple-100 transition-colors shadow-xs"
-              >
-                <span className="material-symbols-outlined text-[15px]">videocam</span>
-                <span>Launch Classroom</span>
-              </a>
+              <span className="px-2 py-0.5 rounded bg-white/10 text-purple-200 text-[10px] font-semibold border border-purple-500/30">
+                Campus Classroom
+              </span>
             </div>
           </article>
 
@@ -799,17 +781,6 @@ export function StudentCalendar({ currentUser }) {
               </span>
 
               <div className="flex items-center gap-2">
-                {selectedEvent.link && selectedEvent.link !== '#' && (
-                  <a
-                    href={selectedEvent.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded bg-light-primary text-light-on-primary font-semibold text-xs hover:bg-light-primary-container"
-                  >
-                    <span className="material-symbols-outlined text-[15px]">videocam</span>
-                    <span>Launch Virtual Class</span>
-                  </a>
-                )}
                 <button
                   type="button"
                   onClick={() => setSelectedEvent(null)}
