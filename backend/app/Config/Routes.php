@@ -42,6 +42,7 @@ $defineApiRoutes = static function ($routes) {
     $routes->get('students/tracks', 'Api\StudentController::tracks');
     $routes->post('students/credentials', 'Api\StudentController::credentials');
     $routes->resource('students', ['controller' => 'Api\StudentController']);
+    $routes->resource('enrollments', ['controller' => 'Api\EnrollmentController']);
     $routes->resource('users', ['controller' => 'Api\UserController']);
     $routes->resource('roles', ['controller' => 'Api\RoleController']);
     $routes->get('permissions', 'Api\PermissionController::index');

@@ -1,10 +1,5 @@
 import React from 'react'
-import StudentManagement from './StudentManagement'
+import CourseOnboarding from '../courses/CourseOnboarding'
 
-export { StudentManagement }
-
-export function StudentOnboarding(props) {
-  return <StudentManagement {...props} />
-}
-
-export default StudentOnboarding
+export { CourseOnboarding }
+export default CourseOnboarding

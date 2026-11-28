@@ -46,6 +46,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       items: [
         { id: 'modules', label: 'Module Master', icon: 'library_books' },
         { id: 'courses', label: 'Course Master', icon: 'menu_book' },
+        { id: 'onboarding', label: 'Course Onboarding', icon: 'assignment_ind' },
       ],
     })
   }

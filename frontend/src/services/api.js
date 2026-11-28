@@ -255,6 +255,24 @@ export const apiService = {
     return response.data
   },
 
+  // Course Onboarding & Enrollment API
+  getEnrollments: async (params = {}) => {
+    const response = await apiClient.get('/enrollments', { params })
+    return response.data
+  },
+  createEnrollment: async (enrollmentData) => {
+    const response = await apiClient.post('/enrollments', enrollmentData)
+    return response.data
+  },
+  updateEnrollment: async (id, enrollmentData) => {
+    const response = await apiClient.put(`/enrollments/${id}`, enrollmentData)
+    return response.data
+  },
+  deleteEnrollment: async (id) => {
+    const response = await apiClient.delete(`/enrollments/${id}`)
+    return response.data
+  },
+
   // Batch Management API
   getBatches: async (params = {}) => {
     const response = await apiClient.get('/batches', { params })

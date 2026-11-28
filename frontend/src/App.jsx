@@ -18,7 +18,7 @@ import { UserProfileScreen } from './components/profile/UserProfileScreen'
 import CourseManagement from './components/courses/CourseManagement'
 import ModuleLibrary from './components/modules/ModuleLibrary'
 import StudentManagement from './components/students/StudentManagement'
-import StudentOnboarding from './components/students/StudentOnboarding'
+import CourseOnboarding from './components/courses/CourseOnboarding'
 import BatchManagement from './components/batches/BatchManagement'
 import TutorManagement from './components/tutors/TutorManagement'
 import FeesPayment from './components/fees/FeesPayment'
@@ -269,7 +269,7 @@ function Dashboard({ currentUser, onLogout }) {
                 : currentTab === 'students'
                   ? 'Student Master'
                   : currentTab === 'onboarding'
-                    ? 'Student Master'
+                    ? 'Course Onboarding'
                     : currentTab === 'tutors'
                       ? 'Tutor Management & Allocation'
                       : currentTab === 'batches'
@@ -384,7 +384,7 @@ function Dashboard({ currentUser, onLogout }) {
           ) : currentTab === 'students' ? (
             <StudentManagement initialTab="directory" />
           ) : currentTab === 'onboarding' ? (
-            <StudentOnboarding />
+            <CourseOnboarding />
           ) : currentTab === 'departments' ? (
             <DepartmentMaster onNavigateToModules={() => handleTabChange('modules')} />
           ) : currentTab === 'modules' ? (
