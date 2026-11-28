@@ -38,7 +38,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       items: [
         { id: 'courses', label: 'Course Management', icon: 'menu_book' },
         { id: 'modules', label: 'Module Library', icon: 'library_books' },
-        { id: 'builder', label: 'Custom Course Builder', icon: 'view_quilt' },
         { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
       ],
     })
@@ -49,7 +48,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       items: [
         { id: 'courses', label: 'Course Management', icon: 'menu_book' },
         { id: 'modules', label: 'Module Library', icon: 'library_books' },
-        { id: 'builder', label: 'Custom Course Builder', icon: 'view_quilt' },
         { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
       ],
     })
@@ -82,10 +80,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
     sections.push({
       group: 'Schedule & Tasks',
       items: [
-        { id: 'timetable', label: 'Class Timetable', icon: 'schedule' },
-        { id: 'assignments', label: 'My Assignments', icon: 'assignment' },
-        { id: 'exams', label: 'Exams & Hall Tickets', icon: 'quiz' },
-        { id: 'milestones', label: 'Competency Milestones', icon: 'flag' },
         { id: 'calendar', label: 'Academic Calendar', icon: 'calendar_month' },
         { id: 'feedback', label: 'Rate My Faculty', icon: 'star' },
       ],
@@ -94,11 +88,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
     sections.push({
       group: 'Faculty Operations',
       items: [
-        { id: 'timetable', label: 'Timetable & Scheduling', icon: 'schedule' },
-        { id: 'attendance', label: 'Attendance Management', icon: 'how_to_reg' },
-        { id: 'assignments', label: 'Assignment Management', icon: 'assignment' },
-        { id: 'exams', label: 'Examination Management', icon: 'quiz' },
-        { id: 'milestones', label: 'Competency Milestones', icon: 'flag' },
         { id: 'calendar', label: 'Student Calendar', icon: 'calendar_month' },
         { id: 'progress', label: 'Academic Progress', icon: 'monitoring' },
         { id: 'feedback', label: 'Student Ratings', icon: 'star' },
@@ -110,11 +99,6 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       group: 'Operations',
       items: [
         { id: 'batches', label: 'Batch Management', icon: 'workspaces' },
-        { id: 'timetable', label: 'Timetable & Scheduling', icon: 'schedule' },
-        { id: 'attendance', label: 'Attendance Management', icon: 'how_to_reg' },
-        { id: 'assignments', label: 'Assignment Management', icon: 'assignment' },
-        { id: 'exams', label: 'Examination Management', icon: 'quiz' },
-        { id: 'milestones', label: 'Competency Milestones', icon: 'flag' },
         { id: 'calendar', label: 'Student Calendar', icon: 'calendar_month' },
         { id: 'progress', label: 'Academic Progress', icon: 'monitoring' },
         { id: 'feedback', label: 'Tutor Rating & Feedback', icon: 'star' },
