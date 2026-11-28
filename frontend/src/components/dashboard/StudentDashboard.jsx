@@ -291,6 +291,7 @@ export function StudentDashboard({ currentUser, onNavigate }) {
   })
 
   const selectedDateEvents = filteredEvents.filter((e) => e.date === selectedDateStr)
+  const todayEvent = calendarEvents.find((e) => e.date === '2026-11-26') || selectedDateEvents[0] || calendarEvents[0] || null
 
   const getTypeBadge = (type) => {
     switch (type) {
@@ -686,16 +687,18 @@ export function StudentDashboard({ currentUser, onNavigate }) {
                   <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
                   <span>HAPPENING TODAY</span>
                 </span>
-                <span className="font-mono text-xs text-purple-200">Room 302</span>
+                <span className="font-mono text-xs text-purple-200">{todayEvent?.location || todayEvent?.room || 'Room 302'}</span>
               </div>
               <h3 className="font-title text-sm font-bold text-white leading-snug">
-                {selectedModule?.title || student.course_name || 'Core Curriculum & Practicum'}
+                {todayEvent?.title || selectedModule?.title || student.course_name || 'Workspace Anatomy, Tools Panel & Scratch Disks'}
               </h3>
               <p className="text-xs text-purple-200/90">
-                Lead Faculty • {student.track} ({student.batch})
+                {todayEvent?.instructor ? `${todayEvent.instructor} • ` : 'Design Faculty Lead • '}{student.track} ({student.batch})
               </p>
               <div className="flex items-center justify-between border-t border-purple-800/80 pt-2.5 text-xs">
-                <span className="text-purple-300 font-mono">09:30 AM - 12:30 PM</span>
+                <span className="text-purple-300 font-mono">
+                  {todayEvent ? `${todayEvent.start_time} - ${todayEvent.end_time}` : '09:30 AM - 12:30 PM'}
+                </span>
                 <span className="px-2.5 py-1 rounded bg-white/10 text-purple-100 text-xs font-semibold border border-purple-500/30">
                   Campus Classroom
                 </span>
