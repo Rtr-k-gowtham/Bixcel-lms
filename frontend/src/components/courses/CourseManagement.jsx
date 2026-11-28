@@ -306,7 +306,7 @@ export function CourseManagement({ onNavigateToModules }) {
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex flex-col gap-0.5">
           <h1 className="font-title text-[17px] font-bold text-light-on-surface dark:text-dark-on-surface">
-            Course Programs &amp; Curriculum Framing
+            Course Master
           </h1>
           <p className="font-body text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
             Multi-modular program tracks with automated instructional duration calculation and tuition fee management.

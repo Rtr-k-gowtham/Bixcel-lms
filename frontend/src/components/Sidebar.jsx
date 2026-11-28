@@ -27,18 +27,16 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
     sections.push({
       group: 'My Academics',
       items: [
-        { id: 'courses', label: 'My Enrolled Courses', icon: 'menu_book' },
-        { id: 'modules', label: 'Module Library', icon: 'library_books' },
-        { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
+        { id: 'modules', label: 'Module Master', icon: 'library_books' },
+        { id: 'courses', label: 'Course Master', icon: 'menu_book' },
       ],
     })
   } else if (isTutor) {
     sections.push({
       group: 'Instruction & Academics',
       items: [
-        { id: 'courses', label: 'Course Management', icon: 'menu_book' },
-        { id: 'modules', label: 'Module Library', icon: 'library_books' },
-        { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
+        { id: 'modules', label: 'Module Master', icon: 'library_books' },
+        { id: 'courses', label: 'Course Master', icon: 'menu_book' },
       ],
     })
   } else {
@@ -46,10 +44,8 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
     sections.push({
       group: 'Academics',
       items: [
-        { id: 'courses', label: 'Course Management', icon: 'menu_book' },
-        { id: 'departments', label: 'Department Master', icon: 'corporate_fare' },
-        { id: 'modules', label: 'Module Library', icon: 'library_books' },
-        { id: 'curriculum', label: 'Day-Wise Curriculum', icon: 'timeline' },
+        { id: 'modules', label: 'Module Master', icon: 'library_books' },
+        { id: 'courses', label: 'Course Master', icon: 'menu_book' },
       ],
     })
   }
@@ -133,6 +129,7 @@ export function Sidebar({ currentTab, onSelectTab, mobileOpen, onCloseMobile, cu
       group: 'Access Control',
       items: [
         { id: 'users', label: 'User Master', icon: 'manage_accounts' },
+        { id: 'departments', label: 'Department Master', icon: 'corporate_fare' },
         { id: 'roles', label: 'Role Master', icon: 'badge' },
         { id: 'permissions', label: 'Permission Matrix', icon: 'security' },
       ],

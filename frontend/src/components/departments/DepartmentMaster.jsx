@@ -177,7 +177,7 @@ export function DepartmentMaster({ onNavigateToModules }) {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container-low text-light-on-surface dark:text-dark-on-surface text-xs font-semibold hover:bg-light-surface-container-high transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">library_books</span>
-              <span>Module Library</span>
+              <span>Module Master</span>
             </button>
           )}
 
