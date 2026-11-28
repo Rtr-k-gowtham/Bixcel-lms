@@ -18,347 +18,218 @@ class AuthController extends BaseApiController
         $this->response ??= \Config\Services::response();
     }
 
+    /**
+     * Authenticates a user strictly against database records (users, students, tutors).
+     * No hardcoded demo personas, mock credentials, or placeholder data.
+     */
     public function login()
     {
         $data = $this->getRequestData();
-        $rawEmail = trim((string)($data['email'] ?? ($data['username'] ?? ($data['user_id'] ?? ''))));
-        $rawPassword = trim((string)($data['password'] ?? ''));
+        $identifier = trim((string)($data['email'] ?? ($data['username'] ?? ($data['user_id'] ?? ''))));
+        $password = trim((string)($data['password'] ?? ''));
         $portal = strtolower(trim((string)($data['portal'] ?? ($data['role'] ?? 'all'))));
 
-        if (empty($rawEmail) || empty($rawPassword)) {
+        if (empty($identifier) || empty($password)) {
             return $this->failValidationErrors('Username/Email/ID and Password are required.');
         }
-
-        $lowerEmail = strtolower($rawEmail);
-        $lowerPassword = strtolower($rawPassword);
-
-        // Normalize email aliases
-        $emailAliases = [
-            'superadmin'             => 'superadmin@bixceltech.com',
-            'superadmin@bixceltech.com' => 'superadmin@bixceltech.com',
-            'admin@bixceltech.com'   => 'admin@bixceltech.com',
-            'admin'               => 'admin@bixceltech.com',
-            'admin@bixcel.edu'    => 'admin@bixceltech.com',
-            'admin@bixcel.com'    => 'admin@bixceltech.com',
-            'administrator'       => 'superadmin@bixceltech.com',
-            'root'                => 'superadmin@bixceltech.com',
-            'bixceltech'          => 'superadmin@bixceltech.com',
-            'bixceltech.com'      => 'superadmin@bixceltech.com',
-            'elena'               => 'superadmin@bixceltech.com',
-            'e.rostova'           => 'superadmin@bixceltech.com',
-            'gowtham'             => 'superadmin@bixceltech.com',
-            'u520351775'          => 'superadmin@bixceltech.com',
-            'u520351775_bixcellms'=> 'superadmin@bixceltech.com',
-            'bixcellms'           => 'superadmin@bixceltech.com',
-            'bixcel'              => 'superadmin@bixceltech.com',
-            'dean'                => 'dean@bixcel.edu',
-            'dean@bixcel.com'     => 'dean@bixcel.edu',
-            'dean@bixceltech.com' => 'dean@bixcel.edu',
-            'marcus'              => 'dean@bixcel.edu',
-            'm.vance'             => 'dean@bixcel.edu',
-            'faculty'             => 'faculty@bixcel.edu',
-            'faculty@bixcel.com'  => 'faculty@bixcel.edu',
-            'faculty@bixceltech.com' => 'faculty@bixcel.edu',
-            'tutor'               => 'faculty@bixcel.edu',
-            'sophia'              => 'faculty@bixcel.edu',
-            's.chen'              => 'faculty@bixcel.edu',
-            'teacher'             => 'faculty@bixcel.edu',
-            'student'             => 'student@bixcel.edu',
-            'student@bixcel.com'  => 'student@bixcel.edu',
-            'learner'             => 'student@bixcel.edu',
-        ];
-
-        $effectiveEmail = $emailAliases[$lowerEmail] ?? $lowerEmail;
-
-        // Master bypass passwords (case-insensitive)
-        $masterPasswords = [
-            'bixcellms@123',
-            'bixcellms',
-            'gowtham@1472004',
-            'admin@123',
-            'bixcel@2026',
-            'admin',
-            '123456',
-            'password',
-            'student@123',
-            'faculty@123',
-            'tutor@123',
-            'dean@123',
-            'gowtham@2026',
-        ];
-        $isMasterPassword = in_array($lowerPassword, $masterPasswords, true);
-
-        // Standard Demo personas
-        $demoCredentials = [
-            'superadmin@bixceltech.com' => [
-                'password' => 'Admin@123',
-                'name' => 'Elena Rostova (Super Admin)',
-                'role' => 'Super Admin',
-                'role_code' => 'ROLE_SUPER_ADMIN',
-                'department' => 'Executive Office',
-                'emp_id' => 'BX-SADM-001',
-                'avatar' => '',
-            ],
-            'admin@bixceltech.com' => [
-                'password' => 'Admin@123',
-                'name' => 'Alexander Hayes (Admin)',
-                'role' => 'Admin',
-                'role_code' => 'ROLE_ADMIN',
-                'department' => 'Academic Operations',
-                'emp_id' => 'BX-ADM-001',
-                'avatar' => '',
-            ],
-            'admin@bixcel.edu' => [
-                'password' => 'Admin@123',
-                'name' => 'Elena Rostova',
-                'role' => 'Super Admin',
-                'role_code' => 'ROLE_SUPER_ADMIN',
-                'department' => 'Executive Office',
-                'emp_id' => 'BX-ADM-002',
-                'avatar' => '',
-            ],
-            'e.rostova@bixcel.edu' => [
-                'password' => 'Admin@123',
-                'name' => 'Elena Rostova',
-                'role' => 'Super Admin',
-                'role_code' => 'ROLE_SUPER_ADMIN',
-                'department' => 'Executive Office',
-                'emp_id' => 'BX-ADM-002',
-                'avatar' => '',
-            ],
-            'dean@bixcel.edu' => [
-                'password' => 'Dean@123',
-                'name' => 'Dr. Marcus Vance',
-                'role' => 'Academic Dean',
-                'role_code' => 'ROLE_DEAN',
-                'department' => 'Computer Science',
-                'emp_id' => 'BX-FAC-014',
-                'avatar' => '',
-            ],
-            'faculty@bixcel.edu' => [
-                'password' => 'Faculty@123',
-                'name' => 'Sophia Chen',
-                'role' => 'Tutor / Faculty',
-                'role_code' => 'ROLE_TUTOR',
-                'department' => 'UI / UX Design',
-                'emp_id' => 'BX-TUT-089',
-                'avatar' => '',
-            ],
-            'student@bixcel.edu' => [
-                'password' => 'Student@123',
-                'name' => 'Marcus Vance',
-                'role' => 'Student',
-                'role_code' => 'ROLE_STUDENT',
-                'department' => 'Full-Stack Web Development',
-                'emp_id' => 'STU-2026-0842',
-                'avatar' => '',
-            ],
-        ];
 
         $matched = false;
         $authenticatedUserData = null;
 
         // =========================================================================
-        // 1. STUDENT AUTHENTICATION CHECK
+        // 1. QUERY USERS TABLE (Admin, Super Admin, Faculty, Staff, Registered Users)
         // =========================================================================
-        if ($portal === 'student' || $portal === 'all' || str_starts_with($lowerEmail, 'stu-')) {
+        $userModel = new UserModel();
+        $dbUser = $userModel
+            ->where('email', $identifier)
+            ->orWhere('username', $identifier)
+            ->orWhere('emp_id', $identifier)
+            ->first();
+
+        if ($dbUser) {
+            $isPasswordValid = false;
+
+            if (!empty($dbUser['password'])) {
+                if (password_verify($password, $dbUser['password']) || $password === $dbUser['password']) {
+                    $isPasswordValid = true;
+                }
+            }
+
+            if ($isPasswordValid) {
+                // Check if user status is active
+                if (!empty($dbUser['status']) && strtolower($dbUser['status']) === 'inactive') {
+                    return $this->failForbidden('Your account has been deactivated. Please contact the administrator.');
+                }
+
+                $matched = true;
+
+                // Update last login timestamp in database
+                try {
+                    $userModel->update($dbUser['id'], [
+                        'last_login' => date('Y-m-d H:i:s'),
+                    ]);
+                } catch (\Throwable $e) {
+                    log_message('error', 'Failed to update last_login: ' . $e->getMessage());
+                }
+
+                $role = $dbUser['role'] ?? 'Admin';
+                $roleCode = $dbUser['role_code'] ?? ($role === 'Super Admin' ? 'ROLE_SUPER_ADMIN' : ($role === 'Student' ? 'ROLE_STUDENT' : 'ROLE_ADMIN'));
+
+                $authenticatedUserData = [
+                    'id'          => (int)$dbUser['id'],
+                    'name'        => $dbUser['name'],
+                    'email'       => $dbUser['email'],
+                    'username'    => $dbUser['username'] ?? $dbUser['email'],
+                    'emp_id'      => $dbUser['emp_id'] ?? '',
+                    'student_id'  => (str_contains(strtolower($role), 'student') || str_starts_with($dbUser['emp_id'] ?? '', 'STU-')) ? ($dbUser['emp_id'] ?? '') : null,
+                    'role'        => $role,
+                    'role_code'   => $roleCode,
+                    'department'  => $dbUser['department'] ?? 'General',
+                    'avatar'      => (!empty($dbUser['avatar']) && !str_contains($dbUser['avatar'], 'unsplash.com')) ? $dbUser['avatar'] : '',
+                    'phone'       => $dbUser['phone'] ?? '',
+                    'status'      => $dbUser['status'] ?? 'Active',
+                    'institution' => $dbUser['institution'] ?? 'Bixcel Technologies',
+                ];
+            }
+        }
+
+        // =========================================================================
+        // 2. QUERY STUDENTS TABLE (Learners / Enrolled Students)
+        // =========================================================================
+        if (!$matched && ($portal === 'student' || $portal === 'all' || str_starts_with(strtolower($identifier), 'stu-'))) {
             $studentModel = new StudentModel();
-            $studentRecord = $studentModel->where('student_id', $rawEmail)
-                ->orWhere('username', $rawEmail)
-                ->orWhere('email', $rawEmail)
-                ->orWhere('student_id', strtoupper($rawEmail))
+            $studentRecord = $studentModel
+                ->where('student_id', $identifier)
+                ->orWhere('username', $identifier)
+                ->orWhere('email', $identifier)
+                ->orWhere('student_id', strtoupper($identifier))
                 ->first();
 
             if ($studentRecord) {
-                $passwordVerified = false;
-                if ($isMasterPassword || $lowerPassword === 'student@123' || $lowerPassword === 'gowtham@2026') {
-                    $passwordVerified = true;
-                } elseif (!empty($studentRecord['raw_password']) && $rawPassword === $studentRecord['raw_password']) {
-                    $passwordVerified = true;
-                } elseif (!empty($studentRecord['password']) && (password_verify($rawPassword, $studentRecord['password']) || $rawPassword === $studentRecord['password'])) {
-                    $passwordVerified = true;
+                $isPasswordValid = false;
+
+                if (!empty($studentRecord['password']) && (password_verify($password, $studentRecord['password']) || $password === $studentRecord['password'])) {
+                    $isPasswordValid = true;
+                } elseif (!empty($studentRecord['raw_password']) && $password === $studentRecord['raw_password']) {
+                    $isPasswordValid = true;
                 }
 
-                if ($passwordVerified) {
+                if ($isPasswordValid) {
+                    if (!empty($studentRecord['status']) && strtolower($studentRecord['status']) === 'inactive') {
+                        return $this->failForbidden('Your student account is currently suspended. Please contact student affairs.');
+                    }
+
                     $matched = true;
+
+                    // Fetch enrollment track and batch from database if present
+                    $track = 'Full-Stack Web Development';
+                    $batch = 'BIX-DEV-24A';
+                    try {
+                        $db = \Config\Database::connect();
+                        $enrollment = $db->table('student_enrollments')
+                            ->where('student_id', $studentRecord['id'])
+                            ->orWhere('student_code', $studentRecord['student_id'])
+                            ->get()
+                            ->getRowArray();
+
+                        if (!empty($enrollment['track'])) {
+                            $track = $enrollment['track'];
+                        }
+                        if (!empty($enrollment['batch'])) {
+                            $batch = $enrollment['batch'];
+                        }
+                    } catch (\Throwable $e) {}
+
                     $authenticatedUserData = [
-                        'id' => (int)$studentRecord['id'],
-                        'student_id' => $studentRecord['student_id'],
-                        'emp_id' => $studentRecord['student_id'],
-                        'name' => $studentRecord['full_name'],
-                        'email' => !empty($studentRecord['email']) ? $studentRecord['email'] : ($studentRecord['student_id'] . '@student.bixcel.edu'),
-                        'username' => !empty($studentRecord['username']) ? $studentRecord['username'] : $studentRecord['student_id'],
-                        'role' => 'Student',
-                        'role_code' => 'ROLE_STUDENT',
-                        'department' => 'Student Learning Portal',
-                        'avatar' => !empty($studentRecord['avatar']) && !str_contains($studentRecord['avatar'], 'unsplash.com') ? $studentRecord['avatar'] : '',
+                        'id'          => (int)$studentRecord['id'],
+                        'student_id'  => $studentRecord['student_id'],
+                        'emp_id'      => $studentRecord['student_id'],
+                        'name'        => $studentRecord['full_name'],
+                        'email'       => !empty($studentRecord['email']) ? $studentRecord['email'] : ($studentRecord['student_id'] . '@student.bixcel.edu'),
+                        'username'    => !empty($studentRecord['username']) ? $studentRecord['username'] : $studentRecord['student_id'],
+                        'role'        => 'Student',
+                        'role_code'   => 'ROLE_STUDENT',
+                        'department'  => $track,
+                        'track'       => $track,
+                        'batch'       => $batch,
+                        'avatar'      => (!empty($studentRecord['avatar']) && !str_contains($studentRecord['avatar'], 'unsplash.com')) ? $studentRecord['avatar'] : '',
+                        'phone'       => $studentRecord['phone'] ?? '',
+                        'status'      => $studentRecord['status'] ?? 'Active',
                     ];
                 }
             }
         }
 
         // =========================================================================
-        // 2. TUTOR AUTHENTICATION CHECK
+        // 3. QUERY TUTORS TABLE (Faculty / Instructors)
         // =========================================================================
-        if (!$matched && ($portal === 'tutor' || $portal === 'all' || str_starts_with($lowerEmail, 'tut-'))) {
+        if (!$matched && ($portal === 'tutor' || $portal === 'all' || str_starts_with(strtolower($identifier), 'tut-'))) {
             $tutorModel = new TutorModel();
-            $tutorRecord = $tutorModel->where('tutor_id', $rawEmail)
-                ->orWhere('tutor_id', strtoupper($rawEmail))
-                ->orWhere('email', $rawEmail)
-                ->orWhere('email', $effectiveEmail)
-                ->orWhere('full_name', $rawEmail)
+            $tutorRecord = $tutorModel
+                ->where('tutor_id', $identifier)
+                ->orWhere('tutor_id', strtoupper($identifier))
+                ->orWhere('email', $identifier)
+                ->orWhere('full_name', $identifier)
                 ->first();
 
             if ($tutorRecord) {
-                $passwordVerified = false;
-                if ($isMasterPassword || $lowerPassword === 'faculty@123' || $lowerPassword === 'tutor@123' || $lowerPassword === 'admin@123') {
-                    $passwordVerified = true;
+                // Check if tutor has a linked user account for password authentication
+                $tutorUser = $userModel
+                    ->where('email', $tutorRecord['email'])
+                    ->orWhere('emp_id', $tutorRecord['tutor_id'])
+                    ->first();
+
+                $isPasswordValid = false;
+                if ($tutorUser && !empty($tutorUser['password'])) {
+                    if (password_verify($password, $tutorUser['password']) || $password === $tutorUser['password']) {
+                        $isPasswordValid = true;
+                    }
                 }
 
-                if ($passwordVerified) {
+                if ($isPasswordValid) {
                     $matched = true;
                     $authenticatedUserData = [
-                        'id' => (int)$tutorRecord['id'],
-                        'staff_id' => $tutorRecord['tutor_id'],
-                        'tutor_id' => $tutorRecord['tutor_id'],
-                        'emp_id' => $tutorRecord['tutor_id'],
-                        'name' => $tutorRecord['full_name'],
-                        'email' => !empty($tutorRecord['email']) ? $tutorRecord['email'] : ($tutorRecord['tutor_id'] . '@faculty.bixcel.edu'),
-                        'username' => $tutorRecord['tutor_id'],
-                        'role' => 'Tutor / Faculty',
-                        'role_code' => 'ROLE_TUTOR',
-                        'department' => $tutorRecord['assigned_track'] ?? ($tutorRecord['specialization'] ?? 'Instructional Faculty'),
-                        'avatar' => !empty($tutorRecord['avatar']) && !str_contains($tutorRecord['avatar'], 'unsplash.com') ? $tutorRecord['avatar'] : '',
+                        'id'          => (int)$tutorRecord['id'],
+                        'staff_id'    => $tutorRecord['tutor_id'],
+                        'tutor_id'    => $tutorRecord['tutor_id'],
+                        'emp_id'      => $tutorRecord['tutor_id'],
+                        'name'        => $tutorRecord['full_name'],
+                        'email'       => !empty($tutorRecord['email']) ? $tutorRecord['email'] : ($tutorRecord['tutor_id'] . '@faculty.bixcel.edu'),
+                        'username'    => $tutorRecord['tutor_id'],
+                        'role'        => 'Tutor / Faculty',
+                        'role_code'   => 'ROLE_TUTOR',
+                        'department'  => $tutorRecord['assigned_track'] ?? ($tutorRecord['specialization'] ?? 'Instructional Faculty'),
+                        'avatar'      => '',
+                        'phone'       => $tutorRecord['phone'] ?? '',
+                        'status'      => $tutorRecord['status'] ?? 'Active',
                     ];
                 }
             }
         }
 
         // =========================================================================
-        // 3. DEMO CREDENTIALS CHECK
+        // 4. INVALID CREDENTIALS
         // =========================================================================
-        if (!$matched && isset($demoCredentials[$effectiveEmail])) {
-            $demo = $demoCredentials[$effectiveEmail];
-            $demoPassLower = strtolower($demo['password']);
-            if ($isMasterPassword || $lowerPassword === $demoPassLower || $rawPassword === $demo['password']) {
-                $matched = true;
-                $authenticatedUserData = [
-                    'id' => 2,
-                    'name' => $demo['name'],
-                    'email' => $effectiveEmail,
-                    'username' => explode('@', $effectiveEmail)[0],
-                    'role' => $demo['role'],
-                    'role_code' => $demo['role_code'],
-                    'department' => $demo['department'],
-                    'emp_id' => $demo['emp_id'],
-                    'avatar' => $demo['avatar'],
-                ];
-            }
-        }
-
-        // =========================================================================
-        // 4. USERS TABLE CHECK (ADMIN / STAFF / ANY REGISTERED USER)
-        // =========================================================================
-        if (!$matched) {
-            $userModel = new UserModel();
-            $dbUser = $userModel->where('email', $effectiveEmail)
-                ->orWhere('email', $rawEmail)
-                ->orWhere('username', $rawEmail)
-                ->orWhere('name', $rawEmail)
-                ->orWhere('emp_id', $rawEmail)
-                ->first();
-
-            if ($dbUser) {
-                $passwordVerified = false;
-                if ($isMasterPassword || $lowerPassword === 'admin@123' || $lowerPassword === 'student@123' || $lowerPassword === 'faculty@123') {
-                    $passwordVerified = true;
-                } elseif (!empty($dbUser['password']) && (password_verify($rawPassword, $dbUser['password']) || $rawPassword === $dbUser['password'])) {
-                    $passwordVerified = true;
-                }
-
-                if ($passwordVerified) {
-                    $matched = true;
-                    $authenticatedUserData = [
-                        'id' => (int)$dbUser['id'],
-                        'name' => $dbUser['name'],
-                        'email' => $dbUser['email'],
-                        'username' => $dbUser['username'] ?? $dbUser['email'],
-                        'role' => $dbUser['role'],
-                        'role_code' => $dbUser['role_code'] ?? ($dbUser['role'] === 'Student' ? 'ROLE_STUDENT' : ($dbUser['role'] === 'Tutor / Faculty' ? 'ROLE_TUTOR' : 'ROLE_SUPER_ADMIN')),
-                        'department' => $dbUser['department'] ?? 'General',
-                        'emp_id' => $dbUser['emp_id'] ?? 'BX-001',
-                        'avatar' => (!empty($dbUser['avatar']) && !str_contains($dbUser['avatar'], 'unsplash.com')) ? $dbUser['avatar'] : '',
-                    ];
-                }
-            }
-        }
-
-        // =========================================================================
-        // 5. MASTER BYPASS FALLBACK (ALLOWS LOGIN AS SPECIFIED PORTAL)
-        // =========================================================================
-        if (!$matched && $isMasterPassword) {
-            $matched = true;
-            if ($portal === 'student' || str_contains($lowerEmail, 'student')) {
-                $authenticatedUserData = [
-                    'id' => 101,
-                    'student_id' => 'STU-2026-0843',
-                    'emp_id' => 'STU-2026-0843',
-                    'name' => 'Marcus Vance',
-                    'email' => !empty($rawEmail) ? $rawEmail : 'student@bixcel.edu',
-                    'username' => 'student.portal',
-                    'role' => 'Student',
-                    'role_code' => 'ROLE_STUDENT',
-                    'department' => 'Full-Stack Web Development',
-                    'avatar' => '',
-                ];
-            } elseif ($portal === 'tutor' || str_contains($lowerEmail, 'tutor') || str_contains($lowerEmail, 'faculty')) {
-                $authenticatedUserData = [
-                    'id' => 102,
-                    'staff_id' => 'TUT-2026-001',
-                    'emp_id' => 'TUT-2026-001',
-                    'name' => 'Sophia Chen',
-                    'email' => !empty($rawEmail) ? $rawEmail : 'faculty@bixcel.edu',
-                    'username' => 'faculty.portal',
-                    'role' => 'Tutor / Faculty',
-                    'role_code' => 'ROLE_TUTOR',
-                    'department' => 'UI / UX Product Design',
-                    'avatar' => '',
-                ];
-            } else {
-                $authenticatedUserData = [
-                    'id' => 1,
-                    'name' => 'Elena Rostova',
-                    'email' => !empty($rawEmail) ? $rawEmail : 'admin@bixcel.edu',
-                    'username' => 'admin',
-                    'role' => 'Super Admin',
-                    'role_code' => 'ROLE_SUPER_ADMIN',
-                    'department' => 'Executive Office',
-                    'emp_id' => 'BX-ADM-002',
-                    'avatar' => '',
-                ];
-            }
-        }
-
         if (!$matched || !$authenticatedUserData) {
             return $this->failUnauthorized('Invalid credentials. Please verify your ID/Email and password.');
         }
 
-        // Generate token
+        // Generate session token
         $token = 'bx_' . bin2hex(random_bytes(24));
         $authenticatedUserData['token'] = $token;
 
         return $this->respond([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Authentication successful. Welcome to Bixcel LMS.',
-            'token' => $token,
-            'user' => $authenticatedUserData,
+            'token'   => $token,
+            'user'    => $authenticatedUserData,
         ]);
     }
 
     public function me()
     {
         return $this->respond([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Active session valid',
         ]);
     }
@@ -366,7 +237,7 @@ class AuthController extends BaseApiController
     public function logout()
     {
         return $this->respond([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Signed out successfully.',
         ]);
     }
