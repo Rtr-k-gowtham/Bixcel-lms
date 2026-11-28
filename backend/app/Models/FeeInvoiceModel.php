@@ -21,6 +21,7 @@ class FeeInvoiceModel extends Model
         'paid_amount',
         'balance_amount',
         'due_date',
+        'fee_schedule',
         'status',
     ];
     protected $useTimestamps = true;

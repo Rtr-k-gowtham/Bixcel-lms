@@ -25,6 +25,7 @@ class StudentEnrollmentModel extends Model
         'paid_amount',
         'balance_amount',
         'due_date',
+        'fee_schedule',
         'plan',
         'payment_method',
     ];

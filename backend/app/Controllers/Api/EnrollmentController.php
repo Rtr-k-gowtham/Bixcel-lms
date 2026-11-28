@@ -70,6 +70,7 @@ class EnrollmentController extends BaseApiController
             $paidAmt = (float) ($enr['paid_amount'] ?? 0.00);
             $balAmt = (float) (isset($enr['balance_amount']) ? $enr['balance_amount'] : max(0, $totalFee - $paidAmt));
             $dueDate = !empty($enr['due_date']) ? $enr['due_date'] : date('Y-m-d', strtotime('+30 days'));
+            $feeSchedule = !empty($enr['fee_schedule']) ? (is_string($enr['fee_schedule']) ? json_decode($enr['fee_schedule'], true) : $enr['fee_schedule']) : null;
 
             $feeStatus = ($balAmt <= 0) ? 'Paid' : (($paidAmt > 0) ? 'Partial' : 'Pending');
 
@@ -97,6 +98,7 @@ class EnrollmentController extends BaseApiController
                 'paid_amount' => $paidAmt,
                 'balance_amount' => $balAmt,
                 'due_date' => $dueDate,
+                'fee_schedule' => $feeSchedule,
                 'fee_status' => $feeStatus,
                 'plan' => $enr['plan'] ?? 'Standard',
                 'payment_method' => $enr['payment_method'] ?? 'Bank Transfer',
@@ -185,6 +187,18 @@ class EnrollmentController extends BaseApiController
         $dueDate = !empty($input['due_date']) ? $input['due_date'] : date('Y-m-d', strtotime('+30 days'));
         $paymentMethod = !empty($input['payment_method']) ? $input['payment_method'] : 'Bank Transfer';
 
+        // Fee Schedule (Multiple Due Dates / Installments)
+        $feeScheduleRaw = $input['fee_schedule'] ?? ($input['installments'] ?? null);
+        $feeScheduleJson = null;
+        if (!empty($feeScheduleRaw)) {
+            $feeScheduleJson = is_string($feeScheduleRaw) ? $feeScheduleRaw : json_encode($feeScheduleRaw);
+            $decodedSchedule = is_string($feeScheduleRaw) ? json_decode($feeScheduleRaw, true) : $feeScheduleRaw;
+            if (is_array($decodedSchedule) && count($decodedSchedule) > 0 && !empty($decodedSchedule[0]['due_date'])) {
+                // Keep due_date synchronized with the earliest upcoming installment
+                $dueDate = $decodedSchedule[0]['due_date'];
+            }
+        }
+
         $feeStatus = ($balanceAmount <= 0) ? 'Paid' : (($paidAmount > 0) ? 'Partial' : 'Pending');
 
         $modules = $input['modules'] ?? [];
@@ -206,6 +220,7 @@ class EnrollmentController extends BaseApiController
             'paid_amount' => $paidAmount,
             'balance_amount' => $balanceAmount,
             'due_date' => $dueDate,
+            'fee_schedule' => $feeScheduleJson,
             'plan' => $plan,
             'payment_method' => $paymentMethod,
             'created_at' => $now,
@@ -277,6 +292,7 @@ class EnrollmentController extends BaseApiController
                 'paid_amount' => $paidAmount,
                 'balance_amount' => $balanceAmount,
                 'due_date' => $dueDate,
+                'fee_schedule' => $feeScheduleJson,
                 'status' => $feeStatus,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -318,6 +334,7 @@ class EnrollmentController extends BaseApiController
                 'student_email' => $student['email'],
                 'student_avatar' => $student['avatar'],
                 'fee_status' => $feeStatus,
+                'fee_schedule' => !empty($feeScheduleJson) ? json_decode($feeScheduleJson, true) : null,
                 'modules' => $modules,
             ]),
         ]);
@@ -352,6 +369,16 @@ class EnrollmentController extends BaseApiController
         if (isset($input['due_date'])) $updateData['due_date'] = $input['due_date'];
         if (isset($input['payment_method'])) $updateData['payment_method'] = $input['payment_method'];
 
+        if (isset($input['fee_schedule']) || isset($input['installments'])) {
+            $sched = $input['fee_schedule'] ?? $input['installments'];
+            $schedJson = is_string($sched) ? $sched : json_encode($sched);
+            $updateData['fee_schedule'] = $schedJson;
+            $decoded = is_string($sched) ? json_decode($sched, true) : $sched;
+            if (is_array($decoded) && count($decoded) > 0 && !empty($decoded[0]['due_date']) && empty($input['due_date'])) {
+                $updateData['due_date'] = $decoded[0]['due_date'];
+            }
+        }
+
         $updateData['updated_at'] = date('Y-m-d H:i:s');
         $enrollmentModel->update($id, $updateData);
 
@@ -366,23 +393,32 @@ class EnrollmentController extends BaseApiController
                 $dueDate = $updateData['due_date'] ?? $inv['due_date'];
                 $feeStatus = ($balAmt <= 0) ? 'Paid' : (($paidAmt > 0) ? 'Partial' : 'Pending');
 
-                $feeInvoiceModel->update($inv['id'], [
+                $invUpdate = [
                     'total_amount' => $totalAmt,
                     'paid_amount' => $paidAmt,
                     'balance_amount' => $balAmt,
                     'due_date' => $dueDate,
                     'status' => $feeStatus,
                     'updated_at' => date('Y-m-d H:i:s'),
-                ]);
+                ];
+                if (isset($updateData['fee_schedule'])) {
+                    $invUpdate['fee_schedule'] = $updateData['fee_schedule'];
+                }
+                $feeInvoiceModel->update($inv['id'], $invUpdate);
             }
         } catch (\Throwable $e) {
             log_message('error', 'Error updating fee invoice: ' . $e->getMessage());
         }
 
+        $returnData = array_merge($enrollment, $updateData);
+        if (isset($returnData['fee_schedule']) && is_string($returnData['fee_schedule'])) {
+            $returnData['fee_schedule'] = json_decode($returnData['fee_schedule'], true);
+        }
+
         return $this->respond([
             'status' => 'success',
             'message' => 'Course onboarding and fee schedule updated successfully.',
-            'data' => array_merge($enrollment, $updateData),
+            'data' => $returnData,
         ]);
     }
 

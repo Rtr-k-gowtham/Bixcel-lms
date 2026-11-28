@@ -30,6 +30,35 @@ const getRecordModules = (record) => {
   ]
 }
 
+const getRecordFeeSchedule = (record) => {
+  if (!record) return []
+  let sched = record.fee_schedule || record.installments
+  if (typeof sched === 'string') {
+    try {
+      sched = JSON.parse(sched)
+    } catch {
+      sched = []
+    }
+  }
+  if (Array.isArray(sched) && sched.length > 0) return sched
+  const bal = record.balance_amount !== undefined
+    ? Number(record.balance_amount)
+    : Math.max(0, (Number(record.tuition_fee || record.total_amount) || 0) - (Number(record.paid_amount) || 0))
+  if (bal > 0) {
+    return [
+      {
+        id: `inst-1`,
+        installment: 1,
+        label: 'Installment 1',
+        amount: bal,
+        due_date: record.due_date || '',
+        status: 'Pending',
+      },
+    ]
+  }
+  return []
+}
+
 export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) {
   // Navigation / View Mode: 'list' (Directory table) | 'form' (Full-screen onboarding form)
   const [viewMode, setViewMode] = useState('list')
@@ -92,11 +121,151 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     return Math.max(0, tot - paid)
   }, [totalAmount, paidNow])
 
+  // Multi-Date Installment Scheduler State
+  const [installments, setInstallments] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 30)
+    return [
+      {
+        id: 'inst-1',
+        installment: 1,
+        label: 'Installment 1',
+        amount: 30000,
+        due_date: d.toISOString().split('T')[0],
+        status: 'Pending',
+      },
+    ]
+  })
+
+  // Fee Schedule state for Edit Modal
+  const [editingFeeSchedule, setEditingFeeSchedule] = useState([])
+
+  // Multi-Date Installment Helper Functions
+  const applyPresetSplits = (count) => {
+    if (balanceAmount <= 0) return
+    const each = Math.floor(balanceAmount / count)
+    const remainder = balanceAmount - each * count
+    const newSplits = []
+    for (let i = 0; i < count; i++) {
+      const d = new Date()
+      d.setDate(d.getDate() + 30 * (i + 1))
+      newSplits.push({
+        id: `inst-${Date.now()}-${i + 1}`,
+        installment: i + 1,
+        label: `Installment ${i + 1}`,
+        amount: i === count - 1 ? each + remainder : each,
+        due_date: d.toISOString().split('T')[0],
+        status: 'Pending',
+      })
+    }
+    setInstallments(newSplits)
+    if (newSplits.length > 0) {
+      setDueDate(newSplits[0].due_date)
+    }
+  }
+
+  const addInstallment = () => {
+    const scheduledSoFar = installments.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0)
+    const remaining = Math.max(0, balanceAmount - scheduledSoFar)
+    const lastInst = installments[installments.length - 1]
+    const baseDate = lastInst?.due_date ? new Date(lastInst.due_date) : new Date()
+    baseDate.setDate(baseDate.getDate() + 30)
+
+    const nextIdx = installments.length + 1
+    const newRow = {
+      id: `inst-${Date.now()}-${nextIdx}`,
+      installment: nextIdx,
+      label: `Installment ${nextIdx}`,
+      amount: remaining,
+      due_date: baseDate.toISOString().split('T')[0],
+      status: 'Pending',
+    }
+    setInstallments((prev) => [...prev, newRow])
+  }
+
+  const removeInstallment = (id) => {
+    if (installments.length <= 1) return
+    setInstallments((prev) => {
+      const filtered = prev.filter((item) => item.id !== id)
+      return filtered.map((item, idx) => ({
+        ...item,
+        installment: idx + 1,
+        label: item.label.startsWith('Installment') ? `Installment ${idx + 1}` : item.label,
+      }))
+    })
+  }
+
+  const updateInstallment = (id, field, value) => {
+    setInstallments((prev) => {
+      const updated = prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+      if (field === 'due_date' && updated[0]?.id === id) {
+        setDueDate(value)
+      }
+      return updated
+    })
+  }
+
+  const setInstallmentDaysFromToday = (id, days) => {
+    const d = new Date()
+    d.setDate(d.getDate() + days)
+    updateInstallment(id, 'due_date', d.toISOString().split('T')[0])
+  }
+
+  const autoReconcileInstallments = () => {
+    if (installments.length === 0 || balanceAmount <= 0) return
+    const each = Math.floor(balanceAmount / installments.length)
+    const remainder = balanceAmount - each * installments.length
+    setInstallments((prev) =>
+      prev.map((item, idx) => ({
+        ...item,
+        amount: idx === prev.length - 1 ? each + remainder : each,
+      }))
+    )
+  }
+
+  const scheduledTotal = useMemo(() => {
+    return installments.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0)
+  }, [installments])
+
+  const scheduledDifference = useMemo(() => {
+    return balanceAmount - scheduledTotal
+  }, [balanceAmount, scheduledTotal])
+
+  // Keep single installment amount in sync with balance
+  useEffect(() => {
+    if (balanceAmount <= 0) {
+      if (installments.length === 1 && installments[0].amount !== 0) {
+        setInstallments((prev) => prev.map((item) => ({ ...item, amount: 0 })))
+      }
+    } else if (installments.length === 1) {
+      if (installments[0].amount !== balanceAmount) {
+        setInstallments((prev) => [{ ...prev[0], amount: balanceAmount }])
+      }
+    } else if (installments.length === 0 && balanceAmount > 0) {
+      const d = new Date()
+      d.setDate(d.getDate() + 30)
+      setInstallments([
+        {
+          id: `inst-${Date.now()}-1`,
+          installment: 1,
+          label: 'Installment 1',
+          amount: balanceAmount,
+          due_date: d.toISOString().split('T')[0],
+          status: 'Pending',
+        },
+      ])
+    }
+  }, [balanceAmount])
+
   // Helper to schedule due date relative to today
   const setDueDaysFromNow = (days) => {
     const d = new Date()
     d.setDate(d.getDate() + days)
-    setDueDate(d.toISOString().split('T')[0])
+    const dStr = d.toISOString().split('T')[0]
+    setDueDate(dStr)
+    if (installments.length > 0) {
+      updateInstallment(installments[0].id, 'due_date', dStr)
+    }
   }
 
   // Fetch initial data
@@ -260,11 +429,25 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     setStartDate(new Date().toISOString().split('T')[0])
     setEndDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
     setStatus('Active')
-    setTotalAmount(courseFee > 0 ? courseFee : 45000)
-    setPaidNow(courseFee > 0 ? Math.round(courseFee / 2) : 15000)
+    const tot = courseFee > 0 ? courseFee : 45000
+    const paid = courseFee > 0 ? Math.round(courseFee / 2) : 15000
+    const bal = Math.max(0, tot - paid)
+    setTotalAmount(tot)
+    setPaidNow(paid)
     const d = new Date()
     d.setDate(d.getDate() + 30)
-    setDueDate(d.toISOString().split('T')[0])
+    const dStr = d.toISOString().split('T')[0]
+    setDueDate(dStr)
+    setInstallments([
+      {
+        id: `inst-${Date.now()}-1`,
+        installment: 1,
+        label: 'Installment 1',
+        amount: bal,
+        due_date: dStr,
+        status: 'Pending',
+      },
+    ])
     setPaymentMethod('Bank Transfer')
     setPlan('Installments')
 
@@ -331,6 +514,18 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     const effectiveCategory = courseMode === 'standard' ? (selectedCourse.category || 'Engineering') : customCategory
     const effectiveModules = courseMode === 'standard' ? standardCourseModules : customSelectedModules
 
+    const activeSchedule = balanceAmount > 0
+      ? installments.map((inst, idx) => ({
+          installment: idx + 1,
+          label: inst.label || `Installment ${idx + 1}`,
+          amount: Number(inst.amount) || 0,
+          due_date: inst.due_date || '',
+          status: inst.status || 'Pending',
+        }))
+      : []
+
+    const firstDueDate = activeSchedule.length > 0 ? activeSchedule[0].due_date : (dueDate || null)
+
     const payload = {
       student_id: selectedStudent.id,
       student_code: selectedStudent.student_id,
@@ -348,7 +543,8 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
       total_amount: Number(totalAmount) || 0,
       paid_amount: Number(paidNow) || 0,
       balance_amount: balanceAmount,
-      due_date: dueDate || null,
+      due_date: firstDueDate,
+      fee_schedule: activeSchedule,
       payment_method: paymentMethod || 'Bank Transfer',
       modules: effectiveModules.map((m, idx) => ({
         module_code: m.code || m.id || `MOD-${idx + 1}`,
@@ -399,13 +595,28 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     const paid = Number(editingOnboarding.paid_amount) || 0
     const bal = Math.max(0, tot - paid)
 
+    const activeSchedule = bal > 0
+      ? (editingFeeSchedule.length > 0
+          ? editingFeeSchedule.map((inst, idx) => ({
+              installment: idx + 1,
+              label: inst.label || `Installment ${idx + 1}`,
+              amount: Number(inst.amount) || 0,
+              due_date: inst.due_date || '',
+              status: inst.status || 'Pending',
+            }))
+          : [{ installment: 1, label: 'Installment 1', amount: bal, due_date: editingOnboarding.due_date || '', status: 'Pending' }])
+      : []
+
+    const firstDueDate = activeSchedule.length > 0 ? activeSchedule[0].due_date : (editingOnboarding.due_date || null)
+
     const updated = {
       ...editingOnboarding,
       tuition_fee: tot,
       total_amount: tot,
       paid_amount: paid,
       balance_amount: bal,
-      due_date: editingOnboarding.due_date || null,
+      due_date: firstDueDate,
+      fee_schedule: activeSchedule,
       payment_method: editingOnboarding.payment_method || 'Bank Transfer',
     }
 
@@ -1135,70 +1346,211 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                   </div>
                 </div>
 
-                {/* SCHEDULE BALANCE DUE DATE SECTION */}
+                {/* SCHEDULE MULTI-DATE BALANCE DUE DATES SECTION */}
                 {balanceAmount > 0 ? (
-                  <div className="p-3 rounded border border-pending/30 bg-pending-container/20 dark:bg-pending-container/10 flex flex-col gap-2.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-[17px] text-pending">event_upcoming</span>
-                        <label className="text-xs font-bold text-light-on-surface dark:text-dark-on-surface">
-                          Schedule Balance Due Date *
-                        </label>
+                  <div className="p-3.5 rounded-md border border-pending/40 bg-pending-container/15 dark:bg-pending-container/10 flex flex-col gap-3">
+                    {/* Header & Quick Split Presets */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pending/25 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-7 h-7 rounded-full bg-pending/20 text-pending flex items-center justify-center">
+                          <span className="material-symbols-outlined text-[17px]">event_repeat</span>
+                        </span>
+                        <div>
+                          <label className="text-xs font-bold text-light-on-surface dark:text-dark-on-surface block">
+                            Multi-Date Installment Scheduler *
+                          </label>
+                          <span className="text-[10px] text-light-on-surface-variant">
+                            Schedule the remaining ₹{balanceAmount.toLocaleString('en-IN')} across multiple due dates / milestones
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap items-center gap-1">
-                        <span className="text-[10px] text-light-on-surface-variant font-medium mr-1">Quick Presets:</span>
+
+                      {/* Presets and Add Row */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] text-light-on-surface-variant font-medium mr-1">Split Presets:</span>
                         <button
                           type="button"
-                          onClick={() => setDueDaysFromNow(15)}
-                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                          onClick={() => applyPresetSplits(1)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                            installments.length === 1
+                              ? 'bg-light-primary text-light-on-primary border-light-primary'
+                              : 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-outline-variant hover:border-light-primary text-light-on-surface'
+                          }`}
                         >
-                          +15 Days
+                          Single Due Date
                         </button>
                         <button
                           type="button"
-                          onClick={() => setDueDaysFromNow(30)}
-                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-primary cursor-pointer"
+                          onClick={() => applyPresetSplits(2)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                            installments.length === 2
+                              ? 'bg-light-primary text-light-on-primary border-light-primary'
+                              : 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-outline-variant hover:border-light-primary text-light-on-surface'
+                          }`}
                         >
-                          +30 Days (1 Mo)
+                          2 Splits (50-50)
                         </button>
                         <button
                           type="button"
-                          onClick={() => setDueDaysFromNow(45)}
-                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                          onClick={() => applyPresetSplits(3)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                            installments.length === 3
+                              ? 'bg-light-primary text-light-on-primary border-light-primary'
+                              : 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-outline-variant hover:border-light-primary text-light-on-surface'
+                          }`}
                         >
-                          +45 Days
+                          3 Splits (Monthly)
                         </button>
                         <button
                           type="button"
-                          onClick={() => setDueDaysFromNow(60)}
-                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                          onClick={() => applyPresetSplits(4)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors cursor-pointer ${
+                            installments.length === 4
+                              ? 'bg-light-primary text-light-on-primary border-light-primary'
+                              : 'bg-light-surface-container-lowest dark:bg-dark-surface-bright border-light-outline-variant hover:border-light-primary text-light-on-surface'
+                          }`}
                         >
-                          +60 Days (2 Mo)
+                          4 Splits
                         </button>
                         <button
                           type="button"
-                          onClick={() => setDueDaysFromNow(90)}
-                          className="px-2 py-0.5 rounded text-[10px] font-bold bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant hover:border-light-primary text-light-on-surface cursor-pointer"
+                          onClick={addInstallment}
+                          className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-light-primary text-light-on-primary hover:bg-light-primary-container transition-colors cursor-pointer shadow-xs"
                         >
-                          +90 Days (3 Mo)
+                          <span className="material-symbols-outlined text-[13px]">add</span>
+                          + Add Due Date
                         </button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                      <div>
-                        <input
-                          type="date"
-                          required
-                          value={dueDate}
-                          onChange={(e) => setDueDate(e.target.value)}
-                          className="w-full px-3 py-1.5 text-xs font-mono font-bold rounded border border-pending/40 bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-pending"
-                        />
+                    {/* Balance Reconciler & Tally Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/70 text-xs">
+                      <div className="flex flex-wrap items-center gap-3 font-mono">
+                        <span>Total Balance: <strong className="text-pending">₹{balanceAmount.toLocaleString('en-IN')}</strong></span>
+                        <span className="text-light-outline">•</span>
+                        <span>Total Scheduled: <strong className={scheduledDifference === 0 ? 'text-success' : 'text-pending'}>₹{scheduledTotal.toLocaleString('en-IN')}</strong></span>
                       </div>
-                      <div className="text-[11px] text-light-on-surface-variant bg-light-surface-container-lowest/80 dark:bg-dark-surface-bright/80 p-2 rounded border border-light-outline-variant/60">
-                        Balance of <strong className="text-pending font-mono">₹{balanceAmount.toLocaleString('en-IN')}</strong> will be captured in the database with scheduled due date <strong className="font-mono text-light-primary">{dueDate}</strong>.
+                      <div className="flex items-center gap-2">
+                        {scheduledDifference === 0 ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-success">
+                            <span className="material-symbols-outlined text-[15px]">check_circle</span>
+                            100% Scheduled &amp; Reconciled
+                          </span>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-bold text-pending">
+                              {scheduledDifference > 0
+                                ? `₹${scheduledDifference.toLocaleString('en-IN')} unallocated`
+                                : `₹${Math.abs(scheduledDifference).toLocaleString('en-IN')} over scheduled`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={autoReconcileInstallments}
+                              className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 cursor-pointer"
+                            >
+                              Auto-Balance
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
+
+                    {/* Interactive Installments Table */}
+                    <div className="overflow-x-auto border border-light-outline-variant/70 rounded-md bg-light-surface-container-lowest dark:bg-dark-surface-bright shadow-2xs">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-light-surface-container dark:bg-dark-surface-container text-light-on-surface-variant text-[10px] uppercase font-bold border-b border-light-outline-variant">
+                            <th className="py-2 px-3 w-12 text-center">#</th>
+                            <th className="py-2 px-3">Milestone / Label</th>
+                            <th className="py-2 px-3 min-w-[200px]">Due Date &amp; Quick Days</th>
+                            <th className="py-2 px-3 w-44">Due Amount (₹)</th>
+                            <th className="py-2 px-3 w-16 text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-light-outline-variant/60">
+                          {installments.map((inst, idx) => {
+                            const pct = balanceAmount > 0 ? ((Number(inst.amount) || 0) / balanceAmount * 100).toFixed(0) : 0
+                            return (
+                              <tr key={inst.id} className="hover:bg-light-surface-container-low/40">
+                                <td className="py-2.5 px-3 text-center align-middle">
+                                  <span className="w-5 h-5 rounded-full bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary text-[10px] font-bold font-mono inline-flex items-center justify-center">
+                                    {idx + 1}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 align-middle">
+                                  <input
+                                    type="text"
+                                    value={inst.label || `Installment ${idx + 1}`}
+                                    onChange={(e) => updateInstallment(inst.id, 'label', e.target.value)}
+                                    placeholder={`Installment ${idx + 1}`}
+                                    className="w-full px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                                  />
+                                </td>
+                                <td className="py-2.5 px-3 align-middle">
+                                  <div className="flex flex-col gap-1">
+                                    <input
+                                      type="date"
+                                      required
+                                      value={inst.due_date || ''}
+                                      onChange={(e) => updateInstallment(inst.id, 'due_date', e.target.value)}
+                                      className="w-full px-2 py-1 text-xs font-mono font-bold rounded border border-pending/40 bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-pending"
+                                    />
+                                    {/* Quick day-to-day shortcuts for this specific due date */}
+                                    <div className="flex items-center gap-1 text-[9px]">
+                                      <span className="text-light-on-surface-variant font-medium">Quick:</span>
+                                      {[15, 30, 45, 60, 90].map((d) => (
+                                        <button
+                                          key={d}
+                                          type="button"
+                                          onClick={() => setInstallmentDaysFromToday(inst.id, d)}
+                                          className="px-1.5 py-0.2 rounded font-mono bg-light-surface-container dark:bg-dark-surface-container hover:bg-light-primary-tint hover:text-light-primary text-light-on-surface cursor-pointer border border-light-outline-variant/40"
+                                        >
+                                          +{d}d
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-2.5 px-3 align-middle">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="relative flex-1">
+                                      <span className="absolute left-2 text-xs font-bold text-light-outline pointer-events-none">₹</span>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        step="500"
+                                        required
+                                        value={inst.amount}
+                                        onChange={(e) => updateInstallment(inst.id, 'amount', Number(e.target.value))}
+                                        className="w-full pl-5 pr-2 py-1 text-xs font-mono font-bold rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-1 focus:ring-light-primary"
+                                      />
+                                    </div>
+                                    <span className="text-[10px] font-mono font-semibold text-light-on-surface-variant w-11 text-right">
+                                      {pct}%
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="py-2.5 px-3 text-center align-middle">
+                                  <button
+                                    type="button"
+                                    disabled={installments.length <= 1}
+                                    onClick={() => removeInstallment(inst.id)}
+                                    title={installments.length <= 1 ? "At least 1 due date required" : "Remove this due date split"}
+                                    className="p-1 rounded text-light-on-surface-variant hover:text-error hover:bg-error-container/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                  >
+                                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="text-[10px] text-light-on-surface-variant font-mono">
+                      * All scheduled installment dates and amounts will be stored in database fee schedule and synchronized with fee balance ledger.
+                    </p>
                   </div>
                 ) : (
                   <div className="p-2.5 rounded border border-success/30 bg-success-container/20 text-xs flex items-center gap-2 text-on-success-container font-medium">
@@ -1545,12 +1897,32 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                               </div>
                               <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-light-on-surface-variant font-mono">
                                 <span>Paid: ₹{(item.paid_amount || 0).toLocaleString('en-IN')}</span>
-                                {item.due_date && (item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))) > 0 && (
-                                  <span className="inline-flex items-center gap-0.5 text-pending font-semibold" title={`Balance Due Date: ${item.due_date}`}>
-                                    <span className="material-symbols-outlined text-[11px]">event</span>
-                                    Due: {item.due_date}
-                                  </span>
-                                )}
+                                {(() => {
+                                  const bal = item.balance_amount !== undefined ? item.balance_amount : ((item.tuition_fee || item.total_amount || 0) - (item.paid_amount || 0))
+                                  if (bal <= 0) return null
+                                  const sched = getRecordFeeSchedule(item)
+                                  if (sched.length > 1) {
+                                    return (
+                                      <span
+                                        className="inline-flex items-center gap-0.5 text-pending font-semibold bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.2 rounded border border-pending/30 cursor-help"
+                                        title={sched.map((s, idx) => `#${idx + 1}: ₹${(s.amount || 0).toLocaleString('en-IN')} due ${s.due_date || 'TBD'}`).join(' | ')}
+                                      >
+                                        <span className="material-symbols-outlined text-[11px]">event_repeat</span>
+                                        <span>{sched.length} Dates</span>
+                                        <span className="text-[9px] opacity-80">({sched[0]?.due_date})</span>
+                                      </span>
+                                    )
+                                  }
+                                  if (item.due_date) {
+                                    return (
+                                      <span className="inline-flex items-center gap-0.5 text-pending font-semibold" title={`Balance Due Date: ${item.due_date}`}>
+                                        <span className="material-symbols-outlined text-[11px]">event</span>
+                                        Due: {item.due_date}
+                                      </span>
+                                    )
+                                  }
+                                  return null
+                                })()}
                               </div>
                             </div>
                           </td>
@@ -1569,7 +1941,10 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
 
                               <button
                                 type="button"
-                                onClick={() => setEditingOnboarding({ ...item })}
+                                onClick={() => {
+                                  setEditingOnboarding({ ...item })
+                                  setEditingFeeSchedule(getRecordFeeSchedule(item))
+                                }}
                                 title="Edit Onboarding & Batch Allocation"
                                 className="p-1 rounded text-light-on-surface-variant hover:text-light-primary hover:bg-light-surface-container transition-colors cursor-pointer"
                               >
@@ -1698,6 +2073,47 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                 <span>Fee Plan: <strong>{viewingOnboarding.plan || 'Standard'}</strong></span>
               </div>
             </div>
+
+            {/* Scheduled Milestone Installments in Drawer */}
+            {(() => {
+              const sched = getRecordFeeSchedule(viewingOnboarding)
+              if (sched.length === 0) return null
+              return (
+                <div className="p-3 rounded-md border border-pending/30 bg-light-surface-container-lowest dark:bg-dark-surface-bright flex flex-col gap-2">
+                  <div className="flex items-center justify-between border-b border-light-outline-variant/60 pb-1">
+                    <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[15px] text-pending">event_repeat</span>
+                      Milestone Due Dates ({sched.length} {sched.length > 1 ? 'Installments' : 'Due Date'})
+                    </span>
+                    <span className="text-[10px] font-mono text-pending font-bold">
+                      Balance Due: ₹{(viewingOnboarding.balance_amount || 0).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="divide-y divide-light-outline-variant/50 border border-light-outline-variant/60 rounded overflow-hidden text-xs">
+                    {sched.map((s, idx) => (
+                      <div key={idx} className="p-2 flex items-center justify-between bg-light-surface-container-low/30 dark:bg-dark-surface-container/30">
+                        <div className="flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary text-[9px] font-bold font-mono inline-flex items-center justify-center">
+                            {idx + 1}
+                          </span>
+                          <span className="font-medium text-xs">{s.label || `Installment ${idx + 1}`}</span>
+                        </div>
+                        <div className="flex items-center gap-3 font-mono text-xs">
+                          <span className="text-light-on-surface-variant flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[13px]">calendar_today</span>
+                            {s.due_date || 'TBD'}
+                          </span>
+                          <strong className="text-pending">₹{(Number(s.amount) || 0).toLocaleString('en-IN')}</strong>
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+                            {s.status || 'Pending'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Modules List */}
             {(() => {
@@ -1872,12 +2288,18 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="block text-[10px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-0.5">
-                      Balance Due Date
+                      First / Primary Due Date
                     </label>
                     <input
                       type="date"
-                      value={editingOnboarding.due_date || ''}
-                      onChange={(e) => setEditingOnboarding({ ...editingOnboarding, due_date: e.target.value })}
+                      value={editingFeeSchedule[0]?.due_date || editingOnboarding.due_date || ''}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setEditingOnboarding({ ...editingOnboarding, due_date: val })
+                        if (editingFeeSchedule.length > 0) {
+                          setEditingFeeSchedule(prev => prev.map((item, idx) => idx === 0 ? { ...item, due_date: val } : item))
+                        }
+                      }}
                       className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
                     />
                   </div>
@@ -1898,6 +2320,86 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     </select>
                   </div>
                 </div>
+
+                {/* Multiple Due Dates Editor in Edit Modal */}
+                {Math.max(0, Number(editingOnboarding.tuition_fee || editingOnboarding.total_amount || 0) - Number(editingOnboarding.paid_amount || 0)) > 0 && (
+                  <div className="pt-1.5 border-t border-light-outline-variant/50 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-light-on-surface dark:text-dark-on-surface flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[13px] text-pending">event_repeat</span>
+                        Installment Splits ({editingFeeSchedule.length})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextIdx = editingFeeSchedule.length + 1
+                          const d = new Date()
+                          d.setDate(d.getDate() + 30 * nextIdx)
+                          setEditingFeeSchedule([
+                            ...editingFeeSchedule,
+                            {
+                              installment: nextIdx,
+                              label: `Installment ${nextIdx}`,
+                              amount: 0,
+                              due_date: d.toISOString().split('T')[0],
+                              status: 'Pending',
+                            },
+                          ])
+                        }}
+                        className="text-[10px] text-light-primary font-bold hover:underline cursor-pointer"
+                      >
+                        + Add Due Date
+                      </button>
+                    </div>
+
+                    <div className="space-y-1 max-h-36 overflow-y-auto pr-0.5">
+                      {editingFeeSchedule.map((s, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5 p-1 rounded bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant/60 text-xs">
+                          <span className="w-4 h-4 rounded-full bg-light-primary-tint text-light-primary text-[9px] font-bold inline-flex items-center justify-center font-mono">
+                            {idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            value={s.label || `Installment ${idx + 1}`}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setEditingFeeSchedule(prev => prev.map((item, i) => i === idx ? { ...item, label: val } : item))
+                            }}
+                            className="w-20 px-1 py-0.5 text-[10px] rounded border border-light-outline-variant"
+                          />
+                          <input
+                            type="date"
+                            value={s.due_date || ''}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setEditingFeeSchedule(prev => prev.map((item, i) => i === idx ? { ...item, due_date: val } : item))
+                              if (idx === 0) setEditingOnboarding({ ...editingOnboarding, due_date: val })
+                            }}
+                            className="flex-1 px-1 py-0.5 text-[10px] font-mono rounded border border-pending/40"
+                          />
+                          <input
+                            type="number"
+                            value={s.amount || 0}
+                            onChange={(e) => {
+                              const val = Number(e.target.value)
+                              setEditingFeeSchedule(prev => prev.map((item, i) => i === idx ? { ...item, amount: val } : item))
+                            }}
+                            className="w-16 px-1 py-0.5 text-[10px] font-mono rounded border border-light-outline-variant"
+                          />
+                          {editingFeeSchedule.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => setEditingFeeSchedule(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-error hover:opacity-75 p-0.5 cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-[13px]">close</span>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-end gap-2 border-t border-light-outline-variant dark:border-dark-outline-variant pt-2 mt-2">
@@ -1978,11 +2480,38 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     ₹{(viewingPass.paid_amount || 0).toLocaleString('en-IN')} / ₹{(viewingPass.tuition_fee || viewingPass.total_amount || 0).toLocaleString('en-IN')}
                   </strong>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <span className="text-[10px] text-light-on-surface-variant block">Scheduled Balance Due:</span>
-                  <strong className="font-mono text-pending">
-                    {(viewingPass.balance_amount || 0) > 0 ? `₹${(viewingPass.balance_amount || 0).toLocaleString('en-IN')} (Due: ${viewingPass.due_date || 'TBD'})` : 'Paid in Full (₹0)'}
-                  </strong>
+                  {(viewingPass.balance_amount || 0) > 0 ? (
+                    <div className="mt-0.5 space-y-1">
+                      <strong className="font-mono text-pending text-xs">
+                        ₹{(viewingPass.balance_amount || 0).toLocaleString('en-IN')}
+                      </strong>
+                      {(() => {
+                        const sched = getRecordFeeSchedule(viewingPass)
+                        if (sched.length > 1) {
+                          return (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {sched.map((s, idx) => (
+                                <span key={idx} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono bg-pending-container/30 text-on-pending-container border border-pending/20">
+                                  <span>#{idx + 1}:</span>
+                                  <strong>₹{(s.amount || 0).toLocaleString('en-IN')}</strong>
+                                  <span>due {s.due_date || 'TBD'}</span>
+                                </span>
+                              ))}
+                            </div>
+                          )
+                        }
+                        return (
+                          <span className="text-[10px] text-light-on-surface-variant font-mono block">
+                            Due on {viewingPass.due_date || 'TBD'}
+                          </span>
+                        )
+                      })()}
+                    </div>
+                  ) : (
+                    <strong className="font-mono text-success text-xs">Paid in Full (₹0)</strong>
+                  )}
                 </div>
               </div>
             </div>
