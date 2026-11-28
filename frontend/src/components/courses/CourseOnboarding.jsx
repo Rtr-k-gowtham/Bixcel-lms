@@ -8,6 +8,28 @@ const getInitials = (name) => {
   return parts.slice(0, 2).map((p) => p[0].toUpperCase()).join('')
 }
 
+const getRecordModules = (record) => {
+  if (!record) return []
+  let mods = record.modules
+  if (typeof mods === 'string') {
+    try {
+      mods = JSON.parse(mods)
+    } catch {
+      mods = []
+    }
+  }
+  if (Array.isArray(mods) && mods.length > 0) return mods
+  return [
+    {
+      module_code: record.course_code || 'MOD-1',
+      title: record.track || 'Core Curriculum Module',
+      days: record.total_days || 30,
+      instructor: 'Faculty Lead',
+      status: 'Active',
+    },
+  ]
+}
+
 export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) {
   // Navigation / View Mode: 'list' (Directory table) | 'form' (Full-screen onboarding form)
   const [viewMode, setViewMode] = useState('list')
@@ -49,8 +71,8 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
 
   // Cohort, Scheduling & Tuition Fee Scheduler State
   const [batchCode, setBatchCode] = useState('BIX-2026-A')
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
-  const [endDate, setEndDate] = useState(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [endDate, setEndDate] = useState(() => new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [status, setStatus] = useState('Active')
   const [totalAmount, setTotalAmount] = useState(45000)
   const [paidNow, setPaidNow] = useState(15000)
@@ -111,6 +133,28 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     loadData()
   }, [])
 
+  // Auto-sync selected course and student once data loads if not yet set
+  useEffect(() => {
+    if (!selectedCourseId && coursesList.length > 0) {
+      const firstCourse = coursesList[0]
+      setSelectedCourseId(firstCourse.id)
+      if (firstCourse.code) {
+        setBatchCode(`${firstCourse.code}-26A`)
+      }
+      const fee = Number(firstCourse.price || firstCourse.tuition_fee)
+      if (fee > 0) {
+        setTotalAmount(fee)
+        setPaidNow(Math.round(fee / 2))
+      }
+    }
+  }, [coursesList, selectedCourseId])
+
+  useEffect(() => {
+    if (!selectedStudentId && studentsList.length > 0) {
+      setSelectedStudentId(studentsList[0].student_id || studentsList[0].id)
+    }
+  }, [studentsList, selectedStudentId])
+
   // Currently selected student object
   const selectedStudent = useMemo(() => {
     if (!selectedStudentId) return null
@@ -126,10 +170,18 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
   // Modules belonging to selected Standard Course
   const standardCourseModules = useMemo(() => {
     if (!selectedCourse) return []
-    const rawIds = selectedCourse.module_ids || []
+    let rawIds = selectedCourse.module_ids || []
+    if (typeof rawIds === 'string') {
+      try {
+        rawIds = JSON.parse(rawIds)
+      } catch {
+        rawIds = []
+      }
+    }
     if (Array.isArray(rawIds) && rawIds.length > 0) {
       const idSet = new Set(rawIds.map(String))
-      return modulesList.filter((m) => idSet.has(String(m.id)) || idSet.has(String(m.code)))
+      const matched = modulesList.filter((m) => idSet.has(String(m.id)) || idSet.has(String(m.code)))
+      if (matched.length > 0) return matched
     }
     return [
       {
@@ -196,6 +248,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
   const startFullOnboarding = (initialStudentId = '') => {
     const defaultStudent = initialStudentId || (studentsList.length > 0 ? (studentsList[0].student_id || studentsList[0].id) : '')
     const defaultCourse = coursesList.length > 0 ? coursesList[0] : null
+    const courseFee = defaultCourse ? Number(defaultCourse.price || defaultCourse.tuition_fee || 45000) : 45000
 
     setSelectedStudentId(defaultStudent)
     setCourseMode('standard')
@@ -207,8 +260,8 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     setStartDate(new Date().toISOString().split('T')[0])
     setEndDate(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
     setStatus('Active')
-    setTotalAmount(45000)
-    setPaidNow(15000)
+    setTotalAmount(courseFee > 0 ? courseFee : 45000)
+    setPaidNow(courseFee > 0 ? Math.round(courseFee / 2) : 15000)
     const d = new Date()
     d.setDate(d.getDate() + 30)
     setDueDate(d.toISOString().split('T')[0])
@@ -238,6 +291,11 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
     if (found) {
       if (found.code) {
         setBatchCode(`${found.code}-26A`)
+      }
+      const p = Number(found.price || found.tuition_fee)
+      if (p > 0) {
+        setTotalAmount(p)
+        setPaidNow(Math.round(p / 2))
       }
     }
   }
@@ -382,14 +440,15 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
   // Filtered Roster
   const filteredEnrollments = useMemo(() => {
     return enrollments.filter((item) => {
-      const q = search.toLowerCase()
+      if (!item) return false
+      const q = (search || '').toLowerCase().trim()
       const matchSearch =
         !q ||
-        item.student_name?.toLowerCase().includes(q) ||
-        item.student_code?.toLowerCase().includes(q) ||
-        item.track?.toLowerCase().includes(q) ||
-        item.batch?.toLowerCase().includes(q) ||
-        item.batch_id?.toLowerCase().includes(q)
+        (item.student_name && item.student_name.toLowerCase().includes(q)) ||
+        (item.student_code && item.student_code.toLowerCase().includes(q)) ||
+        (item.track && item.track.toLowerCase().includes(q)) ||
+        (item.batch && item.batch.toLowerCase().includes(q)) ||
+        (item.batch_id && item.batch_id.toLowerCase().includes(q))
 
       const matchCourse = filterCourse === 'All' || item.track === filterCourse
       const matchBatch = filterBatch === 'All' || (item.batch || item.batch_id) === filterBatch
@@ -403,16 +462,16 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
   const distinctBatches = useMemo(() => {
     const set = new Set()
     enrollments.forEach((e) => {
-      if (e.batch || e.batch_id) set.add(e.batch || e.batch_id)
+      if (e && (e.batch || e.batch_id)) set.add(e.batch || e.batch_id)
     })
     return Array.from(set)
   }, [enrollments])
 
   // Metrics
   const totalCount = enrollments.length
-  const activeCount = enrollments.filter((e) => e.status === 'Active').length
-  const coursesCount = new Set(enrollments.map((e) => e.track)).size
-  const avgDays = totalCount > 0 ? Math.round(enrollments.reduce((acc, e) => acc + (Number(e.total_days) || 0), 0) / totalCount) : 0
+  const activeCount = enrollments.filter((e) => e && e.status === 'Active').length
+  const coursesCount = new Set(enrollments.filter(Boolean).map((e) => e.track)).size
+  const avgDays = totalCount > 0 ? Math.round(enrollments.reduce((acc, e) => acc + (Number(e?.total_days) || 0), 0) / totalCount) : 0
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -504,16 +563,27 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     ))}
                   </select>
                   {studentsList.length === 0 && (
-                    <p className="text-[11px] text-overdue mt-1 font-medium">
-                      No students registered. Please add a student in Student Master first.
-                    </p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <p className="text-[11px] text-overdue font-medium">
+                        No students registered. Please add a student in Student Master first.
+                      </p>
+                      {onNavigateToStudents && (
+                        <button
+                          type="button"
+                          onClick={onNavigateToStudents}
+                          className="text-[11px] text-light-primary hover:underline font-bold cursor-pointer"
+                        >
+                          Go to Student Master &rarr;
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
 
                 {/* Selected Student Profile Preview Card */}
                 {selectedStudent ? (
                   <div className="p-3 rounded border border-light-primary/30 bg-light-primary-tint/30 dark:bg-dark-primary-tint/20 flex items-center gap-3">
-                    {selectedStudent.avatar && !selectedStudent.avatar.includes('unsplash.com') ? (
+                    {selectedStudent.avatar && typeof selectedStudent.avatar === 'string' && selectedStudent.avatar.trim().length > 5 && !selectedStudent.avatar.includes('unsplash.com') ? (
                       <img
                         src={selectedStudent.avatar}
                         alt={selectedStudent.full_name}
@@ -627,9 +697,20 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                 <div className="p-3.5 rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-3 animate-in fade-in duration-150">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex-1">
-                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
-                        Select Course Program (From Course Master) *
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface">
+                          Select Course Program (From Course Master) *
+                        </label>
+                        {onNavigateToCourses && (
+                          <button
+                            type="button"
+                            onClick={onNavigateToCourses}
+                            className="text-[10px] text-light-primary hover:underline font-bold cursor-pointer"
+                          >
+                            Course Master &rarr;
+                          </button>
+                        )}
+                      </div>
                       <select
                         required
                         value={selectedCourseId}
@@ -705,7 +786,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
               {/* OPTION B: CUSTOM MODULAR COURSE FRAMING (PICK FROM MODULE MASTER) */}
               {courseMode === 'custom' && (
                 <div className="p-3.5 rounded border border-light-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container flex flex-col gap-3 animate-in fade-in duration-150">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                     <div className="sm:col-span-2">
                       <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
                         Frame Custom Course Title for Student *
@@ -729,6 +810,22 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                         onChange={(e) => setCustomCourseCode(e.target.value)}
                         className="w-full px-3 py-1.5 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-light-on-surface dark:text-dark-on-surface mb-1">
+                        Category / Domain
+                      </label>
+                      <select
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        className="w-full px-3 py-1.5 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
+                      >
+                        <option value="General">General</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Design">Design</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Management">Management</option>
+                      </select>
                     </div>
                   </div>
 
@@ -1317,7 +1414,14 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-light-outline-variant/60 dark:divide-dark-outline-variant/60 font-body text-xs">
-                  {filteredEnrollments.length === 0 ? (
+                  {loading ? (
+                    <tr>
+                      <td colSpan="9" className="py-12 text-center text-light-on-surface-variant">
+                        <span className="material-symbols-outlined text-[32px] text-light-primary animate-spin block mb-1">sync</span>
+                        <p className="font-semibold text-xs">Loading course onboarding roster...</p>
+                      </td>
+                    </tr>
+                  ) : filteredEnrollments.length === 0 ? (
                     <tr>
                       <td colSpan="9" className="py-12 text-center text-light-on-surface-variant">
                         <span className="material-symbols-outlined text-[36px] opacity-40 block mb-1">assignment_late</span>
@@ -1344,10 +1448,10 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                           {/* Student Details */}
                           <td className="py-2.5 px-3 whitespace-nowrap align-middle">
                             <div className="flex items-center gap-2">
-                              {item.student_avatar && !item.student_avatar.includes('unsplash.com') ? (
+                              {typeof item.student_avatar === 'string' && item.student_avatar.trim().length > 5 && !item.student_avatar.includes('unsplash.com') ? (
                                 <img
                                   src={item.student_avatar}
-                                  alt={item.student_name}
+                                  alt={item.student_name || 'Student'}
                                   className="w-7 h-7 rounded-full object-cover shrink-0 border border-light-outline-variant/60 shadow-2xs"
                                 />
                               ) : (
@@ -1357,7 +1461,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                               )}
                               <div>
                                 <span className="font-body text-xs font-semibold text-light-on-surface dark:text-dark-on-surface block">
-                                  {item.student_name}
+                                  {item.student_name || 'Student Name'}
                                 </span>
                                 <span className="font-mono text-[10px] text-light-on-surface-variant block">
                                   {item.student_phone || item.student_email || 'Contact Registered'}
@@ -1392,7 +1496,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                                 {item.total_days || 30} Days
                               </span>
                               <span className="text-[10px] px-1.5 py-0.2 rounded bg-light-primary-tint dark:bg-dark-primary-tint text-light-primary font-semibold">
-                                {item.modules?.length || item.total_modules || 1} Mod
+                                {getRecordModules(item).length} Mod
                               </span>
                             </div>
                           </td>
@@ -1596,27 +1700,30 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
             </div>
 
             {/* Modules List */}
-            <div className="space-y-1.5">
-              <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface block">
-                Assigned Curriculum Modules ({viewingOnboarding.modules?.length || 1}):
-              </span>
-              <div className="divide-y divide-light-outline-variant/60 border border-light-outline-variant rounded overflow-hidden">
-                {(viewingOnboarding.modules && viewingOnboarding.modules.length > 0 ? viewingOnboarding.modules : [
-                  { title: viewingOnboarding.track, days: viewingOnboarding.total_days, status: 'Active' }
-                ]).map((m, idx) => (
-                  <div key={idx} className="p-2 flex items-center justify-between text-xs bg-light-surface-container-lowest dark:bg-dark-surface-bright">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[10px] font-bold text-light-primary">{m.module_code || m.id || `M-${idx + 1}`}</span>
-                      <span className="font-medium text-light-on-surface dark:text-dark-on-surface">{m.title}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {m.instructor && <span className="text-[10px] text-light-on-surface-variant">{m.instructor}</span>}
-                      <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface">{m.days} Days</span>
-                    </div>
+            {(() => {
+              const modsList = getRecordModules(viewingOnboarding)
+              return (
+                <div className="space-y-1.5">
+                  <span className="font-label text-xs font-bold text-light-on-surface dark:text-dark-on-surface block">
+                    Assigned Curriculum Modules ({modsList.length}):
+                  </span>
+                  <div className="divide-y divide-light-outline-variant/60 border border-light-outline-variant rounded overflow-hidden">
+                    {modsList.map((m, idx) => (
+                      <div key={idx} className="p-2 flex items-center justify-between text-xs bg-light-surface-container-lowest dark:bg-dark-surface-bright">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[10px] font-bold text-light-primary">{m.module_code || m.id || `M-${idx + 1}`}</span>
+                          <span className="font-medium text-light-on-surface dark:text-dark-on-surface">{m.title}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {m.instructor && <span className="text-[10px] text-light-on-surface-variant">{m.instructor}</span>}
+                          <span className="font-mono text-xs font-bold text-light-on-surface dark:text-dark-on-surface">{m.days || 1} Days</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              )
+            })()}
 
             <div className="flex justify-end pt-2 border-t border-light-outline-variant dark:border-dark-outline-variant">
               <button
@@ -1639,7 +1746,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
           <div className="bg-light-surface-container-lowest dark:bg-dark-surface-bright border border-light-outline-variant dark:border-dark-outline-variant rounded-md shadow-modal w-full max-w-md p-4 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-light-outline-variant dark:border-dark-outline-variant pb-2">
               <h3 className="font-title text-[15px] font-bold text-light-on-surface dark:text-dark-on-surface">
-                Edit Course Onboarding: {editingOnboarding.student_name}
+                Edit Course Onboarding: {editingOnboarding.student_name || 'Student'}
               </h3>
               <button
                 type="button"
@@ -1658,7 +1765,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                 <input
                   type="text"
                   disabled
-                  value={editingOnboarding.track}
+                  value={editingOnboarding.track || ''}
                   className="w-full px-2 py-1 text-xs rounded border border-light-outline-variant bg-light-surface-container opacity-70"
                 />
               </div>
@@ -1670,7 +1777,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                   </label>
                   <input
                     type="text"
-                    value={editingOnboarding.batch || editingOnboarding.batch_id}
+                    value={editingOnboarding.batch || editingOnboarding.batch_id || ''}
                     onChange={(e) => setEditingOnboarding({ ...editingOnboarding, batch: e.target.value, batch_id: e.target.value })}
                     className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
                   />
@@ -1680,7 +1787,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     Status
                   </label>
                   <select
-                    value={editingOnboarding.status}
+                    value={editingOnboarding.status || 'Active'}
                     onChange={(e) => setEditingOnboarding({ ...editingOnboarding, status: e.target.value })}
                     className="w-full px-2 py-1 text-xs rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-low dark:bg-dark-surface-container text-light-on-surface dark:text-dark-on-surface"
                   >
@@ -1734,7 +1841,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     <input
                       type="number"
                       min="0"
-                      value={editingOnboarding.tuition_fee || editingOnboarding.total_amount || 0}
+                      value={editingOnboarding.tuition_fee ?? editingOnboarding.total_amount ?? 0}
                       onChange={(e) => setEditingOnboarding({ ...editingOnboarding, tuition_fee: Number(e.target.value), total_amount: Number(e.target.value) })}
                       className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
                     />
@@ -1746,7 +1853,7 @@ export function CourseOnboarding({ onNavigateToStudents, onNavigateToCourses }) 
                     <input
                       type="number"
                       min="0"
-                      value={editingOnboarding.paid_amount || 0}
+                      value={editingOnboarding.paid_amount ?? 0}
                       onChange={(e) => setEditingOnboarding({ ...editingOnboarding, paid_amount: Number(e.target.value) })}
                       className="w-full px-2 py-1 text-xs font-mono rounded border border-light-outline-variant dark:border-dark-outline-variant bg-light-surface-container-lowest dark:bg-dark-surface-bright text-light-on-surface dark:text-dark-on-surface"
                     />

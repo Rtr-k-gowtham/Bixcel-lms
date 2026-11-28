@@ -384,7 +384,10 @@ function Dashboard({ currentUser, onLogout }) {
           ) : currentTab === 'students' ? (
             <StudentManagement initialTab="directory" />
           ) : currentTab === 'onboarding' ? (
-            <CourseOnboarding />
+            <CourseOnboarding
+              onNavigateToStudents={() => handleTabChange('students')}
+              onNavigateToCourses={() => handleTabChange('courses')}
+            />
           ) : currentTab === 'departments' ? (
             <DepartmentMaster onNavigateToModules={() => handleTabChange('modules')} />
           ) : currentTab === 'modules' ? (
